@@ -1,0 +1,68 @@
+
+<div class="row justify-content-sm-center" *ngIf="groups.length === 0">
+    <div class="list-group col-sm-12 col-md-6">
+        <div class="list-group-item list-group-item-action">
+          No hi ha cap grup!!
+        </div>
+    </div>
+</div>
+<div class="row justify-content-sm-center">
+  <div class="list-group col-sm-12 col-md-6">
+    <div class="list-group-item list-group-item-action" *ngFor="let group of groups; index as i">
+      <div class="row align-items-center">
+        <div class="col-sm-1">
+          <div class="custom-control custom-checkbox">
+            <input
+              type="checkbox"
+              class="custom-control-input"
+              [attr.id]="group.id"
+              #checkgroup
+              (click)="onCheckGroupClick(group.id, checkgroup.checked)"
+            />
+            <label
+            class="custom-control-label"
+            [attr.for]="group.id"
+          ></label>
+          </div>
+        </div>
+        <h2 class="col-sm-5">
+          <a [routerLink]="[ '/alumnes', group.id ]" class="btn btn-link">{{group.nom}}</a>
+        </h2>
+        <div class="col-sm-1">
+          <i
+            class="fas fa-times fa-2x text-danger "
+            style="cursor: pointer;"
+            (click) = "onDeleteIconClick(i)"
+          ></i>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="row justify-content-sm-center">
+  <div class="col-sm-12 col-md-6">
+    <button class="btn btn-primary mt-2" (click) = "onAfegirClick(afegirGrupModal)">Afegir Grups</button>
+    <button class="btn btn-primary mt-2 ml-2" (click) = "onDeleteGroups()">Esborrar Sel·lecció</button>
+  </div>
+</div>
+
+<ng-template #afegirGrupModal let-modal>
+    <div class="modal-header">
+      <h4 class="modal-title" id="modal-basic-title">Creació de grups</h4>
+      <button type="button" class="close" aria-label="Close" (click)="modal.dismiss()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <form>
+        <div class="form-group">
+          <label for="amount">Quants grups vols crear?</label>
+          <input type="number" class ="form-control" name="amount" id="amount" value=1 style="width: 5em;" #amount>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-primary" (click)="modal.close(amount.value)">Crear</button>
+      <button type="button" class="btn btn-danger" (click)="modal.dismiss()">Cancel·lar</button>
+    </div>
+  </ng-template>

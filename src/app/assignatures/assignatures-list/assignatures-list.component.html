@@ -1,0 +1,7 @@
+<div class="row justify-content-sm-center">
+  <div class="list-group col-sm-12 col-md-6">
+    <div class="list-group-item list-group-item-action" *ngFor="let assignatura of assignatures">
+      <a [routerLink]="[ '/grups', assignatura.id ]" class="btn btn-link">{{assignatura.codi}} - {{assignatura.nom}}</a>
+    </div>
+  </div>
+</div>
