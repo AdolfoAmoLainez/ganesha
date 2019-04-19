@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { Location } from '@angular/common';
 
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
-import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-alumnes-list',
@@ -15,12 +16,12 @@ export class AlumnesListComponent implements OnInit {
   selectedAlumnes = [];
 
   constructor(private modalService: NgbModal,
-              private activatedRoute: ActivatedRoute) { }
+              private activatedRoute: ActivatedRoute,
+              private myLocation: Location) { }
 
   ngOnInit() {
     this.activatedRoute.params.subscribe(
       (params) => {
-        console.log(params);
         this.alumnes = [
           {
             id: 1,
@@ -39,7 +40,7 @@ export class AlumnesListComponent implements OnInit {
           }
         ];
       }
-    )
+    );
   }
 
   onDeleteIconClick(id: number) {
@@ -77,6 +78,10 @@ export class AlumnesListComponent implements OnInit {
         console.log('Cancelado');
       }
     );
+  }
+
+  onBackClick() {
+    this.myLocation.back();
   }
 
 }

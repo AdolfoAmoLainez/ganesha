@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import { ActivatedRoute } from '@angular/router';
+import { Location } from '@angular/common';
+
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'app-groups-list',
@@ -14,12 +16,12 @@ export class GroupsListComponent implements OnInit {
   selectedGroups = [];
 
   constructor(private modalService: NgbModal,
-              private activatedRoute: ActivatedRoute) { }
+              private activatedRoute: ActivatedRoute,
+              private myLocation: Location) { }
 
   ngOnInit() {
     this.activatedRoute.params.subscribe(
       (params) => {
-        console.log(params);
         this.groups = [
           {
             id: 1 + params.assignaturaid * 10,
@@ -78,6 +80,10 @@ export class GroupsListComponent implements OnInit {
 
   onDeleteIconClick(id: number) {
     this.groups.splice(id, 1);
+  }
+
+  onBackClick() {
+    this.myLocation.back();
   }
 
 }
