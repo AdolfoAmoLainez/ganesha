@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { DataBaseService } from 'src/app/shared/database.service';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-assignatures-list',
@@ -7,27 +9,24 @@ import { Component, OnInit } from '@angular/core';
 })
 export class AssignaturesListComponent implements OnInit {
 
-  assignatures = [
-    {
-      id: 1,
-      codi: '11223311',
-      nom: 'Assignatura 01'
-    },
-    {
-      id: 2,
-      codi: '11223322',
-      nom: 'Assignatura 02'
-    },
-    {
-      id: 3,
-      codi: '11223333',
-      nom: 'Assignatura 03'
-    }
-  ];
+  assignatures = [];
+  perfil = 'adm';
 
-  constructor() { }
+  constructor(private dbService: DataBaseService,
+              private route: ActivatedRoute,
+              private router: Router) { }
 
   ngOnInit() {
+    this.assignatures = this.dbService.getAssignatures();
+    this.perfil = this.route.snapshot.data.perfil;
+
+  }
+  onAssignaturaClick(codi) {
+    this.router.navigate(['assignatura',codi]);
+  }
+
+  onAssignaturaProfeClick(codi) {
+    this.router.navigate(['professor', 'grups', codi]);
   }
 
 }

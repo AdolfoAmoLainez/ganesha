@@ -1,9 +1,22 @@
 <div class="container-fluid">
   <app-header></app-header>
 </div>
-<div class="container">
- <!-- <app-assignatures-list></app-assignatures-list> -->
- <!-- <app-groups-list></app-groups-list> -->
- <router-outlet></router-outlet>
-
+<div class="container-fluid">
+  <div class="row justify-content-sm-center" *ngIf="perfil == 'profe'">
+    <div class="col-sm-12 col-md-9">
+        <router-outlet></router-outlet>
+    </div>
+  </div>
+  <div class="row" *ngIf="perfil == 'adm'">
+    <div class="col-sm-12 col-md-2">
+      <router-outlet name="leftbar"></router-outlet>
+    </div>
+    <div class="col-sm-12 col-md-9">
+      <router-outlet></router-outlet>
+    </div>
+  </div>
 </div>
+
+
+
+

@@ -1,0 +1,31 @@
+<ul class="list-group mt-4">
+  <div class="list-group-item list-group-item-primary" >
+      <div class="row align-items-center">
+        <div class="col-sm">
+          <h5>
+            Assignatura tal y cual
+          </h5>
+        </div>
+      </div>
+    </div>
+</ul>
+<div class="row">
+  <div class="col">
+    <ul class="nav nav-tabs nav-fill">
+      <li class="nav-item">
+        <a class="nav-link active" [routerLink]="['grups']" routerLinkActive="active">Grups</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" [routerLink]="['professors']" routerLinkActive="active">Professors</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" [routerLink]="['info']" routerLinkActive="active">Info</a>
+      </li>
+    </ul>
+  </div>
+</div>
+<div class="row">
+  <div class="col">
+    <router-outlet></router-outlet>
+  </div>
+</div>
