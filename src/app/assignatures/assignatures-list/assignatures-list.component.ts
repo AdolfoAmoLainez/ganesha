@@ -29,4 +29,8 @@ export class AssignaturesListComponent implements OnInit {
     this.router.navigate(['professor', 'grups', codi]);
   }
 
+  onAssignaturaAddClick() {
+    this.router.navigate(['addassignatura']);
+  }
+
 }

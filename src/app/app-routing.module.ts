@@ -20,6 +20,7 @@ const routes: Routes = [
     { path: 'professors', component: ProfessorsListComponent, data: {perfil: 'adm'}},
     { path: 'info', component: AssignaturaInfoComponent}
   ]},
+  { path: 'addassignatura', component: AssignaturaInfoComponent, data: {perfil: 'adm'}}
   // { path: 'path', component: FeatureComponent },
   // { path: '**', component: PageNotFoundComponent },
 ];

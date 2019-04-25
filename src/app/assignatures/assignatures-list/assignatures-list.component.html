@@ -20,6 +20,16 @@
   </div>
 </div>
 <div class="list-group" *ngIf="perfil == 'adm'">
+    <a
+    class="btn btn-primary text-white text-left"
+    role="button"
+    aria-pressed="true"
+    (click)="onAssignaturaAddClick()"
+    ><i
+      class="fas fa-plus text-white mr-2"
+      style="cursor: pointer;"
+    ></i>Afegir assignatura</a
+  >
   <button *ngFor="let assignatura of assignatures"
     type="button"
     class="list-group-item list-group-item-action"
