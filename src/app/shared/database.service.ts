@@ -1,4 +1,8 @@
 import { Injectable } from '@angular/core';
+import { HttpClient} from '@angular/common/http';
+
+import { Assignatura } from '../shared/assignatura.model';
+import { Subject } from 'rxjs';
 
 @Injectable()
 export class DataBaseService {
@@ -20,8 +24,23 @@ export class DataBaseService {
     }
   ];
 
+  assignaturesUpdated = new Subject <Assignatura []>();
+
+  constructor(private http: HttpClient) {}
+
   getAssignatures() {
-    return this.assignatures;
+    return this.http.get<{assignatures: Assignatura[]}>('http://localhost:3000/api/crud/assignatures').subscribe(
+      (data: any) => {
+        console.log(data);
+
+        this.assignaturesUpdated.next(data.json);
+      }
+    );
+    //return this.assignatures;
+  }
+
+  getAssignatura(id: string) {
+    return this.http.get<{assignatura: Assignatura}>('http://localhost:3000/api/crud/assignatures/' + id);
   }
 
 }

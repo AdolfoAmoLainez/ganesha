@@ -1,5 +1,5 @@
 <div class="card-body">
-    <form>
+    <form [formGroup]="assignaturaForm">
       <div class="form-group row">
         <label for="codi" class="col-sm-3 col-form-label"
           >Codi:</label
@@ -9,8 +9,9 @@
             type="text"
             readonly
             class="form-control-plaintext"
-            id="nom"
-            value="11223355"
+            id="codi"
+            name="codi"
+            formControlName = "codi"
           />
         </div>
       </div>
@@ -23,7 +24,8 @@
             type="text"
             class="form-control"
             id="nom"
-            value="Assignatura02"
+            name="nom"
+            formControlName = "nom"
           />
         </div>
       </div>
@@ -36,12 +38,13 @@
             type="number"
             class="form-control"
             id="tamany"
-            value="250"
+            name="tamany"
+            formControlName = "tamany"
             placeholder="Tamany"
           />
         </div>
         <div class="col-sm-3">
-          <select class="custom-select">
+          <select class="custom-select" formControlName = "unitatstamany" name="unitatstamany">
             <option selected>Gb</option>
             <option value="1">Mb</option>
           </select>
@@ -56,12 +59,13 @@
             type="number"
             class="form-control"
             id="quota"
-            value="50"
+            name="quota"
+            formControlName = "quota"
             placeholder="Tamany"
           />
         </div>
         <div class="col-sm-3">
-          <select class="custom-select">
+          <select class="custom-select" formControlName = "unitatsquota" name="unitatsquota">
             <option selected>Gb</option>
             <option value="1">Mb</option>
           </select>
