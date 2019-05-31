@@ -8,13 +8,13 @@ import { Router } from '@angular/router';
 })
 export class AppComponent implements AfterViewInit {
   title = 'ganesha';
-  perfil = 'adm';
+  perfil = 'profe';
 
   constructor(private router: Router) {}
 
   ngAfterViewInit(): void {
     if (this.perfil === 'adm') {
-      console.log('por aqui');
+      //console.log('por aqui');
 
       this.router.navigate([{outlets: {primary: ['assignatura', 1], leftbar: ['adm']}}]);
     } else {

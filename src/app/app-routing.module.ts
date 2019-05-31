@@ -11,11 +11,11 @@ import { AssignaturaViewComponent } from './assignatures/assignatura-view/assign
 const routes: Routes = [
   { path: 'professor', component: AssignaturesListComponent, data: {perfil: 'profe'}},
     { path: 'professor/grups/:assignaturaid', component: GroupsListComponent},
-    { path: 'professor/alumnes/:groupid', component: AlumnesListComponent},
+    { path: 'professor/alumnes/:grupid', component: AlumnesListComponent},
   { path: 'adm', component: AssignaturesListComponent, outlet: 'leftbar', data: {perfil: 'adm'}},
   { path: 'assignatura/:assignaturaid', component: AssignaturaViewComponent, data: {perfil: 'adm'}, children: [
     { path: 'grups', component: GroupsListComponent, data: {perfil: 'adm'}, children: [
-      { path: 'alumnes/:groupid', component: AlumnesListComponent}
+      { path: 'alumnes/:grupid', component: AlumnesListComponent}
     ]},
     { path: 'professors', component: ProfessorsListComponent, data: {perfil: 'adm'}},
     { path: 'info', component: AssignaturaInfoComponent}

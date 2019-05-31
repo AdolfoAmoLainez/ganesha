@@ -1,10 +1,13 @@
 import { Component, OnInit, OnDestroy} from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, ParamMap } from '@angular/router';
 import { Location } from '@angular/common';
 
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import { Subscription } from 'rxjs';
 import { MymodalyesnoComponent } from '../shared/mymodalyesno/mymodalyesno.component';
+import { DataBaseService } from '../shared/database.service';
+import { FormGroup, FormControl, Validators } from '@angular/forms';
+import { Assignatura } from '../shared/assignatura.model';
 
 
 @Component({
@@ -18,12 +21,19 @@ export class GroupsListComponent implements OnInit, OnDestroy {
   groups = [];
   selectedGroups = [];
   groupToDel: string;
+  assignaturaId;
+  assignatura: Assignatura;
+  isLoading = true;
+  factorUnitats: number;
+
+  addGroupsFrom: FormGroup;
 
   paramsSubs: Subscription;
 
   constructor(private modalService: NgbModal,
               private activatedRoute: ActivatedRoute,
-              private myLocation: Location) { }
+              private myLocation: Location,
+              private dbService: DataBaseService) { }
 
   ngOnInit() {
 
@@ -32,54 +42,58 @@ export class GroupsListComponent implements OnInit, OnDestroy {
     }
 
     if (this.perfil === 'adm') {
-      this.paramsSubs = this.activatedRoute.parent.params.subscribe(
-        (params) => {
-          this.groups = [
-            {
-              id: 1 + params.assignaturaid * 10,
-              nom: '11223311-g01',
-              ordre: 1
-            },
-            {
-              id: 2 + params.assignaturaid * 10,
-              nom: '11223311-g02',
-              ordre: 2
-            },
-            {
-              id: 3 + params.assignaturaid * 10,
-              nom: '11223311-g03',
-              ordre: 3
+
+      if (this.activatedRoute.parent.paramMap) {
+        this.paramsSubs = this.activatedRoute.parent.paramMap.subscribe(
+          (paramMap: ParamMap) => {
+            if (paramMap.has('assignaturaid')) {
+              this.assignaturaId = paramMap.get('assignaturaid');
+              this.loadGrups();
             }
-          ];
-        }
-        );
-    } else {
-      this.paramsSubs = this.activatedRoute.params.subscribe(
-        (params) => {
-          this.groups = [
-            {
-              id: 1 + params.assignaturaid * 10,
-              nom: '11223311-g01',
-              ordre: 1
-            },
-            {
-              id: 2 + params.assignaturaid * 10,
-              nom: '11223311-g02',
-              ordre: 2
-            },
-            {
-              id: 3 + params.assignaturaid * 10,
-              nom: '11223311-g03',
-              ordre: 3
-            }
-          ];
-        }
-        );
+          });
       }
+
+    } else {
+
+      if (this.activatedRoute.paramMap) {
+        this.paramsSubs = this.activatedRoute.paramMap.subscribe(
+          (paramMap: ParamMap) => {
+            if (paramMap.has('assignaturaid')) {
+              this.assignaturaId = paramMap.get('assignaturaid');
+              this.loadGrups();
+            }
+          });
+      }
+
+    }
+
+    this.dbService.getFactorUnitats().subscribe(
+      (resultat) => {
+        this.factorUnitats = resultat.json[0].factor;
+      }
+    );
   }
 
   ngOnDestroy() {
     this.paramsSubs.unsubscribe();
+  }
+
+  loadGrups() {
+    this.isLoading = true;
+
+    this.dbService.getAssignatura(this.assignaturaId).subscribe(
+      (assig: Assignatura) => {
+        this.assignatura = assig;
+
+        this.dbService.getGrupsAssignatura(this.assignaturaId).subscribe(
+          (data: any) => {
+            this.groups = data.json;
+            this.isLoading = false;
+          }
+        );
+      }
+    );
+
   }
 
   onDeleteGroups() {
@@ -115,9 +129,16 @@ export class GroupsListComponent implements OnInit, OnDestroy {
   }
 
   onAfegirClick(content) {
+    this.addGroupsFrom = new FormGroup({
+        quantitat: new FormControl(1, [ Validators.required, Validators.pattern(/^-?(0|[1-9]\d*)?$/)]),
+        quota: new FormControl(1, [ Validators.required, Validators.pattern(/^-?(0|[1-9]\d*)?$/)])
+      }
+    );
+
     this.modalService.open(content, {ariaLabelledBy: 'modal-basic-title'}).result.then(
-      (quantitat) => {
-        console.log('Vol crear ' + quantitat + ' grups.');
+      (resposta) => {
+        console.log('Vol crear ' + resposta.quantitat + ' grups.');
+        console.log('Amb quota ' + resposta.quota + ' minuts. Que son ' + (resposta.quota * this.factorUnitats).toFixed(1) + 'Gb.');
       },
       () => {
         console.log('Cancelado');

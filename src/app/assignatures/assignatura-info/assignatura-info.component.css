@@ -1,0 +1,7 @@
+@media screen and (min-width: 600px) {
+  .info_card {
+    width: 500px;
+    margin-left: 0;
+    margin-right: auto;
+  }
+}

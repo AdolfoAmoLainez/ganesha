@@ -1,26 +1,35 @@
-import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { ActivatedRoute, ParamMap } from '@angular/router';
 import { Location } from '@angular/common';
 
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import { MymodalyesnoComponent } from '../shared/mymodalyesno/mymodalyesno.component';
+import { DataBaseService } from '../shared/database.service';
+import { Professor } from '../shared/professor.model';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-professors-list',
   templateUrl: './professors-list.component.html' ,
   styleUrls: ['./professors-list.component.css']
 })
-export class ProfessorsListComponent implements OnInit {
+export class ProfessorsListComponent implements OnInit, OnDestroy {
+
+  isLoading = true;
 
   professors = [];
 
   selectedProfessors = [];
 
+  assignaturaId: string;
+
   perfil = 'adm';
+  paramsSubs: Subscription;
 
   constructor(private modalService: NgbModal,
               private activatedRoute: ActivatedRoute,
-              private myLocation: Location) { }
+              private myLocation: Location,
+              private dbService: DataBaseService) { }
 
   ngOnInit() {
 
@@ -28,26 +37,27 @@ export class ProfessorsListComponent implements OnInit {
       this.perfil = this.activatedRoute.parent.snapshot.data.perfil;
     }
 
-    this.activatedRoute.params.subscribe(
-      (params) => {
-        this.professors = [
-          {
-            id: 1,
-            niu: 1112233,
-            nom: 'Aitor Tilla Fria'
-          },
-          {
-            id: 2,
-            niu: 1112244,
-            nom: 'Carmelo Cotón Maduro'
-          },
-          {
-            id: 3,
-            niu: 1112255,
-            nom: 'Olga Rapata Perro'
+    if (this.activatedRoute.parent.paramMap) {
+      this.paramsSubs = this.activatedRoute.parent.paramMap.subscribe(
+        (paramMap: ParamMap) => {
+          if (paramMap.has('assignaturaid')) {
+            this.assignaturaId = paramMap.get('assignaturaid');
+            this.loadProfessors();
           }
-        ];
-        this.selectedProfessors = [];
+        });
+    }
+
+  }
+  ngOnDestroy() {
+    this.paramsSubs.unsubscribe();
+  }
+
+  loadProfessors() {
+    this.isLoading = true;
+    this.dbService.getProfessorsAssignatura(this.assignaturaId).subscribe(
+      (data: any) => {
+        this.professors = data.json;
+        this.isLoading = false;
       }
     );
   }
@@ -59,7 +69,13 @@ export class ProfessorsListComponent implements OnInit {
     modalRef.result.then(
       (resposta) => {
         console.log('Vol esborrar el professor!' + resposta);
-        this.professors.splice(id, 1);
+        //this.professors.splice(id, 1);
+        this.dbService.deleteProfessorAssignatura(id).subscribe(
+          (data) => {
+            console.log(data);
+            this.loadProfessors();
+          }
+        );
       },
       () => {
         console.log('Cancelado');
@@ -79,6 +95,20 @@ export class ProfessorsListComponent implements OnInit {
     this.modalService.open(content, {ariaLabelledBy: 'modal-basic-title'}).result.then(
       (niu) => {
         console.log('Vol afegir el niu ' + niu + '.');
+        const professor: Professor = {
+          id: null,
+          niu: niu,
+          nom: "Buscar a LDAP?",
+          assignatura_id: this.assignaturaId
+        };
+
+        this.dbService.addProfessorAssignatura(professor).subscribe(
+          (data: any) => {
+            //console.log(data);
+
+            this.professors.push(data.json[0]);
+          }
+        )
       },
       () => {
         console.log('Cancelado');
@@ -97,15 +127,22 @@ export class ProfessorsListComponent implements OnInit {
     modalRef.result.then(
       (resposta) => {
         console.log('Vol esborrar tots els grups.');
-        this.selectedProfessors.forEach(
-          (selectedProfe) => {
-            this.professors = this.professors.filter(
-              (value) => {
-                return value.id !== selectedProfe;
+        this.dbService.deleteProfessorsAssignatura(this.selectedProfessors.join()).subscribe(
+          (data: any) => {
+            console.log(data);
+            this.selectedProfessors.forEach(
+              (selectedProfe) => {
+                this.professors = this.professors.filter(
+                  (value) => {
+                    return value.id !== selectedProfe;
+                  }
+                );
               }
             );
+            this.selectedProfessors = [];
           }
         );
+
       },
       () => {
         console.log('Cancelado');

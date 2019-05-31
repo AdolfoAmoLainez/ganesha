@@ -2,7 +2,9 @@ export interface Assignatura {
   id: number;
   codi: string;
   nom: string;
-  unitat: number;
+  unitat_id: number;
   tamany: number;
-  quota: number;
+  unitatstamany: string;
+  // quota: number;
+  // unitatsquota: string;
 }

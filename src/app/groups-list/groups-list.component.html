@@ -1,4 +1,10 @@
-<div class="row">
+<div class="text-center" *ngIf="isLoading">
+  <div class="spinner-border" style="width: 3rem; height: 3rem;" role="status" >
+    <span class="sr-only">Carregant...</span>
+  </div>
+</div>
+
+<div class="row " *ngIf="!isLoading">
   <div class="col-sm-6">
     <div class="list-group">
       <div class="list-group-item list-group-item-primary mt-4" *ngIf="perfil == 'profe'">
@@ -12,7 +18,7 @@
           </div>
           <div class="col-sm ml-2">
             <h5>
-              Assignatura tal y cual
+              {{assignatura.nom}}
             </h5>
           </div>
         </div>
@@ -37,12 +43,12 @@
               <label class="custom-control-label" [attr.for]="group.id"></label>
             </div>
           </div>
-          <h2 class="col-sm-5">
+          <h2 class="col-sm-6">
             <a *ngIf="perfil == 'profe'" [routerLink]="['/professor','alumnes', group.id]" class="btn btn-link">{{
-              group.nom
+              assignatura.codi + '-g' + group.ordre
             }}</a>
             <a *ngIf="perfil == 'adm'" [routerLink]="['alumnes', group.id]" class="btn btn-link">{{
-              group.nom
+              assignatura.codi + '-g' + group.ordre
             }}</a>
           </h2>
           <div class="col-sm-1">
@@ -57,7 +63,7 @@
       <div class="list-group-item">
         <button
           class="btn btn-primary mt-2"
-          (click)="onAfegirClick(afegirGrupModal)"
+          (click)="onAfegirClick(afegirGrupsModal)"
         >
           Afegir Grups
         </button>
@@ -71,3 +77,42 @@
     <router-outlet></router-outlet>
   </div>
 </div>
+
+<ng-template #afegirGrupsModal let-modal>
+    <div class="modal-header">
+      <h4 class="modal-title" id="modal-basic-title">Afegir Grups</h4>
+      <button
+        type="button"
+        class="close"
+        aria-label="Close"
+        (click)="modal.dismiss()"
+      >
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <form [formGroup]="addGroupsFrom">
+        <div class="form-group">
+          <label for="amount">Quants grups vols afegir?:</label>
+          <input type="number" class="form-control" name="quantitat" id="quantitat" #quantitat formControlName="quantitat" />
+        </div>
+        <div class="form-group">
+          <label for="quota">De quants minuts?:</label>
+          <input type="number" class="form-control" name="quota" id="quota" #quota formControlName="quota" />
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button
+        type="button"
+        class="btn btn-primary"
+        (click)="modal.close({quantitat: quantitat.value, quota: quota.value})"
+        [disabled]="!addGroupsFrom.valid"
+      >
+        Crear
+      </button>
+      <button type="button" class="btn btn-danger" (click)="modal.dismiss()">
+        Cancel·lar
+      </button>
+    </div>
+  </ng-template>
