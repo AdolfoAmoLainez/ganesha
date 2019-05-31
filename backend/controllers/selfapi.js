@@ -1,5 +1,11 @@
 
+/**
+ * Request:
+ *  assignatura
+ *  quantitat de grups
+ */
 exports.crearGrups = (req, res) => {
+  console.log(req);
   console.log("Creació de grups!");
   res.status(200).json({message: 'Fet!'});
 }

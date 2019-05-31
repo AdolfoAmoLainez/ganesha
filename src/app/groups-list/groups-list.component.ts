@@ -29,6 +29,7 @@ export class GroupsListComponent implements OnInit, OnDestroy {
   addGroupsFrom: FormGroup;
 
   paramsSubs: Subscription;
+  grupsUpdatedSubs: Subscription;
 
   constructor(private modalService: NgbModal,
               private activatedRoute: ActivatedRoute,
@@ -40,6 +41,12 @@ export class GroupsListComponent implements OnInit, OnDestroy {
     if (this.activatedRoute.parent.snapshot.data.perfil) {
       this.perfil = this.activatedRoute.parent.snapshot.data.perfil;
     }
+
+    this.grupsUpdatedSubs = this.dbService.grupsUpdated.subscribe(
+      () => {
+        this.loadGrups();
+      }
+    );
 
     if (this.perfil === 'adm') {
 
@@ -76,6 +83,7 @@ export class GroupsListComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.paramsSubs.unsubscribe();
+    this.grupsUpdatedSubs.unsubscribe();
   }
 
   loadGrups() {
@@ -139,6 +147,7 @@ export class GroupsListComponent implements OnInit, OnDestroy {
       (resposta) => {
         console.log('Vol crear ' + resposta.quantitat + ' grups.');
         console.log('Amb quota ' + resposta.quota + ' minuts. Que son ' + (resposta.quota * this.factorUnitats).toFixed(1) + 'Gb.');
+        this.dbService.addGrupsAssignatura(this.assignatura, resposta.quantitat, resposta.quota);
       },
       () => {
         console.log('Cancelado');
@@ -150,7 +159,7 @@ export class GroupsListComponent implements OnInit, OnDestroy {
 
     const modalRef = this.modalService.open(MymodalyesnoComponent);
     modalRef.componentInstance.titol = 'Esborrar Grup';
-    modalRef.componentInstance.missatge = 'Vols esborrar els grups ' + grupNom + '?';
+    modalRef.componentInstance.missatge = 'Vols esborrar el grup ' + grupNom + '?';
     modalRef.result.then(
       (resposta) => {
         console.log('Vol esborrar el grup!' + resposta);

@@ -31,6 +31,7 @@ export class DataBaseService {
 
   assignaturesUpdated = new Subject <Assignatura []>();
   assignaturaChanged = new Subject <Assignatura>();
+  grupsUpdated = new Subject();
 
   constructor(private http: HttpClient) {}
 
@@ -106,6 +107,23 @@ export class DataBaseService {
     return this.http.post<{professor: Professor}>('http://localhost:3000/api/crud/professors', professor);
   }
 
+  /** GRUPS */
+
+  addGrupsAssignatura(assignatura: Assignatura, quantitat: number, quota: number) {
+    const obj = {
+      assignatura,
+      quantitat,
+      quota
+    };
+
+    return this.http.post('http://localhost:3000/selfapi/crea_grups', obj).subscribe(
+      (response) => {
+        console.log(response);
+
+        this.grupsUpdated.next();
+      }
+    );
+  }
 
   getGrupsAssignatura(assignaturaId: string) {
     return this.http.get<{grups: Grup[]}> ('http://localhost:3000/api/crud/grups?assignatura_id[LIKE]=' + assignaturaId);
