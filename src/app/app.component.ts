@@ -8,7 +8,7 @@ import { Router } from '@angular/router';
 })
 export class AppComponent implements AfterViewInit {
   title = 'ganesha';
-  perfil = 'profe';
+  perfil = 'adm';
 
   constructor(private router: Router) {}
 

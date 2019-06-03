@@ -18,6 +18,11 @@ export class AssignaturaInfoComponent implements OnInit {
   assignaturaForm: FormGroup;
   assignaturaId;
   editMode = false;
+  lvmInfo = {
+    volname: '',
+    tamany: '',
+    disponible: ''
+  };
 
   constructor(private activatedRoute: ActivatedRoute,
               private dbService: DataBaseService) {}
@@ -75,6 +80,12 @@ export class AssignaturaInfoComponent implements OnInit {
         }
       );
     }
+
+    this.dbService.getLvmInfo().subscribe(
+      (data) => {
+        this.lvmInfo = data.json[0];
+      }
+    )
   }
 
   onAddAssignatura() {

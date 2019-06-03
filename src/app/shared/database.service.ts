@@ -29,11 +29,17 @@ export class DataBaseService {
     }
   ];
 
-  assignaturesUpdated = new Subject <Assignatura []>();
   assignaturaChanged = new Subject <Assignatura>();
+  assignaturesUpdated = new Subject <Assignatura []>();
   grupsUpdated = new Subject();
+  alumnesUpdated = new Subject();
 
   constructor(private http: HttpClient) {}
+
+
+  getLvmInfo() {
+    return this.http.get<{codi: number, message: string, json: any}>('http://localhost:3000/selfapi/getlvminfo');
+  }
 
   getAssignatures() {
     return this.http.get<{assignatures: Assignatura[]}>('http://localhost:3000/api/crud/assignatures').subscribe(
@@ -109,7 +115,7 @@ export class DataBaseService {
 
   /** GRUPS */
 
-  addGrupsAssignatura(assignatura: Assignatura, quantitat: number, quota: number) {
+  addGrupsAssignatura(assignatura: Assignatura, quantitat: number, quota: string) {
     const obj = {
       assignatura,
       quantitat,
@@ -125,19 +131,37 @@ export class DataBaseService {
     );
   }
 
+  deleteGrupsAssignatura(grups: number[]) {
+
+    return this.http.post('http://localhost:3000/selfapi/esborra_grups', grups).subscribe(
+      (response) => {
+        console.log(response);
+
+        this.grupsUpdated.next();
+      }
+    );
+
+  }
+
   getGrupsAssignatura(assignaturaId: string) {
     return this.http.get<{grups: Grup[]}> ('http://localhost:3000/api/crud/grups?assignatura_id[LIKE]=' + assignaturaId);
   }
 
   getGrupInfo(id: string) {
     const query = {
-      query: 'SELECT assignatures.codi, grups.ordre FROM `grups` INNER JOIN assignatures on assignatures.id = grups.assignatura_id WHERE grups.id=' + id
+      query: 'SELECT assignatures.codi, grups.* FROM `grups` INNER JOIN assignatures on assignatures.id = grups.assignatura_id WHERE grups.id=' + id
     };
 
     return this.http.post<{result: string, json: any, length: number}>('http://localhost:3000/api/custom/', query).pipe(
       map(
         (data: any) => {
-          return {assignatura_codi: data.json[0].codi, grup_ordre: data.json[0].ordre};
+          const grup: Grup = {
+            id: data.json[0].id,
+            assignatura_id: data.json[0].assignatura_id,
+            quota: data.json[0].quota,
+            ordre: data.json[0].ordre
+          }
+          return {assignatura_codi: data.json[0].codi, grup: grup};
         }
       )
     );
@@ -158,20 +182,29 @@ export class DataBaseService {
   }
 
   addAlumneGrup(alumne: Alumne) {
-      return this.http.post<{alumne: Alumne}>('http://localhost:3000/api/crud/alumnes', alumne);
+      return this.http.post<{result: string, json: any, length: number}>('http://localhost:3000/selfapi/add_alumne_grup', alumne).subscribe(
+        (data) => {
+          this.alumnesUpdated.next();
+        }
+      );
   }
 
-  deleteAlumneGrup(alumneId: number) {
-    return this.http.delete('http://localhost:3000/api/crud/alumnes/' + alumneId);
+  deleteAlumnesGrup(alumnes: Alumne[]) {
+    return this.http.post<{result: string, json: any, length: number}>
+      ('http://localhost:3000/selfapi/delete_alumnes_grup', alumnes).subscribe(
+        (data) => {
+          this.alumnesUpdated.next();
+        }
+      );
   }
 
-  deleteAlumnesGrup(alumneList: string) {
-    const query = {
-      query: 'DELETE FROM alumnes WHERE id IN (' + alumneList + ');'
-    };
+  // deleteAlumnesGrup(alumneList: string) {
+  //   const query = {
+  //     query: 'DELETE FROM alumnes WHERE id IN (' + alumneList + ');'
+  //   };
 
-    return this.http.post('http://localhost:3000/api/custom/', query);
-  }
+  //   return this.http.post('http://localhost:3000/api/custom/', query);
+  // }
 
   getFactorUnitats() {
     return this.http.get<{result: string, json: any, length: number}> ('http://localhost:3000/api/crud/factorunitats/1');

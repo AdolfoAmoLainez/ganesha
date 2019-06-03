@@ -1,113 +1,149 @@
-<div class="card-body info_card">
-  <form [formGroup]="assignaturaForm">
-    <div class="form-group row">
-      <label for="codi" class="col-sm-3 col-form-label">Codi:</label>
-      <div class="col-sm-9">
-        <input
-          type="text"
-          [readonly]="editMode"
-          [class.form-control-plaintext]="editMode"
-          id="codi"
-          name="codi"
-          formControlName="codi"
-        />
+<div class="row" >
+  <div class="col-sm-12 mb-2" *ngIf="editMode == false">
+      <ul class="list-group">
+          <div class="list-group-item list-group-item-primary" >
+                  <h5>
+                    Afegir Assignatura Nova
+                  </h5>
+            </div>
+        </ul>
+  </div>
+  <div class="col-sm-6">
+      <form [formGroup]="assignaturaForm">
+        <div class="form-group row">
+          <label for="codi" class="col-sm-3 col-form-label">Codi:</label>
+          <div class="col-sm-9">
+            <input
+              type="text"
+              [readonly]="editMode"
+              [class.form-control-plaintext]="editMode"
+              id="codi"
+              name="codi"
+              formControlName="codi"
+            />
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="nom" class="col-sm-3 col-form-label">Nom complert:</label>
+          <div class="col-sm-9">
+            <input
+              type="text"
+              class="form-control"
+              id="nom"
+              name="nom"
+              formControlName="nom"
+            />
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="unitat_id" class="col-sm-3 col-form-label">Unitat:</label>
+          <div class="col-sm-3">
+            <select
+              class="custom-select form-control"
+              id="unitat_id"
+              name="unitat_id"
+              formControlName="unitat_id"
+            >
+              <option
+                *ngFor="let unitat of unitatsDisponibles"
+                [value]="unitat.id"
+                >{{ unitat.lletra }}</option
+              >
+            </select>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="tamany" class="col-sm-3 col-form-label">Tamany:</label>
+          <div class="col-sm-3">
+            <input
+              type="number"
+              class="form-control"
+              id="tamany"
+              name="tamany"
+              formControlName="tamany"
+              placeholder="Tamany"
+            />
+          </div>
+          <div class="col-sm-3">
+            <select
+              class="custom-select"
+              formControlName="unitatstamany"
+              name="unitatstamany"
+            >
+              <option selected>Gb</option>
+              <option value="1">Mb</option>
+            </select>
+          </div>
+        </div>
+        <!-- <div class="form-group row">
+          <label for="quota" class="col-sm-3 col-form-label">Quota:</label>
+          <div class="col-sm-3">
+            <input
+              type="number"
+              class="form-control"
+              id="quota"
+              name="quota"
+              formControlName="quota"
+              placeholder="Tamany"
+            />
+          </div>
+          <div class="col-sm-3">
+            <select
+              class="custom-select"
+              formControlName="unitatsquota"
+              name="unitatsquota"
+            >
+              <option selected>Gb</option>
+              <option value="1">Mb</option>
+            </select>
+          </div>
+        </div> -->
+        <div class="form-group row" *ngIf="editMode == true">
+          <div class="col-sm-12">
+            <button type="submit" class="btn btn-primary" [disabled]="!assignaturaForm.dirty" (click)="onUpdateAssignatura()">
+              Actualitzar
+            </button>
+          </div>
+        </div>
+        <div class="form-group row" *ngIf="editMode == false">
+          <div class="col-sm-12">
+            <button
+              type="submit"
+              [disabled]="!assignaturaForm.valid"
+              [class]="
+                assignaturaForm.valid ? 'btn btn-success' : 'btn btn-warning'
+              "
+              (click)="onAddAssignatura()"
+            >
+              Afegir
+            </button>
+          </div>
+        </div>
+      </form>
+
+
+  </div>
+  <div class="col-sm-6" *ngIf="editMode == false">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Info {{lvmInfo.volname}}</h5>
+          <form>
+              <div class="form-group row">
+                <label for="tamanyvol" class="col-sm-3 col-form-label">Tamany</label>
+                <div class="col-sm-9">
+                  <input type="text" readonly class="form-control-plaintext" id="tamanyvol" [value]="lvmInfo.tamany">
+                </div>
+              </div>
+              <div class="form-group row">
+                <label for="disponible" class="col-sm-3 col-form-label">Disponible</label>
+                <div class="col-sm-9">
+                  <input type="text" readonly class="form-control-plaintext" id="disponible" [value]="lvmInfo.disponible">
+                </div>
+              </div>
+            </form>
+
+        </div>
       </div>
     </div>
-    <div class="form-group row">
-      <label for="nom" class="col-sm-3 col-form-label">Nom complert:</label>
-      <div class="col-sm-9">
-        <input
-          type="text"
-          class="form-control"
-          id="nom"
-          name="nom"
-          formControlName="nom"
-        />
-      </div>
-    </div>
-    <div class="form-group row">
-      <label for="unitat_id" class="col-sm-3 col-form-label">Unitat:</label>
-      <div class="col-sm-3">
-        <select
-          class="custom-select form-control"
-          id="unitat_id"
-          name="unitat_id"
-          formControlName="unitat_id"
-        >
-          <option
-            *ngFor="let unitat of unitatsDisponibles"
-            [value]="unitat.id"
-            >{{ unitat.lletra }}</option
-          >
-        </select>
-      </div>
-    </div>
-    <div class="form-group row">
-      <label for="tamany" class="col-sm-3 col-form-label">Tamany:</label>
-      <div class="col-sm-3">
-        <input
-          type="number"
-          class="form-control"
-          id="tamany"
-          name="tamany"
-          formControlName="tamany"
-          placeholder="Tamany"
-        />
-      </div>
-      <div class="col-sm-3">
-        <select
-          class="custom-select"
-          formControlName="unitatstamany"
-          name="unitatstamany"
-        >
-          <option selected>Gb</option>
-          <option value="1">Mb</option>
-        </select>
-      </div>
-    </div>
-    <!-- <div class="form-group row">
-      <label for="quota" class="col-sm-3 col-form-label">Quota:</label>
-      <div class="col-sm-3">
-        <input
-          type="number"
-          class="form-control"
-          id="quota"
-          name="quota"
-          formControlName="quota"
-          placeholder="Tamany"
-        />
-      </div>
-      <div class="col-sm-3">
-        <select
-          class="custom-select"
-          formControlName="unitatsquota"
-          name="unitatsquota"
-        >
-          <option selected>Gb</option>
-          <option value="1">Mb</option>
-        </select>
-      </div>
-    </div> -->
-    <div class="form-group row" *ngIf="editMode == true">
-      <div class="col-sm-12">
-        <button type="submit" class="btn btn-primary" [disabled]="!assignaturaForm.dirty" (click)="onUpdateAssignatura()">
-          Actualitzar
-        </button>
-      </div>
-    </div>
-    <div class="form-group row" *ngIf="editMode == false">
-      <div class="col-sm-12">
-        <button
-          type="submit"
-          [disabled]="!assignaturaForm.valid"
-          [class]="
-            assignaturaForm.valid ? 'btn btn-success' : 'btn btn-warning'
-          "
-          (click)="onAddAssignatura()"
-        >
-          Afegir
-        </button>
-      </div>
-    </div>
-  </form>
 </div>
+

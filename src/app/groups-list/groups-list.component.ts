@@ -20,7 +20,6 @@ export class GroupsListComponent implements OnInit, OnDestroy {
   perfil = 'profe';
   groups = [];
   selectedGroups = [];
-  groupToDel: string;
   assignaturaId;
   assignatura: Assignatura;
   isLoading = true;
@@ -97,6 +96,7 @@ export class GroupsListComponent implements OnInit, OnDestroy {
           (data: any) => {
             this.groups = data.json;
             this.isLoading = false;
+            this.selectedGroups = [];
           }
         );
       }
@@ -111,15 +111,7 @@ export class GroupsListComponent implements OnInit, OnDestroy {
     modalRef.result.then(
       (resposta) => {
         console.log('Vol esborrar tots els grups.');
-        this.selectedGroups.forEach(
-          (selectedGroup) => {
-            this.groups = this.groups.filter(
-              (value) => {
-                return value.id !== selectedGroup;
-              }
-            );
-          }
-        );
+        this.dbService.deleteGrupsAssignatura(this.selectedGroups);
       },
       () => {
         console.log('Cancelado');
@@ -147,7 +139,7 @@ export class GroupsListComponent implements OnInit, OnDestroy {
       (resposta) => {
         console.log('Vol crear ' + resposta.quantitat + ' grups.');
         console.log('Amb quota ' + resposta.quota + ' minuts. Que son ' + (resposta.quota * this.factorUnitats).toFixed(1) + 'Gb.');
-        this.dbService.addGrupsAssignatura(this.assignatura, resposta.quantitat, resposta.quota);
+        this.dbService.addGrupsAssignatura(this.assignatura, resposta.quantitat, (resposta.quota * this.factorUnitats).toFixed(1) );
       },
       () => {
         console.log('Cancelado');
@@ -163,7 +155,8 @@ export class GroupsListComponent implements OnInit, OnDestroy {
     modalRef.result.then(
       (resposta) => {
         console.log('Vol esborrar el grup!' + resposta);
-        this.groups.splice(id, 1);
+        //this.groups.splice(id, 1);
+        this.dbService.deleteGrupsAssignatura([id]);
       },
       () => {
         console.log('Cancelado');
