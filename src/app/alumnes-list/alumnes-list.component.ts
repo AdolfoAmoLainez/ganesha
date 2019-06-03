@@ -23,10 +23,12 @@ export class AlumnesListComponent implements OnInit, OnDestroy {
 
   isLoading = true;
 
+  assignaturaCodi = '';
   grupId;
   //grupNom = '';
-  grupInfo;
+  grup: Grup;
   paramsSubs: Subscription;
+  alumnesUpdatedSubs: Subscription;
 
   constructor(private modalService: NgbModal,
               private activatedRoute: ActivatedRoute,
@@ -35,12 +37,19 @@ export class AlumnesListComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.paramsSubs.unsubscribe();
+    this.alumnesUpdatedSubs.unsubscribe();
   }
 
   ngOnInit() {
     if (this.activatedRoute.parent.snapshot.data.perfil) {
       this.perfil = this.activatedRoute.parent.snapshot.data.perfil;
     }
+
+    this.alumnesUpdatedSubs = this.dbService.alumnesUpdated.subscribe(
+      () => {
+        this.loadAlumnes();
+      }
+    );
 
     if (this.activatedRoute.paramMap) {
       this.paramsSubs = this.activatedRoute.paramMap.subscribe(
@@ -51,42 +60,22 @@ export class AlumnesListComponent implements OnInit, OnDestroy {
           }
         });
     }
-
-    // this.activatedRoute.params.subscribe(
-    //   (params) => {
-    //     this.alumnes = [
-    //       {
-    //         id: 1,
-    //         niu: 1112233,
-    //         nom: 'Aitor Tilla Fria'
-    //       },
-    //       {
-    //         id: 2,
-    //         niu: 1112244,
-    //         nom: 'Carmelo Cotón Maduro'
-    //       },
-    //       {
-    //         id: 3,
-    //         niu: 1112255,
-    //         nom: 'Olga Rapata Perro'
-    //       }
-    //     ];
-    //     this.selectedAlumnes = [];
-    //   }
-    // );
   }
 
   loadAlumnes() {
     this.isLoading = true;
 
     this.dbService.getGrupInfo(this.grupId).subscribe(
-      (grup: any) => {
+      (grupInfo: any) => {
 
-        this.grupInfo = grup;
+        this.grup = grupInfo.grup;
+        this.assignaturaCodi = grupInfo.assignatura_codi;
+
         this.dbService.getAlumnesGrup(this.grupId).subscribe(
           (data: any) => {
             this.alumnes = data.json;
             this.isLoading = false;
+            this.selectedAlumnes = [];
           }
         );
 
@@ -94,18 +83,14 @@ export class AlumnesListComponent implements OnInit, OnDestroy {
     );
   }
 
-  onDeleteIconClick(id: number, alumneNom: string) {
+  onDeleteIconClick(alumne: Alumne) {
     const modalRef = this.modalService.open(MymodalyesnoComponent);
     modalRef.componentInstance.titol = 'Esborrar Alumne';
-    modalRef.componentInstance.missatge = 'Vols esborrar l\'alumne ' + alumneNom + '?';
+    modalRef.componentInstance.missatge = 'Vols esborrar l\'alumne ' + alumne.nom + '?';
     modalRef.result.then(
       (resposta) => {
         // console.log('Vol esborrar l\'alumne!' + resposta);
-        this.dbService.deleteAlumneGrup(id).subscribe(
-          (data) => {
-            this.loadAlumnes();
-          }
-        );
+        this.dbService.deleteAlumnesGrup([alumne]);
       },
       () => {
         console.log('Cancelado');
@@ -113,11 +98,11 @@ export class AlumnesListComponent implements OnInit, OnDestroy {
     );
   }
 
-  onCheckAlumneClick(alumneId: number, value: boolean) {
+  onCheckAlumneClick(alumne: Alumne, value: boolean) {
     if (value) {
-      this.selectedAlumnes.push(alumneId);
+      this.selectedAlumnes.push(alumne);
     } else {
-      this.selectedAlumnes.splice(this.selectedAlumnes.indexOf(alumneId), 1);
+      this.selectedAlumnes.splice(this.selectedAlumnes.indexOf(alumne), 1);
     }
   }
 
@@ -131,11 +116,7 @@ export class AlumnesListComponent implements OnInit, OnDestroy {
           nom: 'El busquem a LDAP?',
           grup_id: this.grupId
         };
-        this.dbService.addAlumneGrup(al).subscribe(
-          (data: any) => {
-            this.alumnes.push(data.json[0]);
-          }
-        );
+        this.dbService.addAlumneGrup(al);
       },
       () => {
         console.log('Cancelado');
@@ -154,20 +135,21 @@ export class AlumnesListComponent implements OnInit, OnDestroy {
     modalRef.result.then(
       (resposta) => {
         console.log('Vol esborrar tots els alumnes.');
-        this.dbService.deleteAlumnesGrup(this.selectedAlumnes.join()).subscribe(
-          (data: any) => {
-            this.selectedAlumnes.forEach(
-              (selected) => {
-                this.alumnes = this.alumnes.filter(
-                  (value) => {
-                    return value.id !== selected;
-                  }
-                );
-              }
-            );
-            this.selectedAlumnes = [];
-          }
-        );
+        this.dbService.deleteAlumnesGrup(this.selectedAlumnes);
+        // this.dbService.deleteAlumnesGrup(this.selectedAlumnes.join()).subscribe(
+        //   (data: any) => {
+        //     this.selectedAlumnes.forEach(
+        //       (selected) => {
+        //         this.alumnes = this.alumnes.filter(
+        //           (value) => {
+        //             return value.id !== selected;
+        //           }
+        //         );
+        //       }
+        //     );
+        //     this.selectedAlumnes = [];
+        //   }
+        // );
       },
       () => {
         console.log('Cancelado');

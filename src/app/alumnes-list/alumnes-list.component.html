@@ -17,7 +17,7 @@
       </div>
       <div class="col-sm ml-2">
         <h5>
-          {{grupInfo.assignatura_codi}}-g{{grupInfo.grup_ordre}}
+          {{assignaturaCodi}}-g{{grup.ordre}}
         </h5>
       </div>
     </div>
@@ -37,7 +37,7 @@
             class="custom-control-input"
             [attr.id]="alumne.id"
             #checkalumne
-            (click)="onCheckAlumneClick(alumne.id, checkalumne.checked)"
+            (click)="onCheckAlumneClick(alumne, checkalumne.checked)"
           />
           <label class="custom-control-label" [attr.for]="alumne.id"></label>
         </div>
@@ -47,7 +47,7 @@
         <i
           class="fas fa-times text-danger"
           style="cursor: pointer;"
-          (click)="onDeleteIconClick(alumne.id, alumne.niu)"
+          (click)="onDeleteIconClick(alumne)"
         ></i>
       </div>
     </div>
