@@ -73,7 +73,7 @@ export class DataBaseService {
   }
 
   addAssignatura(assignatura: Assignatura) {
-    return this.http.post('http://localhost:3000/api/crud/assignatures', assignatura).subscribe(
+    return this.http.post('http://localhost:3000/selfapi/add_assignatura', assignatura).subscribe(
       (data) => {
         // console.log(data);
         this.getAssignatures();

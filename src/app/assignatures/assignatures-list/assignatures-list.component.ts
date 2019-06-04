@@ -13,7 +13,7 @@ export class AssignaturesListComponent implements OnInit, OnDestroy {
 
   assignatures = [];
   perfil = 'adm';
-  assignaturesSubs: Subscription;
+  assignaturesUpdatedSubs: Subscription;
 
   constructor(private dbService: DataBaseService,
               private route: ActivatedRoute,
@@ -21,7 +21,7 @@ export class AssignaturesListComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     //this.assignatures = this.dbService.getAssignatures();
-    this.assignaturesSubs = this.dbService.assignaturesUpdated.subscribe(
+    this.assignaturesUpdatedSubs = this.dbService.assignaturesUpdated.subscribe(
       (assignatures: Assignatura[]) => {
         this.assignatures = assignatures;
       }
@@ -32,7 +32,7 @@ export class AssignaturesListComponent implements OnInit, OnDestroy {
   }
 
 ngOnDestroy() {
-  this.assignaturesSubs.unsubscribe();
+  this.assignaturesUpdatedSubs.unsubscribe();
 }
 
   onAssignaturaClick(codi) {

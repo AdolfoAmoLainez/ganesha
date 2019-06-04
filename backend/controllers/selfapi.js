@@ -63,4 +63,9 @@ exports.getLvmInfo = (req, res) => {
 
 }
 
+exports.addAssignatura = (req, res) => {
+  console.log(req.body);
+  console.log("add Assignatura!");
+  res.status(200).json({message: 'Fet!'});
 
+}

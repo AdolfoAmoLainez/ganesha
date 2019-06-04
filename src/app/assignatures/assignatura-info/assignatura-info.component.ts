@@ -1,22 +1,24 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, ParamMap } from '@angular/router';
 import { Assignatura } from 'src/app/shared/assignatura.model';
 import { DataBaseService } from 'src/app/shared/database.service';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { Unitat } from 'src/app/shared/unitat.model';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-assignatura-info',
   templateUrl: './assignatura-info.component.html',
   styleUrls: ['./assignatura-info.component.css']
 })
-export class AssignaturaInfoComponent implements OnInit {
+export class AssignaturaInfoComponent implements OnInit, OnDestroy {
 
   perfil = 'adm';
   assignatura: Assignatura;
   unitatsDisponibles: Unitat[];
   assignaturaForm: FormGroup;
   assignaturaId;
+  assignaturesUpdatedSubs: Subscription;
   editMode = false;
   lvmInfo = {
     volname: '',
@@ -85,7 +87,22 @@ export class AssignaturaInfoComponent implements OnInit {
       (data) => {
         this.lvmInfo = data.json[0];
       }
-    )
+    );
+
+    /* Cada vegada que s'afegeix una assignatura actualitzem les dades LVM */
+    this.assignaturesUpdatedSubs = this.dbService.assignaturesUpdated.subscribe(
+      (data) => {
+        this.dbService.getLvmInfo().subscribe(
+          (info) => {
+            this.lvmInfo = info.json[0];
+          }
+        );
+      }
+    );
+  }
+
+  ngOnDestroy() {
+    this.assignaturesUpdatedSubs.unsubscribe();
   }
 
   onAddAssignatura() {
