@@ -7,6 +7,7 @@ import { MymodalyesnoComponent } from '../shared/mymodalyesno/mymodalyesno.compo
 import { DataBaseService } from '../shared/database.service';
 import { Professor } from '../shared/professor.model';
 import { Subscription } from 'rxjs';
+import { Assignatura } from '../shared/assignatura.model';
 
 @Component({
   selector: 'app-professors-list',
@@ -22,9 +23,11 @@ export class ProfessorsListComponent implements OnInit, OnDestroy {
   selectedProfessors = [];
 
   assignaturaId: string;
+  assignatura: Assignatura;
 
   perfil = 'adm';
   paramsSubs: Subscription;
+  profesUpdatedSubs: Subscription;
 
   constructor(private modalService: NgbModal,
               private activatedRoute: ActivatedRoute,
@@ -47,19 +50,33 @@ export class ProfessorsListComponent implements OnInit, OnDestroy {
         });
     }
 
+    this.profesUpdatedSubs = this.dbService.profesUpdated.subscribe(
+      () => {
+        this.loadProfessors();
+      }
+    );
+
   }
   ngOnDestroy() {
     this.paramsSubs.unsubscribe();
+    this.profesUpdatedSubs.unsubscribe();
   }
 
   loadProfessors() {
     this.isLoading = true;
-    this.dbService.getProfessorsAssignatura(this.assignaturaId).subscribe(
-      (data: any) => {
-        this.professors = data.json;
-        this.isLoading = false;
+
+    this.dbService.getAssignatura(this.assignaturaId).subscribe(
+      (assig: Assignatura) => {
+        this.assignatura = assig;
+        this.dbService.getProfessorsAssignatura(this.assignaturaId).subscribe(
+          (data: any) => {
+            this.professors = data.json;
+            this.isLoading = false;
+          }
+        );
       }
     );
+
   }
 
   onDeleteIconClick(id: number, profeNom: string) {
@@ -102,13 +119,7 @@ export class ProfessorsListComponent implements OnInit, OnDestroy {
           assignatura_id: this.assignaturaId
         };
 
-        this.dbService.addProfessorAssignatura(professor).subscribe(
-          (data: any) => {
-            //console.log(data);
-
-            this.professors.push(data.json[0]);
-          }
-        )
+        this.dbService.addProfessorAssignatura(professor, this.assignatura);
       },
       () => {
         console.log('Cancelado');
@@ -126,7 +137,7 @@ export class ProfessorsListComponent implements OnInit, OnDestroy {
     modalRef.componentInstance.missatge = 'Vols esborrar els professors sel·leccionats?';
     modalRef.result.then(
       (resposta) => {
-        console.log('Vol esborrar tots els grups.');
+        console.log('Vol esborrar tots els professors.');
         this.dbService.deleteProfessorsAssignatura(this.selectedProfessors.join()).subscribe(
           (data: any) => {
             console.log(data);

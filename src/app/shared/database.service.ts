@@ -33,6 +33,7 @@ export class DataBaseService {
   assignaturesUpdated = new Subject <Assignatura []>();
   grupsUpdated = new Subject();
   alumnesUpdated = new Subject();
+  profesUpdated = new Subject();
 
   constructor(private http: HttpClient) {}
 
@@ -109,8 +110,16 @@ export class DataBaseService {
     return this.http.post('http://localhost:3000/api/custom/', query);
   }
 
-  addProfessorAssignatura(professor: Professor) {
-    return this.http.post<{professor: Professor}>('http://localhost:3000/api/crud/professors', professor);
+  addProfessorAssignatura(professor: Professor, assignatura: Assignatura) {
+    const profObj = {
+      assignatura,
+      professor
+    };
+    return this.http.post('http://localhost:3000/selfapi/add_professor_assignatura', profObj).subscribe(
+      (response) => {
+        this.profesUpdated.next();
+      }
+    );
   }
 
   /** GRUPS */
