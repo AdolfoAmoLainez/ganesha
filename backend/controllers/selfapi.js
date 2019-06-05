@@ -48,12 +48,12 @@ exports.crearGrups = (req, res) => {
 
 /**
  * Request:
- *  llista de grups
+ *  llista de grup_id
  */
 
 exports.esborrarGrups = (req, res) => {
   console.log(req.body);
-  console.log("Esborrar grups'!");
+  console.log("Esborrar grups!");
   res.status(200).json({message: 'Fet!'});
 }
 
@@ -64,7 +64,7 @@ exports.esborrarGrups = (req, res) => {
  */
 exports.addAlumneGrup = (req, res) => {
   console.log(req.body);
-  console.log("Assignar usuari grup'!");
+  console.log("Assignar usuari grup!");
   res.status(200).json({message: 'Fet!'});
 }
 
@@ -75,7 +75,7 @@ exports.addAlumneGrup = (req, res) => {
 
 exports.deleteAlumnesGrup = (req, res) => {
   console.log(req.body);
-  console.log("Esborrar alumnes grup'!");
+  console.log("Esborrar alumnes grup!");
   res.status(200).json({message: 'Fet!'});
 }
 
@@ -100,14 +100,23 @@ exports.getLvmInfo = (req, res) => {
 
 /**
  * Request:
- *  assignatura
- *  niu a afegir
+ * {
+ *  assignatura,
+ *  professor
+ * }
+ *
  */
+
 exports.addProfeAssignatura = (req, res) => {
   console.log(req.body);
-  console.log("Assignar profe a assignatura'!");
+  console.log("Assignar profe a assignatura!");
   res.status(200).json({message: 'Fet!'});
 }
+
+/**
+ * Request:
+ *  assignatura
+ */
 
 exports.addAssignatura = (req, res) => {
   console.log(req.body);

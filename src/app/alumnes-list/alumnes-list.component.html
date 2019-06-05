@@ -1,11 +1,9 @@
 <div class="text-center" *ngIf="isLoading">
-  <div class="spinner-border" style="width: 3rem; height: 3rem;" role="status" >
+  <div class="spinner-border" style="width: 3rem; height: 3rem;" role="status">
     <span class="sr-only">Carregant...</span>
   </div>
 </div>
-<div class="row " *ngIf="!isLoading">
-  <div class="col-sm-6">
-<ul class="list-group mt-4">
+<ul class="list-group mt-4" *ngIf="!isLoading">
   <div class="list-group-item list-group-item-primary">
     <div class="row align-items-center">
       <div class="col-sm-1" *ngIf="perfil == 'profe'">
@@ -16,9 +14,7 @@
         ></i>
       </div>
       <div class="col-sm ml-2">
-        <h5>
-          {{assignaturaCodi}}-g{{grup.ordre}}
-        </h5>
+        <h5>{{ assignaturaCodi }}-g{{ grup.ordre }}</h5>
       </div>
     </div>
   </div>
@@ -28,7 +24,10 @@
   >
     No hi ha cap alummne en aquest grup!!
   </div>
-  <li class="list-group-item list-group-item-action" *ngFor="let alumne of alumnes; index as i">
+  <li
+    class="list-group-item list-group-item-action"
+    *ngFor="let alumne of alumnes; index as i"
+  >
     <div class="row">
       <div class="col-sm-1">
         <div class="custom-control custom-checkbox">
@@ -42,7 +41,7 @@
           <label class="custom-control-label" [attr.for]="alumne.id"></label>
         </div>
       </div>
-      <div class="col-sm">
+      <div class="col-sm-11">
         {{ alumne.niu + " - " + alumne.nom }}
         <i
           class="fas fa-times text-danger"
@@ -61,8 +60,6 @@
     </button>
   </li>
 </ul>
-</div>
-</div>
 
 <ng-template #afegirAlumneModal let-modal>
   <div class="modal-header">
