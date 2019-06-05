@@ -9,6 +9,7 @@ import { Router } from '@angular/router';
 export class AppComponent implements AfterViewInit {
   title = 'ganesha';
   perfil = 'adm';
+  viewSideBar = false;
 
   constructor(private router: Router) {}
 
@@ -16,11 +17,16 @@ export class AppComponent implements AfterViewInit {
     if (this.perfil === 'adm') {
       //console.log('por aqui');
 
-      this.router.navigate([{outlets: {primary: ['assignatura', 1], leftbar: ['adm']}}]);
+      //this.router.navigate([{outlets: {primary: ['assignatura', 1], leftbar: ['adm']}}]);
+      //this.router.navigate( ['assignatura', 1]);
     } else {
 
       this.router.navigate(['professor']);
     }
+  }
+
+  onToggleSideBar() {
+    this.viewSideBar = !this.viewSideBar;
   }
 
 }

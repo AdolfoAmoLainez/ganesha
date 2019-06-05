@@ -3,6 +3,7 @@ import { DataBaseService } from 'src/app/shared/database.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { Assignatura } from 'src/app/shared/assignatura.model';
+import { relative } from 'path';
 
 @Component({
   selector: 'app-assignatures-list',
@@ -27,7 +28,7 @@ export class AssignaturesListComponent implements OnInit, OnDestroy {
       }
     );
     this.dbService.getAssignatures();
-    this.perfil = this.route.snapshot.data.perfil;
+    //this.perfil = this.route.snapshot.data.perfil;
 
   }
 
@@ -36,7 +37,7 @@ ngOnDestroy() {
 }
 
   onAssignaturaClick(codi) {
-    this.router.navigate(['assignatura',codi]);
+    this.router.navigate(['adm', 'assignatura', codi]);
   }
 
   onAssignaturaProfeClick(codi) {
@@ -44,7 +45,7 @@ ngOnDestroy() {
   }
 
   onAssignaturaAddClick() {
-    this.router.navigate(['addassignatura']);
+    this.router.navigate(['adm', 'addassignatura']);
   }
 
 }

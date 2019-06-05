@@ -12,7 +12,7 @@ const routes: Routes = [
   { path: 'professor', component: AssignaturesListComponent, data: {perfil: 'profe'}},
     { path: 'professor/grups/:assignaturaid', component: GroupsListComponent},
     { path: 'professor/alumnes/:grupid', component: AlumnesListComponent},
-  { path: 'adm', component: AssignaturesListComponent, outlet: 'leftbar', data: {perfil: 'adm'}},
+  { path: 'adm', children: [
   { path: 'assignatura/:assignaturaid', component: AssignaturaViewComponent, data: {perfil: 'adm'}, children: [
     { path: 'grups', component: GroupsListComponent, data: {perfil: 'adm'}, children: [
       { path: 'alumnes/:grupid', component: AlumnesListComponent}
@@ -21,6 +21,7 @@ const routes: Routes = [
     { path: 'info', component: AssignaturaInfoComponent}
   ]},
   { path: 'addassignatura', component: AssignaturaInfoComponent, data: {perfil: 'adm'}}
+  ]}
   // { path: 'path', component: FeatureComponent },
   // { path: '**', component: PageNotFoundComponent },
 ];
