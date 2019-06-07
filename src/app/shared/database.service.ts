@@ -8,6 +8,7 @@ import { Professor } from './professor.model';
 import { map } from 'rxjs/operators';
 import { Grup } from './grup.model';
 import { Alumne } from './alumne.model';
+import {environment} from '../../environments/environment';
 
 @Injectable()
 export class DataBaseService {
@@ -39,11 +40,11 @@ export class DataBaseService {
 
 
   getLvmInfo() {
-    return this.http.get<{codi: number, message: string, json: any}>('http://localhost:3000/selfapi/getlvminfo');
+    return this.http.get<{codi: number, message: string, json: any}>(environment.selfApiUrl + 'getlvminfo');
   }
 
   getAssignatures() {
-    return this.http.get<{assignatures: Assignatura[]}>('http://localhost:3000/api/crud/assignatures').subscribe(
+    return this.http.get<{assignatures: Assignatura[]}>(environments.selfApiCrud + 'assignatures').subscribe(
       (data: any) => {
         // console.log(data);
 
@@ -54,7 +55,7 @@ export class DataBaseService {
   }
 
   getAssignatura(id: string) {
-    return this.http.get<{result: string, json: Assignatura[], length: number}>('http://localhost:3000/api/crud/assignatures/' + id).pipe(
+    return this.http.get<{result: string, json: Assignatura[], length: number}>(environments.selfApiCrud + 'assignatures/' + id).pipe(
       map(
         (data) => {
           return data.json[0];
@@ -64,7 +65,7 @@ export class DataBaseService {
   }
 
   getNomAssignatura(id: string) {
-    return this.http.get<{nom: string}>('http://localhost:3000/api/crud/assignatures/' + id ).pipe(
+    return this.http.get<{nom: string}>(environments.selfApiCrud + 'assignatures/' + id ).pipe(
       map(
         (data: any) => {
           return data.json[0].nom;
@@ -74,7 +75,7 @@ export class DataBaseService {
   }
 
   addAssignatura(assignatura: Assignatura) {
-    return this.http.post('http://localhost:3000/selfapi/add_assignatura', assignatura).subscribe(
+    return this.http.post(environment.selfApiUrl + 'add_assignatura', assignatura).subscribe(
       (data) => {
         // console.log(data);
         this.getAssignatures();
@@ -83,7 +84,7 @@ export class DataBaseService {
   }
 
   updateAssignatura(assignatura: Assignatura) {
-    return this.http.put('http://localhost:3000/api/crud/assignatures/' + assignatura.id, assignatura).subscribe(
+    return this.http.put(environments.selfApiCrud + 'assignatures/' + assignatura.id, assignatura).subscribe(
       (data: any) => {
         this.assignaturaChanged.next(assignatura);
       }
@@ -91,15 +92,15 @@ export class DataBaseService {
   }
 
   getUnitatsDisponibles() {
-    return this.http.get<{unitats: Unitat[]}>('http://localhost:3000/api/crud/unitats?disponible[LIKE]=1');
+    return this.http.get<{unitats: Unitat[]}>(environments.selfApiCrud + 'unitats?disponible[LIKE]=1');
   }
 
   getProfessorsAssignatura(assignaturaId: string) {
-    return this.http.get<{professors: Professor[]}> ('http://localhost:3000/api/crud/professors?assignatura_id[LIKE]=' + assignaturaId);
+    return this.http.get<{professors: Professor[]}> (environments.selfApiCrud + 'professors?assignatura_id[LIKE]=' + assignaturaId);
   }
 
   deleteProfessorAssignatura(profeId: number) {
-    return this.http.delete('http://localhost:3000/api/crud/professors/' + profeId);
+    return this.http.delete(environments.selfApiCrud + 'professors/' + profeId);
   }
 
   deleteProfessorsAssignatura(profeList: string) {
@@ -107,7 +108,7 @@ export class DataBaseService {
       query: 'DELETE FROM professors WHERE id IN (' + profeList + ');'
     };
 
-    return this.http.post('http://localhost:3000/api/custom/', query);
+    return this.http.post(environments.selfApiCustom + '', query);
   }
 
   addProfessorAssignatura(professor: Professor, assignatura: Assignatura) {
@@ -115,7 +116,7 @@ export class DataBaseService {
       assignatura,
       professor
     };
-    return this.http.post('http://localhost:3000/selfapi/add_professor_assignatura', profObj).subscribe(
+    return this.http.post(environment.selfApiUrl + 'add_professor_assignatura', profObj).subscribe(
       (response) => {
         this.profesUpdated.next();
       }
@@ -131,7 +132,7 @@ export class DataBaseService {
       quota
     };
 
-    return this.http.post('http://localhost:3000/selfapi/crea_grups', obj).subscribe(
+    return this.http.post(environment.selfApiUrl + 'crea_grups', obj).subscribe(
       (response) => {
         console.log(response);
 
@@ -142,7 +143,7 @@ export class DataBaseService {
 
   deleteGrupsAssignatura(grups: number[]) {
 
-    return this.http.post('http://localhost:3000/selfapi/esborra_grups', grups).subscribe(
+    return this.http.post(environment.selfApiUrl + 'esborra_grups', grups).subscribe(
       (response) => {
         console.log(response);
 
@@ -153,7 +154,7 @@ export class DataBaseService {
   }
 
   getGrupsAssignatura(assignaturaId: string) {
-    return this.http.get<{grups: Grup[]}> ('http://localhost:3000/api/crud/grups?assignatura_id[LIKE]=' + assignaturaId);
+    return this.http.get<{grups: Grup[]}> (environments.selfApiCrud + 'grups?assignatura_id[LIKE]=' + assignaturaId);
   }
 
   getGrupInfo(id: string) {
@@ -161,7 +162,7 @@ export class DataBaseService {
       query: 'SELECT assignatures.codi, grups.* FROM `grups` INNER JOIN assignatures on assignatures.id = grups.assignatura_id WHERE grups.id=' + id
     };
 
-    return this.http.post<{result: string, json: any, length: number}>('http://localhost:3000/api/custom/', query).pipe(
+    return this.http.post<{result: string, json: any, length: number}>(environments.selfApiCustom + '', query).pipe(
       map(
         (data: any) => {
           const grup: Grup = {
@@ -177,7 +178,7 @@ export class DataBaseService {
   }
 
   getNomGrup(idGrup) {
-    return this.http.get<{nom: string}>('http://localhost:3000/api/crud/grups/' + idGrup ).pipe(
+    return this.http.get<{nom: string}>(environments.selfApiCrud + 'grups/' + idGrup ).pipe(
       map(
         (data: any) => {
           return data.json[0].nom;
@@ -187,11 +188,11 @@ export class DataBaseService {
   }
 
   getAlumnesGrup(grupId: string) {
-    return this.http.get<{grups: Grup[]}> ('http://localhost:3000/api/crud/alumnes?grup_id[LIKE]=' + grupId);
+    return this.http.get<{grups: Grup[]}> (environments.selfApiCrud + 'alumnes?grup_id[LIKE]=' + grupId);
   }
 
   addAlumneGrup(alumne: Alumne) {
-      return this.http.post<{result: string, json: any, length: number}>('http://localhost:3000/selfapi/add_alumne_grup', alumne).subscribe(
+      return this.http.post<{result: string, json: any, length: number}>(environment.selfApiUrl + 'add_alumne_grup', alumne).subscribe(
         (data) => {
           this.alumnesUpdated.next();
         }
@@ -200,7 +201,7 @@ export class DataBaseService {
 
   deleteAlumnesGrup(alumnes: Alumne[]) {
     return this.http.post<{result: string, json: any, length: number}>
-      ('http://localhost:3000/selfapi/delete_alumnes_grup', alumnes).subscribe(
+      (environment.selfApiUrl + 'delete_alumnes_grup', alumnes).subscribe(
         (data) => {
           this.alumnesUpdated.next();
         }
@@ -212,11 +213,11 @@ export class DataBaseService {
   //     query: 'DELETE FROM alumnes WHERE id IN (' + alumneList + ');'
   //   };
 
-  //   return this.http.post('http://localhost:3000/api/custom/', query);
+  //   return this.http.post(environments.selfApiCustom + '', query);
   // }
 
   getFactorUnitats() {
-    return this.http.get<{result: string, json: any, length: number}> ('http://localhost:3000/api/crud/factorunitats/1');
+    return this.http.get<{result: string, json: any, length: number}> (environments.selfApiCrud + 'factorunitats/1');
   }
 
 }

@@ -3,7 +3,10 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
-  production: false
+  production: false,
+  selfApiUrl: 'http://localhost:3000/selfapi/',
+  apiCrudUrl: 'http://localhost:3000/api/crud/',
+  apiCustomUrl: 'http://localhost:3000/api/custom/'
 };
 
 /*
