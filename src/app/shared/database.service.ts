@@ -44,7 +44,7 @@ export class DataBaseService {
   }
 
   getAssignatures() {
-    return this.http.get<{assignatures: Assignatura[]}>(environments.selfApiCrud + 'assignatures').subscribe(
+    return this.http.get<{assignatures: Assignatura[]}>(environment.apiCrudUrl + 'assignatures').subscribe(
       (data: any) => {
         // console.log(data);
 
@@ -55,7 +55,7 @@ export class DataBaseService {
   }
 
   getAssignatura(id: string) {
-    return this.http.get<{result: string, json: Assignatura[], length: number}>(environments.selfApiCrud + 'assignatures/' + id).pipe(
+    return this.http.get<{result: string, json: Assignatura[], length: number}>(environment.apiCrudUrl + 'assignatures/' + id).pipe(
       map(
         (data) => {
           return data.json[0];
@@ -65,7 +65,7 @@ export class DataBaseService {
   }
 
   getNomAssignatura(id: string) {
-    return this.http.get<{nom: string}>(environments.selfApiCrud + 'assignatures/' + id ).pipe(
+    return this.http.get<{nom: string}>(environment.apiCrudUrl + 'assignatures/' + id ).pipe(
       map(
         (data: any) => {
           return data.json[0].nom;
@@ -84,7 +84,7 @@ export class DataBaseService {
   }
 
   updateAssignatura(assignatura: Assignatura) {
-    return this.http.put(environments.selfApiCrud + 'assignatures/' + assignatura.id, assignatura).subscribe(
+    return this.http.put(environment.apiCrudUrl + 'assignatures/' + assignatura.id, assignatura).subscribe(
       (data: any) => {
         this.assignaturaChanged.next(assignatura);
       }
@@ -92,15 +92,15 @@ export class DataBaseService {
   }
 
   getUnitatsDisponibles() {
-    return this.http.get<{unitats: Unitat[]}>(environments.selfApiCrud + 'unitats?disponible[LIKE]=1');
+    return this.http.get<{unitats: Unitat[]}>(environment.apiCrudUrl + 'unitats?disponible[LIKE]=1');
   }
 
   getProfessorsAssignatura(assignaturaId: string) {
-    return this.http.get<{professors: Professor[]}> (environments.selfApiCrud + 'professors?assignatura_id[LIKE]=' + assignaturaId);
+    return this.http.get<{professors: Professor[]}> (environment.apiCrudUrl + 'professors?assignatura_id[LIKE]=' + assignaturaId);
   }
 
   deleteProfessorAssignatura(profeId: number) {
-    return this.http.delete(environments.selfApiCrud + 'professors/' + profeId);
+    return this.http.delete(environment.apiCrudUrl + 'professors/' + profeId);
   }
 
   deleteProfessorsAssignatura(profeList: string) {
@@ -108,7 +108,7 @@ export class DataBaseService {
       query: 'DELETE FROM professors WHERE id IN (' + profeList + ');'
     };
 
-    return this.http.post(environments.selfApiCustom + '', query);
+    return this.http.post(environment.apiCustomUrl + '', query);
   }
 
   addProfessorAssignatura(professor: Professor, assignatura: Assignatura) {
@@ -154,7 +154,7 @@ export class DataBaseService {
   }
 
   getGrupsAssignatura(assignaturaId: string) {
-    return this.http.get<{grups: Grup[]}> (environments.selfApiCrud + 'grups?assignatura_id[LIKE]=' + assignaturaId);
+    return this.http.get<{grups: Grup[]}> (environment.apiCrudUrl + 'grups?assignatura_id[LIKE]=' + assignaturaId);
   }
 
   getGrupInfo(id: string) {
@@ -162,7 +162,7 @@ export class DataBaseService {
       query: 'SELECT assignatures.codi, grups.* FROM `grups` INNER JOIN assignatures on assignatures.id = grups.assignatura_id WHERE grups.id=' + id
     };
 
-    return this.http.post<{result: string, json: any, length: number}>(environments.selfApiCustom + '', query).pipe(
+    return this.http.post<{result: string, json: any, length: number}>(environment.apiCustomUrl + '', query).pipe(
       map(
         (data: any) => {
           const grup: Grup = {
@@ -178,7 +178,7 @@ export class DataBaseService {
   }
 
   getNomGrup(idGrup) {
-    return this.http.get<{nom: string}>(environments.selfApiCrud + 'grups/' + idGrup ).pipe(
+    return this.http.get<{nom: string}>(environment.apiCrudUrl + 'grups/' + idGrup ).pipe(
       map(
         (data: any) => {
           return data.json[0].nom;
@@ -188,7 +188,7 @@ export class DataBaseService {
   }
 
   getAlumnesGrup(grupId: string) {
-    return this.http.get<{grups: Grup[]}> (environments.selfApiCrud + 'alumnes?grup_id[LIKE]=' + grupId);
+    return this.http.get<{grups: Grup[]}> (environment.apiCrudUrl + 'alumnes?grup_id[LIKE]=' + grupId);
   }
 
   addAlumneGrup(alumne: Alumne) {
@@ -217,7 +217,7 @@ export class DataBaseService {
   // }
 
   getFactorUnitats() {
-    return this.http.get<{result: string, json: any, length: number}> (environments.selfApiCrud + 'factorunitats/1');
+    return this.http.get<{result: string, json: any, length: number}> (environment.apiCrudUrl + 'factorunitats/1');
   }
 
 }
