@@ -28,8 +28,9 @@ export class AssignaturesListComponent implements OnInit, OnDestroy {
       }
     );
     this.dbService.getAssignatures();
-    //this.perfil = this.route.snapshot.data.perfil;
-
+    if (this.route.snapshot.data.perfil) {
+      this.perfil = this.route.snapshot.data.perfil;
+    }
   }
 
 ngOnDestroy() {
