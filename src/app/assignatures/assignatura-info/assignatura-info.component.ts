@@ -15,7 +15,7 @@ export class AssignaturaInfoComponent implements OnInit, OnDestroy {
 
   perfil = 'adm';
   assignatura: Assignatura;
-  unitatsDisponibles: Unitat[];
+  //unitatsDisponibles: Unitat[];
   assignaturaForm: FormGroup;
   assignaturaId;
   assignaturesUpdatedSubs: Subscription;
@@ -25,6 +25,8 @@ export class AssignaturaInfoComponent implements OnInit, OnDestroy {
     tamany: '',
     disponible: ''
   };
+
+  factorUnitats = 1;
 
   constructor(private activatedRoute: ActivatedRoute,
               private dbService: DataBaseService) {}
@@ -36,12 +38,20 @@ export class AssignaturaInfoComponent implements OnInit, OnDestroy {
       id: new FormControl(''),
       codi: new FormControl('', [Validators.required]),
       nom: new FormControl('', [Validators.required]),
-      unitat_id: new FormControl('', [Validators.required]),
+      //unitat_id: new FormControl('', [Validators.required]),
       tamany: new FormControl('', [Validators.required]),
-      unitatstamany: new FormControl('', [Validators.required]),
+      tamanygb: new FormControl(0)
+      //unitatstamany: new FormControl('', [Validators.required]),
       // quota: new FormControl('', [Validators.required]),
       // unitatsquota: new FormControl('', [Validators.required])
     });
+
+
+    this.dbService.getFactorUnitats().subscribe(
+      (resultat) => {
+        this.factorUnitats = resultat.json[0].factor;
+      }
+    );
 
     if (this.activatedRoute.parent.snapshot.data.perfil) {
       this.perfil = this.activatedRoute.parent.snapshot.data.perfil;
@@ -51,11 +61,12 @@ export class AssignaturaInfoComponent implements OnInit, OnDestroy {
       this.activatedRoute.parent.paramMap.subscribe(
         (paramMap: ParamMap) => {
 
-          this.dbService.getUnitatsDisponibles().subscribe(
-            (data: any) => {
-              this.unitatsDisponibles = data.json;
-            }
-          );
+          // Comentat per la posibilitat de no fer servir diferents lletres d'unitats
+          // this.dbService.getUnitatsDisponibles().subscribe(
+          //   (data: any) => {
+          //     this.unitatsDisponibles = data.json;
+          //   }
+          // );
 
           // console.log(paramMap);
           if (paramMap.has('assignaturaid')) {
@@ -71,8 +82,8 @@ export class AssignaturaInfoComponent implements OnInit, OnDestroy {
                   codi: assignatura.codi,
                   nom: assignatura.nom,
                   tamany: assignatura.tamany,
-                  unitat_id: assignatura.unitat_id,
-                  unitatstamany: assignatura.unitatstamany,
+                  //unitat_id: assignatura.unitat_id,
+                  //unitatstamany: assignatura.unitatstamany,
                   // quota: assignatura.quota,
                   // unitatsquota: assignatura.unitatsquota
                 });
@@ -106,7 +117,13 @@ export class AssignaturaInfoComponent implements OnInit, OnDestroy {
   }
 
   onAddAssignatura() {
+
+    this.assignaturaForm.patchValue({
+      tamanygb: parseInt((this.assignaturaForm.get('tamany').value * this.factorUnitats).toFixed(0))
+    });
+    //console.log(this.assignaturaForm.value);
     this.dbService.addAssignatura(this.assignaturaForm.value);
+
     this.assignaturaForm.reset();
   }
 

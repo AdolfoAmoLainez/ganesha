@@ -121,6 +121,14 @@ exports.addProfeAssignatura = (req, res) => {
 exports.addAssignatura = (req, res) => {
   console.log(req.body);
   console.log("add Assignatura!");
-  res.status(200).json({message: 'Fet!'});
-
+  dbconfig.connection.query( //Afegir assignatura
+    "INSERT INTO `assignatures` (`id`, `codi`, `nom`, `unitat_id`, `tamany`, `unitatstamany`) " +
+    "VALUES (NULL, '"+req.body.codi+"', '"+req.body.nom+"','"+req.body.unitat_id+"', '"+req.body.tamany+"', '"+req.body.unitatstamany+"');",
+    (errorinsert) =>{
+      if (!errorinsert){
+        res.status(200).json({message: 'Fet!'});
+      } else {
+        res.status(500).json({message: "No s'ha pogut insertar l'assigantura en la BBDD"});
+      }
+    });
 }

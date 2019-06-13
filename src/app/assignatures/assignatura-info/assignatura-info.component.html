@@ -35,7 +35,7 @@
             />
           </div>
         </div>
-        <div class="form-group row">
+        <!-- <div class="form-group row">
           <label for="unitat_id" class="col-sm-3 col-form-label">Unitat:</label>
           <div class="col-sm-3">
             <select
@@ -51,9 +51,9 @@
               >
             </select>
           </div>
-        </div>
+        </div> -->
         <div class="form-group row">
-          <label for="tamany" class="col-sm-3 col-form-label">Tamany:</label>
+          <label for="tamany" class="col-sm-3 col-form-label">Tamany Min:</label>
           <div class="col-sm-3">
             <input
               type="number"
@@ -62,18 +62,29 @@
               name="tamany"
               formControlName="tamany"
               placeholder="Tamany"
+              #tamany
             />
           </div>
-          <div class="col-sm-3">
-            <select
+          <!-- <div class="col-sm-3">
+            <label class="col-form-label">Min</label>
+            <!-- <select
               class="custom-select"
               formControlName="unitatstamany"
               name="unitatstamany"
             >
-              <option selected>Gb</option>
-              <option value="1">Mb</option>
+              <option value="Min" selected>Min</option>
+              <option value="Gb">Gb</option>
             </select>
-          </div>
+          </div> -->
+
+        </div>
+        <div class="form-group row">
+            <label for="tamanygb" class="col-sm-3 col-form-label">Tamany Gb: </label>
+            <div class="col-sm-3">
+              <input type="number" readonly class="form-control-plaintext" id="tamanygb" name="tamanygb" formControlName="tamanygb"
+              [value]="(tamany.value * factorUnitats).toFixed(0)">
+            </div>
+            <!-- <label class="col-sm-3 col-form-label" [innerHTML]="(tamany.value * factorUnitats).toFixed(0)"></label> -->
         </div>
         <!-- <div class="form-group row">
           <label for="quota" class="col-sm-3 col-form-label">Quota:</label>
@@ -123,7 +134,7 @@
 
 
   </div>
-  <div class="col-sm-6" *ngIf="editMode == false">
+  <div class="col-sm-6" >
       <div class="card">
         <div class="card-body">
           <h5 class="card-title">Info {{lvmInfo.volname}}</h5>
