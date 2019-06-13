@@ -93,13 +93,20 @@
     <div class="modal-body">
       <form [formGroup]="addGroupsFrom">
         <div class="form-group">
-          <label for="amount">Quants grups vols afegir?:</label>
-          <input type="number" class="form-control" name="quantitat" id="quantitat" #quantitat formControlName="quantitat" />
+          <label for="quantitat">Quants grups vols afegir?:</label>
+          <input type="number" class="form-control" name="quantitat" id="quantitat" #quantitat formControlName="quantitat"
+                  min="0"
+                  (input)="onAddGroupFormChangeValues($event.target.value)"/>
         </div>
         <div class="form-group">
           <label for="quota">De quants minuts?:</label>
-          <input type="number" class="form-control" name="quota" id="quota" #quota formControlName="quota" />
+          <input type="number" class="form-control" name="quota" id="quota" #quota formControlName="quota" min="0"
+                 (input)="onAddGroupFormChangeValues($event.target.value)"/>
         </div>
+        <div class="form-group">
+            <label for="disponibles">Minuts disponibles:</label>
+            <input type="number" readonly class="form-control" name="disponibles" id="disponibles" formControlName="disponibles"/>
+          </div>
       </form>
     </div>
     <div class="modal-footer">

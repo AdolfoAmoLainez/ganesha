@@ -132,3 +132,24 @@ exports.addAssignatura = (req, res) => {
       }
     });
 }
+
+/**
+ * Total de minuts ocupats pels grups d'una assignatura
+ *
+ * Request:
+ *  id: assignatura_id
+ */
+
+exports.getMinutsConsumits = (req, res) => {
+  console.log(req.body);
+  console.log("Minuts ocupats Assignatura!");
+  dbconfig.connection.query( //Afegir assignatura
+      "SELECT SUM(`quota`) as consumits FROM `grups` WHERE assignatura_id="+req.body.id+";",
+      (errorSel, consulta) => {
+      if (!errorSel){
+        res.status(200).json({message: 'Fet!', consulta});
+      } else {
+        res.status(500).json({message: "No s'ha pogut consultar els minuts consumits!"});
+      }
+    });
+}

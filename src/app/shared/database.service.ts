@@ -83,6 +83,13 @@ export class DataBaseService {
     );
   }
 
+  getMinutsConsumits(id: string) {
+    const peticio = {
+      id
+    };
+    return this.http.post<{message: string, consulta: any}>(environment.selfApiUrl + 'get_minuts_consumits', peticio);
+  }
+
   updateAssignatura(assignatura: Assignatura) {
     return this.http.put(environment.apiCrudUrl + 'assignatures/' + assignatura.id, assignatura).subscribe(
       (data: any) => {

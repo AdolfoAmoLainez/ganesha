@@ -10,5 +10,6 @@ router.post('/add_professor_assignatura', SelfApiController.addProfeAssignatura)
 router.post('/delete_alumnes_grup', SelfApiController.deleteAlumnesGrup);
 router.post('/add_assignatura', SelfApiController.addAssignatura);
 router.get('/getlvminfo', SelfApiController.getLvmInfo);
+router.post('/get_minuts_consumits', SelfApiController.getMinutsConsumits);
 
 module.exports = router;

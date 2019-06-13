@@ -24,6 +24,7 @@ export class GroupsListComponent implements OnInit, OnDestroy {
   assignatura: Assignatura;
   isLoading = true;
   factorUnitats: number;
+  minutsConsumits = 0;
 
   addGroupsFrom: FormGroup;
 
@@ -129,21 +130,37 @@ export class GroupsListComponent implements OnInit, OnDestroy {
   }
 
   onAfegirClick(content) {
-    this.addGroupsFrom = new FormGroup({
-        quantitat: new FormControl(1, [ Validators.required, Validators.pattern(/^-?(0|[1-9]\d*)?$/)]),
-        quota: new FormControl(1, [ Validators.required, Validators.pattern(/^-?(0|[1-9]\d*)?$/)])
-      }
-    );
 
-    this.modalService.open(content, {ariaLabelledBy: 'modal-basic-title'}).result.then(
-      (resposta) => {
-        console.log('Vol crear ' + resposta.quantitat + ' grups.');
-        console.log('Amb quota ' + resposta.quota + ' minuts. Que son ' + (resposta.quota * this.factorUnitats).toFixed(1) + 'Gb.');
-        this.dbService.addGrupsAssignatura(this.assignatura, resposta.quantitat, (resposta.quota * this.factorUnitats).toFixed(1) );
-      },
-      () => {
-        console.log('Cancelado');
+    this.dbService.getMinutsConsumits(this.assignaturaId).subscribe(
+      (respostaMinuts) => {
+        console.log(respostaMinuts);
+
+        this.minutsConsumits = respostaMinuts.consulta[0].consumits;
+
+        this.addGroupsFrom = new FormGroup({
+            quantitat: new FormControl(1, [ Validators.required, Validators.pattern(/^-?([1-9]\d*)?$/)]),
+            quota: new FormControl(1, [ Validators.required, Validators.pattern(/^-?([1-9]\d*)?$/)]),
+            disponibles: new FormControl(this.assignatura.tamany - this.minutsConsumits)
+          }
+        );
+
+        this.modalService.open(content, {ariaLabelledBy: 'modal-basic-title'}).result.then(
+          (resposta) => {
+            if (this.addGroupsFrom.get('disponibles').value > 0){
+            console.log('Vol crear ' + resposta.quantitat + ' grups.');
+            console.log('Amb quota ' + resposta.quota + ' minuts. Que son ' + (resposta.quota * this.factorUnitats).toFixed(1) + 'Gb.');
+            this.dbService.addGrupsAssignatura(this.assignatura, resposta.quantitat, (resposta.quota * this.factorUnitats).toFixed(1) );
+            } else {
+              console.log("No es poden crear tants grups amb aquesta quota!!!!");
+
+            }
+          },
+          () => {
+            console.log('Cancelado');
+          }
+        );
       }
+
     );
   }
 
@@ -167,6 +184,13 @@ export class GroupsListComponent implements OnInit, OnDestroy {
 
   onBackClick() {
     this.myLocation.back();
+  }
+
+  onAddGroupFormChangeValues(quantitat: number) {
+    this.addGroupsFrom.patchValue({
+      disponibles: (this.assignatura.tamany - this.minutsConsumits) -
+                  (this.addGroupsFrom.get('quantitat').value * this.addGroupsFrom.get('quota').value)
+    });
   }
 
 }
