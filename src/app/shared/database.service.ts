@@ -32,7 +32,8 @@ export class DataBaseService {
 
   assignaturaChanged = new Subject <Assignatura>();
   assignaturesUpdated = new Subject <Assignatura []>();
-  grupsUpdated = new Subject();
+  grupsUpdated = new Subject<Grup[]>();
+  grupsChanged = new Subject();
   alumnesUpdated = new Subject();
   profesUpdated = new Subject();
 
@@ -132,18 +133,19 @@ export class DataBaseService {
 
   /** GRUPS */
 
-  addGrupsAssignatura(assignatura: Assignatura, quantitat: number, quota: string) {
+  addGrupsAssignatura(assignatura: Assignatura, quantitat: number, quotaMin: string, quotaGb: string) {
     const obj = {
       assignatura,
       quantitat,
-      quota
+      quotaMin,
+      quotaGb
     };
 
     return this.http.post(environment.selfApiUrl + 'crea_grups', obj).subscribe(
       (response) => {
         console.log(response);
 
-        this.grupsUpdated.next();
+        this.grupsChanged.next();
       }
     );
   }
@@ -154,14 +156,26 @@ export class DataBaseService {
       (response) => {
         console.log(response);
 
-        this.grupsUpdated.next();
+        this.grupsChanged.next();
       }
     );
 
   }
 
   getGrupsAssignatura(assignaturaId: string) {
-    return this.http.get<{grups: Grup[]}> (environment.apiCrudUrl + 'grups?assignatura_id[LIKE]=' + assignaturaId);
+    //return this.http.get<{grups: Grup[]}> (environment.apiCrudUrl + 'grups?assignatura_id[LIKE]=' + assignaturaId);
+    const obj = {
+      id: assignaturaId
+    };
+
+    return this.http.post<{message: string, consulta: Grup[]}>
+      (environment.selfApiUrl + 'get_grups_assignatura', obj).subscribe(
+      (response) => {
+        console.log(response);
+
+        this.grupsUpdated.next(...[response.consulta]);
+      }
+    );
   }
 
   getGrupInfo(id: string) {
@@ -176,7 +190,8 @@ export class DataBaseService {
             id: data.json[0].id,
             assignatura_id: data.json[0].assignatura_id,
             quota: data.json[0].quota,
-            ordre: data.json[0].ordre
+            ordre: data.json[0].ordre,
+            alumnes:  data.json[0].alumnes
           }
           return {assignatura_codi: data.json[0].codi, grup: grup};
         }

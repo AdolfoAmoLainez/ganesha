@@ -30,6 +30,7 @@ export class GroupsListComponent implements OnInit, OnDestroy {
 
   paramsSubs: Subscription;
   grupsUpdatedSubs: Subscription;
+  grupsChangedSubs: Subscription;
 
   constructor(private modalService: NgbModal,
               private activatedRoute: ActivatedRoute,
@@ -43,6 +44,15 @@ export class GroupsListComponent implements OnInit, OnDestroy {
     }
 
     this.grupsUpdatedSubs = this.dbService.grupsUpdated.subscribe(
+      (grups) => {
+        console.log(grups);
+
+        this.groups = grups;
+        this.isLoading = false;
+      }
+    );
+
+    this.grupsChangedSubs = this.dbService.grupsChanged.subscribe(
       () => {
         this.loadGrups();
       }
@@ -84,6 +94,7 @@ export class GroupsListComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.paramsSubs.unsubscribe();
     this.grupsUpdatedSubs.unsubscribe();
+    this.grupsChangedSubs.unsubscribe();
   }
 
   loadGrups() {
@@ -93,13 +104,14 @@ export class GroupsListComponent implements OnInit, OnDestroy {
       (assig: Assignatura) => {
         this.assignatura = assig;
 
-        this.dbService.getGrupsAssignatura(this.assignaturaId).subscribe(
+        this.dbService.getGrupsAssignatura(this.assignaturaId);
+        /*.subscribe(
           (data: any) => {
             this.groups = data.json;
             this.isLoading = false;
             this.selectedGroups = [];
           }
-        );
+        );*/
       }
     );
 
@@ -149,7 +161,7 @@ export class GroupsListComponent implements OnInit, OnDestroy {
             if (this.addGroupsFrom.get('disponibles').value > 0){
             console.log('Vol crear ' + resposta.quantitat + ' grups.');
             console.log('Amb quota ' + resposta.quota + ' minuts. Que son ' + (resposta.quota * this.factorUnitats).toFixed(1) + 'Gb.');
-            this.dbService.addGrupsAssignatura(this.assignatura, resposta.quantitat, (resposta.quota * this.factorUnitats).toFixed(1) );
+            this.dbService.addGrupsAssignatura(this.assignatura, resposta.quantitat, resposta.quota, (resposta.quota * this.factorUnitats).toFixed(1) );
             } else {
               console.log("No es poden crear tants grups amb aquesta quota!!!!");
 

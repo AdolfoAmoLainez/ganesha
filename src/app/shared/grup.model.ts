@@ -4,4 +4,5 @@ export interface Grup {
   // nom: string;
   quota: number;
   ordre: number;
+  alumnes: number;
 }

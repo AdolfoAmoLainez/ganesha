@@ -32,7 +32,7 @@
       >
         <div class="row align-items-center">
           <div class="col-sm-1">
-            <div class="custom-control custom-checkbox">
+            <div class="custom-control custom-checkbox" *ngIf="group.alumnes === 0">
               <input
                 type="checkbox"
                 class="custom-control-input"
@@ -52,7 +52,7 @@
             }}</a>
           </h2>
           <div class="col-sm-1">
-            <i
+            <i *ngIf="group.alumnes === 0"
               class="fas fa-times fa-2x text-danger "
               style="cursor: pointer;"
               (click)="onDeleteIconClick(group.id,group.nom)"
