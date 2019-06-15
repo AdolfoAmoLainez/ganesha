@@ -21,6 +21,7 @@ export class ProfessorsListComponent implements OnInit, OnDestroy {
   professors = [];
 
   selectedProfessors = [];
+  selectAll = false;
 
   assignaturaId: string;
   assignatura: Assignatura;
@@ -140,11 +141,23 @@ export class ProfessorsListComponent implements OnInit, OnDestroy {
       (resposta) => {
         console.log('Vol esborrar tots els professors.');
         this.dbService.deleteProfessorsAssignatura(this.selectedProfessors, this.assignatura.codi);
+        this.selectAll = false;
       },
       () => {
         console.log('Cancelado');
       }
     );
+  }
+
+  onSelectAll(selectAllStatus: boolean) {
+    if (selectAllStatus) {
+      this.professors.forEach( element => {
+          this.selectedProfessors.push(element);
+      });
+    } else {
+      this.selectedProfessors = [];
+    }
+
   }
 
 }

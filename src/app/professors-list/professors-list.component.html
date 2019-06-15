@@ -11,6 +11,20 @@
   >
     No hi ha cap professor en aquest grup!!
   </li>
+  <li class="list-group-item list-group-item-action">
+    <div class="custom-control custom-checkbox">
+        <input
+          type="checkbox"
+          class="custom-control-input"
+          [(ngModel)]="selectAll"
+          name="selectAll"
+          id="selectAll"
+          #selectAllStatus
+          (click)="onSelectAll(selectAllStatus.checked);"
+        />
+        <label class="custom-control-label" for="selectAll">Selecciona tots</label>
+      </div>
+  </li>
   <li class="list-group-item" *ngFor="let profe of professors; index as i">
     <div class="row">
       <div class="col-sm-1">
@@ -19,6 +33,7 @@
             type="checkbox"
             class="custom-control-input"
             [attr.id]="profe.id"
+            [checked]="selectAll"
             #checkprofe
             (click)="onCheckProfessorClick(profe, checkprofe.checked)"
           />
@@ -39,8 +54,8 @@
     <button class="btn btn-primary" (click)="onAfegirClick(afegirProfeModal)">
       Afegir Professor
     </button>
-    <button class="btn btn-primary ml-2" (click)="onDeleteProfessors()" [disabled]="selectedProfessors.length <= 0">
-      Esborrar Sel·lecció
+    <button class="btn btn-primary ml-2" (click)="onDeleteProfessors()" [disabled]="selectedProfessors.length === 0">
+      Esborrar Selecció
     </button>
   </li>
 </ul>
