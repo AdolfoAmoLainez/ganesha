@@ -5,6 +5,8 @@ import { DataBaseService } from 'src/app/shared/database.service';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { Unitat } from 'src/app/shared/unitat.model';
 import { Subscription } from 'rxjs';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { MymodalyesnoComponent } from 'src/app/shared/mymodalyesno/mymodalyesno.component';
 
 @Component({
   selector: 'app-assignatura-info',
@@ -29,7 +31,8 @@ export class AssignaturaInfoComponent implements OnInit, OnDestroy {
   factorUnitats = 1;
 
   constructor(private activatedRoute: ActivatedRoute,
-              private dbService: DataBaseService) {}
+              private dbService: DataBaseService,
+              private modalService: NgbModal) {}
 
   ngOnInit() {
     // this.assignatura.codi = "1212"
@@ -76,7 +79,7 @@ export class AssignaturaInfoComponent implements OnInit, OnDestroy {
               (assignatura: Assignatura) => {
                 //const assignatura = result.json[0];
                 // console.log(assignatura);
-
+                this.assignatura = assignatura;
                 this.assignaturaForm.patchValue({
                   id: assignatura.id,
                   codi: assignatura.codi,
@@ -131,6 +134,21 @@ export class AssignaturaInfoComponent implements OnInit, OnDestroy {
   // hacer cambios en el SO. Con el pristine y el touched
   onUpdateAssignatura() {
     this.dbService.updateAssignatura(this.assignaturaForm.value);
+  }
+
+  onDeleteAssignatura() {
+    const modalRef = this.modalService.open(MymodalyesnoComponent);
+    modalRef.componentInstance.titol = 'Esborrar Assignatura';
+    modalRef.componentInstance.missatge = 'Vols esborrar l\'assignatura ' + this.assignatura.nom + '?';
+    modalRef.result.then(
+      (resposta) => {
+        console.log('Vol esborrar l\'assignatura');
+        // this.dbService.deleteGrupsAssignatura(this.selectedGroups);
+      },
+      () => {
+        console.log('Cancelado');
+      }
+    );
   }
 
 }
