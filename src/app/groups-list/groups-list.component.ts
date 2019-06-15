@@ -8,6 +8,7 @@ import { MymodalyesnoComponent } from '../shared/mymodalyesno/mymodalyesno.compo
 import { DataBaseService } from '../shared/database.service';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { Assignatura } from '../shared/assignatura.model';
+import { Grup } from '../shared/grup.model';
 
 
 @Component({
@@ -20,6 +21,7 @@ export class GroupsListComponent implements OnInit, OnDestroy {
   perfil = 'profe';
   groups = [];
   selectedGroups = [];
+  selectAll = false; // per seleccionar tota els grups
   assignaturaId;
   assignatura: Assignatura;
   isLoading = true;
@@ -124,7 +126,8 @@ export class GroupsListComponent implements OnInit, OnDestroy {
     modalRef.result.then(
       (resposta) => {
         console.log('Vol esborrar tots els grups.');
-        this.dbService.deleteGrupsAssignatura(this.selectedGroups);
+        this.dbService.deleteGrupsAssignatura(this.selectedGroups, this.assignatura.codi);
+        this.selectAll = false;
       },
       () => {
         console.log('Cancelado');
@@ -132,13 +135,14 @@ export class GroupsListComponent implements OnInit, OnDestroy {
     );
   }
 
-  onCheckGroupClick(groupId: number, value: boolean) {
+  onCheckGroupClick(groupId: Grup, value: boolean) {
 
     if (value) {
       this.selectedGroups.push(groupId);
     } else {
       this.selectedGroups.splice(this.selectedGroups.indexOf(groupId), 1);
     }
+    console.log(this.selectedGroups);
   }
 
   onAfegirClick(content) {
@@ -176,16 +180,15 @@ export class GroupsListComponent implements OnInit, OnDestroy {
     );
   }
 
-  onDeleteIconClick(id: number, grupNom: string) {
+  onDeleteIconClick(grup: Grup) {
 
     const modalRef = this.modalService.open(MymodalyesnoComponent);
     modalRef.componentInstance.titol = 'Esborrar Grup';
-    modalRef.componentInstance.missatge = 'Vols esborrar el grup ' + grupNom + '?';
+    modalRef.componentInstance.missatge = 'Vols esborrar el grup ' + this.assignatura.codi + '-g' + grup.ordre + '?';
     modalRef.result.then(
       (resposta) => {
         console.log('Vol esborrar el grup!' + resposta);
-        //this.groups.splice(id, 1);
-        this.dbService.deleteGrupsAssignatura([id]);
+        this.dbService.deleteGrupsAssignatura([grup], this.assignatura.codi);
       },
       () => {
         console.log('Cancelado');
@@ -203,6 +206,21 @@ export class GroupsListComponent implements OnInit, OnDestroy {
       disponibles: (this.assignatura.tamany - this.minutsConsumits) -
                   (this.addGroupsFrom.get('quantitat').value * this.addGroupsFrom.get('quota').value)
     });
+  }
+
+  onSelectAll(selectAllStatus: boolean) {
+    if (selectAllStatus) {
+      this.groups.forEach( element => {
+        if (element.alumnes === 0) {
+          this.selectedGroups.push(element);
+        }
+      });
+    } else {
+      this.selectedGroups = [];
+    }
+
+    console.log(this.selectedGroups);
+
   }
 
 }

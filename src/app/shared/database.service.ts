@@ -185,9 +185,13 @@ export class DataBaseService {
     );
   }
 
-  deleteGrupsAssignatura(grups: number[]) {
+  deleteGrupsAssignatura(grups: Grup[], assigCodi: string) {
 
-    return this.http.post(environment.selfApiUrl + 'esborra_grups', grups).subscribe(
+    const obj = {
+      grups,
+      assigCodi
+    };
+    return this.http.post(environment.selfApiUrl + 'esborra_grups', obj).subscribe(
       (response) => {
         console.log(response);
 

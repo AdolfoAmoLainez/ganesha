@@ -25,7 +25,21 @@
       </div>
       <div class="list-group-item list-group-item-action" *ngIf="groups.length === 0">
           No hi ha cap grup!!
-        </div>
+      </div>
+      <div class="list-group-item list-group-item-action">
+          <div class="custom-control custom-checkbox">
+              <input
+                type="checkbox"
+                class="custom-control-input"
+                [(ngModel)]="selectAll"
+                name="selectAll"
+                id="selectAll"
+                #selectAllStatus
+                (click)="onSelectAll(selectAllStatus.checked);"
+              />
+              <label class="custom-control-label" for="selectAll">Selecciona tots</label>
+            </div>
+      </div>
       <div
         class="list-group-item list-group-item-action"
         *ngFor="let group of groups; index as i"
@@ -37,8 +51,9 @@
                 type="checkbox"
                 class="custom-control-input"
                 [attr.id]="group.id"
+                [checked]="selectAll"
                 #checkgroup
-                (click)="onCheckGroupClick(group.id, checkgroup.checked)"
+                (click)="onCheckGroupClick(group, checkgroup.checked)"
               />
               <label class="custom-control-label" [attr.for]="group.id"></label>
             </div>
@@ -55,7 +70,7 @@
             <i *ngIf="group.alumnes === 0"
               class="fas fa-times fa-2x text-danger "
               style="cursor: pointer;"
-              (click)="onDeleteIconClick(group.id,group.nom)"
+              (click)="onDeleteIconClick(group)"
             ></i>
           </div>
         </div>
@@ -67,7 +82,7 @@
         >
           Afegir Grups
         </button>
-        <button class="btn btn-primary mt-2 ml-2" (click)="onDeleteGroups()">
+        <button class="btn btn-primary mt-2 ml-2" (click)="onDeleteGroups()" [disabled]="selectedGroups.length === 0">
           Esborrar Sel·lecció
         </button>
     </div>

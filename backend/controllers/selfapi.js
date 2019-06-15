@@ -7,6 +7,7 @@ var dbconfig = require('../mysqlconn');
  *  quota en Gb
  */
 exports.crearGrups = (req, res) => {
+  console.log("\nInsertar grups!");
   console.log(req.body);
   dbconfig.connection.query( //Busquem el max ordre del grup
     "SELECT MAX(ordre) as max FROM grups WHERE assignatura_id="+req.body.assignatura.id,
@@ -65,14 +66,21 @@ exports.crearGrups = (req, res) => {
 
 /**
  * Request:
- *  llista en format array de grup_id
+ *  grups: llista en format array de grups
+ * assigCodi: codi de l'assignatura
  */
 
 exports.esborrarGrups = (req, res) => {
   console.log("\nEsborrar grups!");
-  console.log(req.body.join());
+  console.log(req.body);
+  grupsId = [];
+
+  req.body.grups.forEach(element => {
+    grupsId.push(element.id);
+  });
+
   dbconfig.connection.query( //Esborrar grups
-    "DELETE FROM `grups` WHERE id IN ("+req.body.join()+");" ,
+    "DELETE FROM `grups` WHERE id IN ("+grupsId.join()+");" ,
     (errorDel) =>{
       if (!errorDel){
         res.status(200).json({message: 'Fet!'});
