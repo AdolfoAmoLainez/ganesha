@@ -28,6 +28,7 @@ export class ProfessorsListComponent implements OnInit, OnDestroy {
   perfil = 'adm';
   paramsSubs: Subscription;
   profesUpdatedSubs: Subscription;
+  profesChangedSubs: Subscription;
 
   constructor(private modalService: NgbModal,
               private activatedRoute: ActivatedRoute,
@@ -51,15 +52,25 @@ export class ProfessorsListComponent implements OnInit, OnDestroy {
     }
 
     this.profesUpdatedSubs = this.dbService.profesUpdated.subscribe(
+      (profes: Professor[]) => {
+        console.log(profes);
+
+        this.professors = profes;
+        this.isLoading = false;
+      }
+    );
+
+    this.profesChangedSubs = this.dbService.profesChanged.subscribe(
       () => {
         this.loadProfessors();
       }
-    );
+    )
 
   }
   ngOnDestroy() {
     this.paramsSubs.unsubscribe();
     this.profesUpdatedSubs.unsubscribe();
+    this.profesChangedSubs.unsubscribe();
   }
 
   loadProfessors() {
@@ -68,31 +79,21 @@ export class ProfessorsListComponent implements OnInit, OnDestroy {
     this.dbService.getAssignatura(this.assignaturaId).subscribe(
       (assig: Assignatura) => {
         this.assignatura = assig;
-        this.dbService.getProfessorsAssignatura(this.assignaturaId).subscribe(
-          (data: any) => {
-            this.professors = data.json;
-            this.isLoading = false;
-          }
-        );
+        this.dbService.getProfessorsAssignatura(this.assignaturaId);
+        this.selectedProfessors = [];
       }
     );
 
   }
 
-  onDeleteIconClick(id: number, profeNom: string) {
+  onDeleteIconClick(profe: Professor, profeNom: string) {
     const modalRef = this.modalService.open(MymodalyesnoComponent);
     modalRef.componentInstance.titol = 'Esborrar Professor';
     modalRef.componentInstance.missatge = 'Vols esborrar el professor ' + profeNom + '?';
     modalRef.result.then(
       (resposta) => {
         console.log('Vol esborrar el professor!' + resposta);
-        //this.professors.splice(id, 1);
-        this.dbService.deleteProfessorAssignatura(id).subscribe(
-          (data) => {
-            console.log(data);
-            this.loadProfessors();
-          }
-        );
+        this.dbService.deleteProfessorsAssignatura([profe], this.assignatura.codi);
       },
       () => {
         console.log('Cancelado');
@@ -100,11 +101,11 @@ export class ProfessorsListComponent implements OnInit, OnDestroy {
     );
   }
 
-  onCheckProfessorClick(profeId: number, value: boolean) {
+  onCheckProfessorClick(profe: Professor, value: boolean) {
     if (value) {
-      this.selectedProfessors.push(profeId);
+      this.selectedProfessors.push(profe);
     } else {
-      this.selectedProfessors.splice(this.selectedProfessors.indexOf(profeId), 1);
+      this.selectedProfessors.splice(this.selectedProfessors.indexOf(profe), 1);
     }
   }
 
@@ -115,11 +116,11 @@ export class ProfessorsListComponent implements OnInit, OnDestroy {
         const professor: Professor = {
           id: null,
           niu: niu,
-          nom: "Buscar a LDAP?",
+          nom: 'Buscar a LDAP?',
           assignatura_id: this.assignaturaId
         };
 
-        this.dbService.addProfessorAssignatura(professor, this.assignatura);
+        this.dbService.addProfessorAssignatura(professor, this.assignatura.codi);
       },
       () => {
         console.log('Cancelado');
@@ -138,22 +139,7 @@ export class ProfessorsListComponent implements OnInit, OnDestroy {
     modalRef.result.then(
       (resposta) => {
         console.log('Vol esborrar tots els professors.');
-        this.dbService.deleteProfessorsAssignatura(this.selectedProfessors.join()).subscribe(
-          (data: any) => {
-            console.log(data);
-            this.selectedProfessors.forEach(
-              (selectedProfe) => {
-                this.professors = this.professors.filter(
-                  (value) => {
-                    return value.id !== selectedProfe;
-                  }
-                );
-              }
-            );
-            this.selectedProfessors = [];
-          }
-        );
-
+        this.dbService.deleteProfessorsAssignatura(this.selectedProfessors, this.assignatura.codi);
       },
       () => {
         console.log('Cancelado');

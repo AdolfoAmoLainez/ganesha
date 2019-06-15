@@ -17,7 +17,7 @@ import { Grup } from '../shared/grup.model';
 export class AlumnesListComponent implements OnInit, OnDestroy {
   perfil = 'profe';
 
-  alumnes = [];
+  alumnes: Alumne[] = [];
 
   selectedAlumnes = [];
 
@@ -25,10 +25,10 @@ export class AlumnesListComponent implements OnInit, OnDestroy {
 
   assignaturaCodi = '';
   grupId;
-  //grupNom = '';
   grup: Grup;
   paramsSubs: Subscription;
   alumnesUpdatedSubs: Subscription;
+  alumnesChangedSubs: Subscription;
 
   constructor(private modalService: NgbModal,
               private activatedRoute: ActivatedRoute,
@@ -38,6 +38,7 @@ export class AlumnesListComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.paramsSubs.unsubscribe();
     this.alumnesUpdatedSubs.unsubscribe();
+    this.alumnesChangedSubs.unsubscribe();
   }
 
   ngOnInit() {
@@ -46,6 +47,13 @@ export class AlumnesListComponent implements OnInit, OnDestroy {
     }
 
     this.alumnesUpdatedSubs = this.dbService.alumnesUpdated.subscribe(
+      (alumnes) => {
+        this.alumnes = alumnes;
+        this.isLoading = false;
+      }
+    );
+
+    this.alumnesChangedSubs = this.dbService.alumnesChanged.subscribe(
       () => {
         this.loadAlumnes();
       }
@@ -71,13 +79,7 @@ export class AlumnesListComponent implements OnInit, OnDestroy {
         this.grup = grupInfo.grup;
         this.assignaturaCodi = grupInfo.assignatura_codi;
 
-        this.dbService.getAlumnesGrup(this.grupId).subscribe(
-          (data: any) => {
-            this.alumnes = data.json;
-            this.isLoading = false;
-            this.selectedAlumnes = [];
-          }
-        );
+        this.dbService.getAlumnesGrup(this.grupId);
 
       }
     );
@@ -90,7 +92,9 @@ export class AlumnesListComponent implements OnInit, OnDestroy {
     modalRef.result.then(
       (resposta) => {
         // console.log('Vol esborrar l\'alumne!' + resposta);
-        this.dbService.deleteAlumnesGrup([alumne]);
+        this.dbService.deleteAlumnesGrup([alumne],
+                                         this.assignaturaCodi + '-g' + this.grup.ordre,
+                                        this.assignaturaCodi );
       },
       () => {
         console.log('Cancelado');
@@ -116,7 +120,7 @@ export class AlumnesListComponent implements OnInit, OnDestroy {
           nom: 'El busquem a LDAP?',
           grup_id: this.grupId
         };
-        this.dbService.addAlumneGrup(al);
+        this.dbService.addAlumneGrup(al, this.assignaturaCodi + '-g' + this.grup.ordre, this.assignaturaCodi);
       },
       () => {
         console.log('Cancelado');
@@ -135,21 +139,9 @@ export class AlumnesListComponent implements OnInit, OnDestroy {
     modalRef.result.then(
       (resposta) => {
         console.log('Vol esborrar tots els alumnes.');
-        this.dbService.deleteAlumnesGrup(this.selectedAlumnes);
-        // this.dbService.deleteAlumnesGrup(this.selectedAlumnes.join()).subscribe(
-        //   (data: any) => {
-        //     this.selectedAlumnes.forEach(
-        //       (selected) => {
-        //         this.alumnes = this.alumnes.filter(
-        //           (value) => {
-        //             return value.id !== selected;
-        //           }
-        //         );
-        //       }
-        //     );
-        //     this.selectedAlumnes = [];
-        //   }
-        // );
+        this.dbService.deleteAlumnesGrup(this.selectedAlumnes,
+                                         this.assignaturaCodi + '-g' + this.grup.ordre,
+                                         this.assignaturaCodi);
       },
       () => {
         console.log('Cancelado');

@@ -85,16 +85,16 @@ exports.esborrarGrups = (req, res) => {
 
 /**
  * Request:
- *  grup
- *  niu a afegir
- * SELECT grups.*, count(alumnes.id) as alumnes FROM `grups` RIGHT JOIN alumnes on grups.id = alumnes.grup_id WHERE grups.assignatura_id=1
+ *  alumne
+ *  grupNom: Nomc omplert del grup
+ *  AssigCodi: Codi de l'assignatura
  */
 exports.addAlumneGrup = (req, res) => {
   console.log("\nAssignar usuari grup!");
   console.log(req.body);
-  dbconfig.connection.query( //Afegir assignatura
+  dbconfig.connection.query( //Afegir alumne a grup
     "INSERT INTO `alumnes` (`id`, `niu`, `nom`, `grup_id`) " +
-    "VALUES (NULL, '"+req.body.niu+"', '"+req.body.nom+"','"+req.body.grup_id+"');",
+    "VALUES (NULL, '"+req.body.alumne.niu+"', '"+req.body.alumne.nom+"','"+req.body.alumne.grup_id+"');",
     (errorinsert) =>{
       if (!errorinsert){
         res.status(200).json({message: 'Fet!'});
@@ -107,13 +107,56 @@ exports.addAlumneGrup = (req, res) => {
 
 /**
  * Request:
- *  llista d'alumnes
+ *  alumnes: llista d'alumnes
+ *  grupName: nom del grup (carpeta)
+ *  assigCodi: codi assignatura
  */
 
 exports.deleteAlumnesGrup = (req, res) => {
+  console.log("\nEsborrar alumnes grup!");
   console.log(req.body);
-  console.log("Esborrar alumnes grup!");
-  res.status(200).json({message: 'Fet!'});
+  alumnesId = [];
+
+  req.body.alumnes.forEach(element => {
+    alumnesId.push(element.id);
+  });
+
+  dbconfig.connection.query( //Esborrar grups
+    "DELETE FROM `alumnes` WHERE id IN ("+alumnesId.join()+");" ,
+    (errorDel) =>{
+      if (!errorDel){
+        res.status(200).json({message: 'Fet!'});
+      } else {
+        res.status(500).json({message: "No s'han pogut esborrar els alumnes"});
+      }
+    });
+}
+
+/**
+ * Request:
+ *  profes: llista de profes
+ *
+ *  assigCodi: codi assignatura
+ */
+
+exports.deleteProfesAssignatura = (req, res) => {
+  console.log("\nEsborrar profesors assignatura!");
+  console.log(req.body);
+  profesId = [];
+
+  req.body.profes.forEach(element => {
+    profesId.push(element.id);
+  });
+
+  dbconfig.connection.query( //Esborrar grups
+    "DELETE FROM `professors` WHERE id IN ("+profesId.join()+");" ,
+    (errorDel) =>{
+      if (!errorDel){
+        res.status(200).json({message: 'Fet!'});
+      } else {
+        res.status(500).json({message: "No s'han pogut esborrar els professors"});
+      }
+    });
 }
 
 exports.getLvmInfo = (req, res) => {
@@ -138,21 +181,37 @@ exports.getLvmInfo = (req, res) => {
 /**
  * Request:
  * {
- *  assignatura,
+ *  assignaturaCodi,
  *  professor
  * }
+ *
+ * Resposta:
+ * message
  *
  */
 
 exports.addProfeAssignatura = (req, res) => {
+  console.log("\nAssignar profe a assignatura!");
   console.log(req.body);
-  console.log("Assignar profe a assignatura!");
-  res.status(200).json({message: 'Fet!'});
+  dbconfig.connection.query( //Afegir profe assignatura
+    "INSERT INTO `professors` (`id`, `niu`, `nom`, `assignatura_id`) " +
+    "VALUES (NULL, '"+req.body.professor.niu+"', '"+req.body.professor.nom+"','"+req.body.professor.assignatura_id+"');",
+    (errorinsert) =>{
+      if (!errorinsert){
+        res.status(200).json({message: 'Fet!'});
+      } else {
+        res.status(500).json({message: "No s'ha pogut insertar el professor a la BBDD"});
+      }
+    });
 }
 
 /**
  * Request:
  *  assignatura
+ *
+ * Resposta:
+ *   message
+ *   assignaturaId: Id de l'assignatura insertada
  */
 
 exports.addAssignatura = (req, res) => {
@@ -161,9 +220,10 @@ exports.addAssignatura = (req, res) => {
   dbconfig.connection.query( //Afegir assignatura
     "INSERT INTO `assignatures` (`id`, `codi`, `nom`, `unitat_id`, `tamany`, `unitatstamany`) " +
     "VALUES (NULL, '"+req.body.codi+"', '"+req.body.nom+"','"+req.body.unitat_id+"', '"+req.body.tamany+"', '"+req.body.unitatstamany+"');",
-    (errorinsert) =>{
+    (errorinsert, result) =>{
+
       if (!errorinsert){
-        res.status(200).json({message: 'Fet!'});
+        res.status(200).json({message: 'Fet!', assignaturaId: result.insertId});
       } else {
         res.status(500).json({message: "No s'ha pogut insertar l'assigantura en la BBDD"});
       }
@@ -172,10 +232,14 @@ exports.addAssignatura = (req, res) => {
 
 
 /**
- * Total de minuts ocupats pels grups d'una assignatura
+ * Grups d'una assignatura
  *
  * Request:
  *  id: assignatura_id
+ *
+ * Resposta:
+ *  message:
+ *  conjunt de grups de l'assignatura + la quantitat d'alumnes que té cada grup
  */
 
 exports.getGrupsAssignatura = (req, res) => {

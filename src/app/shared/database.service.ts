@@ -9,6 +9,8 @@ import { map } from 'rxjs/operators';
 import { Grup } from './grup.model';
 import { Alumne } from './alumne.model';
 import {environment} from '../../environments/environment';
+import { Router } from '@angular/router';
+import { stringify } from '@angular/core/src/render3/util';
 
 @Injectable()
 export class DataBaseService {
@@ -34,10 +36,13 @@ export class DataBaseService {
   assignaturesUpdated = new Subject <Assignatura []>();
   grupsUpdated = new Subject<Grup[]>();
   grupsChanged = new Subject();
-  alumnesUpdated = new Subject();
-  profesUpdated = new Subject();
+  alumnesUpdated = new Subject<Alumne[]>();
+  alumnesChanged = new Subject();
+  profesUpdated = new Subject<Professor[]>();
+  profesChanged = new Subject();
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient,
+              private router: Router) {}
 
 
   getLvmInfo() {
@@ -76,10 +81,11 @@ export class DataBaseService {
   }
 
   addAssignatura(assignatura: Assignatura) {
-    return this.http.post(environment.selfApiUrl + 'add_assignatura', assignatura).subscribe(
+    return this.http.post<{message: string, assignaturaId: number}>(environment.selfApiUrl + 'add_assignatura', assignatura).subscribe(
       (data) => {
-        // console.log(data);
+        console.log(data);
         this.getAssignatures();
+        this.router.navigate(['/', 'adm', 'assignatura', data.assignaturaId, 'professors']);
       }
     );
   }
@@ -104,29 +110,58 @@ export class DataBaseService {
   }
 
   getProfessorsAssignatura(assignaturaId: string) {
-    return this.http.get<{professors: Professor[]}> (environment.apiCrudUrl + 'professors?assignatura_id[LIKE]=' + assignaturaId);
+    return this.http.get<{result: string, json: Professor[], length: number}>
+      (environment.apiCrudUrl + 'professors?assignatura_id[LIKE]=' + assignaturaId).subscribe(
+        (data) => {
+          console.log(data);
+
+          this.profesUpdated.next([...data.json]);
+        }
+      );
   }
 
-  deleteProfessorAssignatura(profeId: number) {
-    return this.http.delete(environment.apiCrudUrl + 'professors/' + profeId);
-  }
+  // deleteProfessorAssignatura(profeId: number) {
+  //   return this.http.delete(environment.apiCrudUrl + 'professors/' + profeId).subscribe(
+  //     (data) => {
+  //       console.log(data);
+  //       this.profesChanged.next();
+  //     }
+  //   );
+  // }
 
-  deleteProfessorsAssignatura(profeList: string) {
-    const query = {
-      query: 'DELETE FROM professors WHERE id IN (' + profeList + ');'
+  deleteProfessorsAssignatura(profes: Professor[], assigCodi: string) {
+    const obj = {
+      profes,
+      assigCodi
     };
 
-    return this.http.post(environment.apiCustomUrl + '', query);
+    return this.http.post<{result: string, json: any, length: number}>
+      (environment.selfApiUrl + 'delete_professors_assignatura', obj).subscribe(
+        (data) => {
+          console.log(data);
+
+          this.profesChanged.next();
+
+        }
+      );
+
+    // const query = {
+    //   query: 'DELETE FROM professors WHERE id IN (' + profeList + ');'
+    // };
+
+    // return this.http.post(environment.apiCustomUrl + '', query);
   }
 
-  addProfessorAssignatura(professor: Professor, assignatura: Assignatura) {
+  addProfessorAssignatura(professor: Professor, assignaturaCodi: string) {
     const profObj = {
-      assignatura,
+      assignaturaCodi,
       professor
     };
     return this.http.post(environment.selfApiUrl + 'add_professor_assignatura', profObj).subscribe(
       (response) => {
-        this.profesUpdated.next();
+        console.log(response);
+
+        this.profesChanged.next();
       }
     );
   }
@@ -210,22 +245,43 @@ export class DataBaseService {
   }
 
   getAlumnesGrup(grupId: string) {
-    return this.http.get<{grups: Grup[]}> (environment.apiCrudUrl + 'alumnes?grup_id[LIKE]=' + grupId);
+    return this.http.get<{result: string, json: any, length: number}>(environment.apiCrudUrl + 'alumnes?grup_id[LIKE]=' + grupId).subscribe(
+      (data) => {
+        this.alumnesUpdated.next([...data.json]);
+      }
+    )
   }
 
-  addAlumneGrup(alumne: Alumne) {
-      return this.http.post<{result: string, json: any, length: number}>(environment.selfApiUrl + 'add_alumne_grup', alumne).subscribe(
-        (data) => {
-          this.alumnesUpdated.next();
-        }
-      );
-  }
+  addAlumneGrup(alumne: Alumne, grupName: string, assigCodi: string) {
+    const obj = {
+      alumne,
+      grupName,
+      assigCodi
+    };
 
-  deleteAlumnesGrup(alumnes: Alumne[]) {
     return this.http.post<{result: string, json: any, length: number}>
-      (environment.selfApiUrl + 'delete_alumnes_grup', alumnes).subscribe(
+      (environment.selfApiUrl + 'add_alumne_grup', obj).subscribe(
+      (data) => {
+        this.alumnesChanged.next();
+        this.grupsChanged.next();
+      }
+    );
+  }
+
+  deleteAlumnesGrup(alumnes: Alumne[], grupName: string, assigCodi: string) {
+    const obj = {
+      alumnes,
+      grupName,
+      assigCodi
+    };
+
+    return this.http.post<{result: string, json: any, length: number}>
+      (environment.selfApiUrl + 'delete_alumnes_grup', obj).subscribe(
         (data) => {
-          this.alumnesUpdated.next();
+          console.log(data);
+
+          this.alumnesChanged.next();
+          this.grupsChanged.next();
         }
       );
   }

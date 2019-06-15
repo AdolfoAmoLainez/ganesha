@@ -20,7 +20,7 @@
             class="custom-control-input"
             [attr.id]="profe.id"
             #checkprofe
-            (click)="onCheckProfessorClick(profe.id, checkprofe.checked)"
+            (click)="onCheckProfessorClick(profe, checkprofe.checked)"
           />
           <label class="custom-control-label" [attr.for]="profe.id"></label>
         </div>
@@ -30,7 +30,7 @@
         <i
           class="fas fa-times text-danger"
           style="cursor: pointer;"
-          (click)="onDeleteIconClick(profe.id, profe.niu)"
+          (click)="onDeleteIconClick(profe, profe.niu)"
         ></i>
       </div>
     </div>
