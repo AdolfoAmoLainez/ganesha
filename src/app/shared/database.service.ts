@@ -90,6 +90,15 @@ export class DataBaseService {
     );
   }
 
+  deleteAssignatura(assignatura: Assignatura) {
+    return this.http.post<{message: string}>(environment.selfApiUrl + 'delete_assignatura', assignatura).subscribe(
+      (data) => {
+        console.log(data);
+        this.getAssignatures();
+      }
+    );
+  }
+
   getMinutsConsumits(id: string) {
     const peticio = {
       id

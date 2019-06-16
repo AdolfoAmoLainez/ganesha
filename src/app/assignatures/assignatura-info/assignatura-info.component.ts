@@ -143,7 +143,7 @@ export class AssignaturaInfoComponent implements OnInit, OnDestroy {
     modalRef.result.then(
       (resposta) => {
         console.log('Vol esborrar l\'assignatura');
-        // this.dbService.deleteGrupsAssignatura(this.selectedGroups);
+        this.dbService.deleteAssignatura(this.assignatura);
       },
       () => {
         console.log('Cancelado');

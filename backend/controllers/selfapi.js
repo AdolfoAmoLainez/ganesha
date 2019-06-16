@@ -179,7 +179,7 @@ exports.getLvmInfo = (req, res) => {
         }
       ]
     };
-  console.log("get LVM Info!");
+  console.log("\nget LVM Info!");
 
 
   res.status(200).json(volinfo);
@@ -236,6 +236,21 @@ exports.addAssignatura = (req, res) => {
         res.status(500).json({message: "No s'ha pogut insertar l'assigantura en la BBDD"});
       }
     });
+}
+
+/**
+ * Request:
+ *  assignatura
+ *
+ * Resposta:
+ *   message
+ *
+ */
+
+exports.deleteAssignatura = (req, res) => {
+  console.log(req.body);
+  console.log("\ndelete Assignatura. Not implemented!");
+  res.status(200).json({message: 'Fet!'});
 }
 
 
