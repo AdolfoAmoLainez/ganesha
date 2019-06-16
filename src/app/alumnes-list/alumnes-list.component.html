@@ -4,7 +4,7 @@
   </div>
 </div>
 <ul class="list-group mt-4" *ngIf="!isLoading">
-  <div class="list-group-item list-group-item-primary">
+  <li class="list-group-item list-group-item-primary">
     <div class="row align-items-center">
       <div class="col-sm-1" *ngIf="perfil == 'profe'">
         <i
@@ -17,13 +17,27 @@
         <h5>{{ assignaturaCodi }}-g{{ grup?.ordre }}</h5>
       </div>
     </div>
-  </div>
-  <div
+  </li>
+  <li
     class="list-group-item list-group-item-action"
     *ngIf="alumnes.length === 0"
   >
     No hi ha cap alummne en aquest grup!!
-  </div>
+</li>
+  <li class="list-group-item list-group-item-action" *ngIf="alumnes.length !== 0">
+    <div class="custom-control custom-checkbox">
+        <input
+          type="checkbox"
+          class="custom-control-input"
+          [(ngModel)]="selectAllAlumnes"
+          name="selectAllAlumnes"
+          id="selectAllAlumnes"
+          #selectAllAlumnesStatus
+          (click)="onSelectAllAlumnes(selectAllAlumnesStatus.checked);"
+        />
+        <label class="custom-control-label" for="selectAllAlumnes">Selecciona tots</label>
+      </div>
+  </li>
   <li
     class="list-group-item list-group-item-action"
     *ngFor="let alumne of alumnes; index as i"
@@ -36,6 +50,7 @@
             class="custom-control-input"
             [attr.id]="alumne.id"
             #checkalumne
+            [checked]="selectAllAlumnes"
             (click)="onCheckAlumneClick(alumne, checkalumne.checked)"
           />
           <label class="custom-control-label" [attr.for]="alumne.id"></label>
@@ -55,8 +70,8 @@
     <button class="btn btn-primary" (click)="onAfegirClick(afegirAlumneModal)">
       Afegir Alumne
     </button>
-    <button class="btn btn-primary ml-2" (click)="onDeleteAlumnes()">
-      Esborrar Sel·lecció
+    <button class="btn btn-primary ml-2" (click)="onDeleteAlumnes()" [disabled]="selectedAlumnes.length === 0">
+      Esborrar Selecció
     </button>
   </li>
 </ul>
@@ -87,7 +102,7 @@
       class="btn btn-primary"
       (click)="modal.close(niu.value)"
     >
-      Crear
+      Afegir
     </button>
     <button type="button" class="btn btn-danger" (click)="modal.dismiss()">
       Cancel·lar

@@ -20,6 +20,7 @@ export class AlumnesListComponent implements OnInit, OnDestroy {
   alumnes: Alumne[] = [];
 
   selectedAlumnes = [];
+  selectAllAlumnes = false;
 
   isLoading = true;
 
@@ -50,6 +51,7 @@ export class AlumnesListComponent implements OnInit, OnDestroy {
       (alumnes) => {
         this.alumnes = alumnes;
         this.isLoading = false;
+        this.selectAllAlumnes = false;
       }
     );
 
@@ -95,6 +97,7 @@ export class AlumnesListComponent implements OnInit, OnDestroy {
         this.dbService.deleteAlumnesGrup([alumne],
                                          this.assignaturaCodi + '-g' + this.grup.ordre,
                                         this.assignaturaCodi );
+        this.selectAllAlumnes = false;
       },
       () => {
         console.log('Cancelado');
@@ -108,6 +111,8 @@ export class AlumnesListComponent implements OnInit, OnDestroy {
     } else {
       this.selectedAlumnes.splice(this.selectedAlumnes.indexOf(alumne), 1);
     }
+    console.log(this.selectedAlumnes);
+
   }
 
   onAfegirClick(content) {
@@ -142,11 +147,23 @@ export class AlumnesListComponent implements OnInit, OnDestroy {
         this.dbService.deleteAlumnesGrup(this.selectedAlumnes,
                                          this.assignaturaCodi + '-g' + this.grup.ordre,
                                          this.assignaturaCodi);
+        this.selectAllAlumnes = false;
       },
       () => {
         console.log('Cancelado');
       }
     );
+  }
+
+  onSelectAllAlumnes(selectAllStatus: boolean) {
+    if (selectAllStatus) {
+      this.alumnes.forEach( element => {
+          this.selectedAlumnes.push(element);
+      });
+    } else {
+      this.selectedAlumnes = [];
+    }
+
   }
 
 }
