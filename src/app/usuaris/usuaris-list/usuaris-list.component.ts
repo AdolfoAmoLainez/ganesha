@@ -12,32 +12,8 @@ import { Subscription } from 'rxjs';
 })
 export class UsuarisListComponent implements OnInit, OnDestroy {
 
-  usuaris: Usuari[] = [{
-    id: 1,
-    niu: '2040206',
-    perfil_id: 1
-  },
-  {
-    id: 2,
-    niu: '2040206',
-    perfil_id: 2
-  },
-  {
-    id: 3,
-    niu: '2040206',
-    perfil_id: 1
-  }];
-
-  perfils = [
-    {
-      id: 1,
-      perfil: 'adm'
-    },
-    {
-      id: 2,
-      perfil: 'profe'
-    }
-  ];
+  usuaris: Usuari[];
+  isLoading = true;
 
   usuarisUpdatedSubs: Subscription;
   usuarisChangedSubs: Subscription;
@@ -45,20 +21,18 @@ export class UsuarisListComponent implements OnInit, OnDestroy {
   constructor(private modalService: NgbModal,
               private dbService: DataBaseService) { }
 
-
-  /**
-   * TODO: Falta isLoading
-   */
   ngOnInit() {
     this.usuarisUpdatedSubs = this.dbService.usuarisUpdated.subscribe(
       (usuaris) => {
         this.usuaris = usuaris;
+        this.isLoading = false;
       }
     );
 
     this.usuarisChangedSubs = this.dbService.usuarisChanged.subscribe(
       () => {
         this.dbService.getUsuaris();
+        this.isLoading = true;
       }
     );
 
@@ -84,6 +58,7 @@ export class UsuarisListComponent implements OnInit, OnDestroy {
       (resposta) => {
         console.log('Vol esborrar l\'usuari.');
         this.dbService.deleteUsuari(usuari.id);
+        this.isLoading = true;
       },
       () => {
         console.log('Cancelado');
@@ -94,6 +69,7 @@ export class UsuarisListComponent implements OnInit, OnDestroy {
 
   onAfegir() {
     this.dbService.addUsuari();
+    this.isLoading = true;
   }
 
 
