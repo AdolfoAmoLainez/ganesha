@@ -94,7 +94,7 @@ exports.deleteGrups = (req, res) => {
 /**
  * Request:
  *  alumne
- *  grupNom: Nomc omplert del grup
+ *  grupNom: Nomcomplert del grup
  *  AssigCodi: Codi de l'assignatura
  */
 exports.addAlumneGrup = (req, res) => {
@@ -299,6 +299,29 @@ exports.getMinutsConsumits = (req, res) => {
         res.status(200).json({message: 'Fet!', consulta});
       } else {
         res.status(500).json({message: "No s'ha pogut consultar els minuts consumits!"});
+      }
+    });
+}
+
+/**
+ * Request:
+ *
+ * Resposta:
+ * message
+ *
+ */
+
+exports.addUsuari = (req, res) => {
+  console.log("\nAfegir Usuari!");
+  console.log(req.body);
+  dbconfig.connection.query( //Afegir profe assignatura
+    "INSERT INTO `usuaris` (`id`, `niu`, `perfil_id`) " +
+    "VALUES (NULL, 'Escriu Niu', '2');",
+    (errorinsert) =>{
+      if (!errorinsert){
+        res.status(200).json({message: 'Fet!'});
+      } else {
+        res.status(500).json({message: "No s'ha pogut insertar l'usuari a la BBDD"});
       }
     });
 }

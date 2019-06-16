@@ -49,4 +49,8 @@ ngOnDestroy() {
     this.router.navigate(['adm', 'addassignatura']);
   }
 
+  onUsuarisClick() {
+    this.router.navigate(['adm', 'usuaris']);
+  }
+
 }

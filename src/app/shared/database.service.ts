@@ -11,6 +11,7 @@ import { Alumne } from './alumne.model';
 import {environment} from '../../environments/environment';
 import { Router } from '@angular/router';
 import { stringify } from '@angular/core/src/render3/util';
+import { Usuari } from './usuari.model';
 
 @Injectable()
 export class DataBaseService {
@@ -40,6 +41,8 @@ export class DataBaseService {
   alumnesChanged = new Subject();
   profesUpdated = new Subject<Professor[]>();
   profesChanged = new Subject();
+  usuarisUpdated = new Subject<Usuari[]>();
+  usuarisChanged = new Subject();
 
   constructor(private http: HttpClient,
               private router: Router) {}
@@ -310,5 +313,43 @@ export class DataBaseService {
   getFactorUnitats() {
     return this.http.get<{result: string, json: any, length: number}> (environment.apiCrudUrl + 'factorunitats/1');
   }
+
+  getUsuaris() {
+    return this.http.get<{result: string, json: any, length: number}>(environment.apiCrudUrl + 'usuaris').subscribe(
+      (data) => {
+        // console.log(data);
+
+        this.usuarisUpdated.next(data.json);
+      }
+    );
+  }
+
+  addUsuari() {
+    return this.http.get<{result: string, json: any, length: number}>(environment.selfApiUrl + 'add_usuari').subscribe(
+      (data) => {
+        // console.log(data);
+
+        this.usuarisChanged.next();
+      }
+    );
+  }
+
+  deleteUsuari(usuariId: number) {
+    return this.http.delete<{result: string, json: any, length: number}>
+      (environment.apiCrudUrl + 'usuaris/' + usuariId).subscribe(
+      (data) => {
+        this.usuarisChanged.next();
+      }
+    )
+  }
+
+  modificarUsuari(usuari: Usuari) {
+    return this.http.put(environment.apiCrudUrl + 'usuaris/' + usuari.id, usuari).subscribe(
+      (data: any) => {
+        this.usuarisChanged.next();
+      }
+    );
+  }
+
 
 }

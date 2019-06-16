@@ -18,6 +18,7 @@ import { MymodalyesnoComponent } from './shared/mymodalyesno/mymodalyesno.compon
 
 import {NgbModalModule} from '@ng-bootstrap/ng-bootstrap';
 import {NgbAccordionModule} from '@ng-bootstrap/ng-bootstrap';
+import { UsuarisListComponent } from './usuaris/usuaris-list/usuaris-list.component';
 
 @NgModule({
   declarations: [
@@ -29,7 +30,8 @@ import {NgbAccordionModule} from '@ng-bootstrap/ng-bootstrap';
     ProfessorsListComponent,
     AssignaturaInfoComponent,
     AssignaturaViewComponent,
-    MymodalyesnoComponent
+    MymodalyesnoComponent,
+    UsuarisListComponent
   ],
   imports: [
     BrowserModule,

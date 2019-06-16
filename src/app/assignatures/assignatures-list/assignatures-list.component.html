@@ -21,7 +21,18 @@
 </div>
 <div class="list-group" *ngIf="perfil == 'adm'">
   <div>
-
+    <a
+    class="btn btn-primary text-white text-left"
+    role="button"
+    aria-pressed="true"
+    (click)="onUsuarisClick()"
+    ><i
+    class="fas fa-edit text-white mr-2"
+    style="cursor: pointer;"
+    ></i>Usuaris</a
+    >
+  </div>
+  <div>
     <a
     class="btn btn-primary text-white text-left"
     role="button"

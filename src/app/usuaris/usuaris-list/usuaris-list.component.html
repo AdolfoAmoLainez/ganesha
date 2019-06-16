@@ -1,0 +1,64 @@
+<ul class="list-group">
+  <li class="list-group-item list-group-item-action">
+    <div class="row justify-content-center">
+      <div class="col-sm-2">Id</div>
+      <div class="col-sm-4">Niu</div>
+      <div class="col-sm-2">Perfil</div>
+      <div class="col-sm-1"></div>
+      <div class="col-sm-1"></div>
+    </div>
+  </li>
+  <li
+    class="list-group-item list-group-item-action"
+    *ngFor="let usuari of usuaris"
+  >
+    <form>
+      <div class="row justify-content-center">
+        <div class="col-sm-2">
+          {{ usuari.id }}
+        </div>
+        <div class="col-sm-4">
+          <div class="form-group">
+            <input
+              type="text"
+              class="form-control"
+              id="niu"
+              [value]="usuari.niu"
+              name="niu"
+              [(ngModel)]="usuari.niu"
+            />
+          </div>
+        </div>
+        <div class="col-sm-2">
+          <div class="form-group">
+            <select
+              class="form-control"
+              name="perfil_id"
+              id="perfil_id"
+              [value]="usuari.perfil_id"
+              [(ngModel)]="usuari.perfil_id"
+            >
+              <option *ngFor="let perfil of perfils" [value]="perfil.id">{{
+                perfil.perfil
+              }}</option>
+            </select>
+          </div>
+        </div>
+        <div class="col-sm-1">
+          <button type="button" class="btn btn-primary" (click)="onGuardar(usuari)">Guardar</button>
+        </div>
+        <div class="col-sm-1 ml-2">
+            <i
+              class="fas fa-times fa-2x text-danger "
+              style="cursor: pointer;"
+              (click)="onEsborrar(usuari)"
+            ></i>
+        </div>
+      </div>
+    </form>
+  </li>
+  <li
+  class="list-group-item list-group-item-action">
+    <button type="button" class="btn btn-primary" (click)="onAfegir()">Afegir</button>
+  </li>
+</ul>
