@@ -185,7 +185,7 @@ export class DataBaseService {
       quotaGb
     };
 
-    return this.http.post(environment.selfApiUrl + 'crea_grups', obj).subscribe(
+    return this.http.post(environment.selfApiUrl + 'add_grups', obj).subscribe(
       (response) => {
         console.log(response);
 
@@ -200,7 +200,7 @@ export class DataBaseService {
       grups,
       assigCodi
     };
-    return this.http.post(environment.selfApiUrl + 'esborra_grups', obj).subscribe(
+    return this.http.post(environment.selfApiUrl + 'delete_grups', obj).subscribe(
       (response) => {
         console.log(response);
 

@@ -3,8 +3,8 @@ const SelfApiController = require("../controllers/selfapi");
 
 const router = express.Router();
 
-router.post('/crea_grups', SelfApiController.crearGrups);
-router.post('/esborra_grups', SelfApiController.esborrarGrups);
+router.post('/add_grups', SelfApiController.addGrups);
+router.post('/delete_grups', SelfApiController.deleteGrups);
 router.post('/add_alumne_grup', SelfApiController.addAlumneGrup);
 router.post('/add_professor_assignatura', SelfApiController.addProfeAssignatura);
 router.post('/delete_professors_assignatura', SelfApiController.deleteProfesAssignatura);

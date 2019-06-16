@@ -6,7 +6,7 @@ var dbconfig = require('../mysqlconn');
  *  quantitat de grups
  *  quota en Gb
  */
-exports.crearGrups = (req, res) => {
+exports.addGrups = (req, res) => {
   console.log("\nInsertar grups!");
   console.log(req.body);
   dbconfig.connection.query( //Busquem el max ordre del grup
@@ -70,7 +70,7 @@ exports.crearGrups = (req, res) => {
  * assigCodi: codi de l'assignatura
  */
 
-exports.esborrarGrups = (req, res) => {
+exports.deleteGrups = (req, res) => {
   console.log("\nEsborrar grups!");
   console.log(req.body);
   grupsId = [];
