@@ -26,7 +26,7 @@
       <div class="list-group-item list-group-item-action" *ngIf="groups.length === 0">
           No hi ha cap grup!!
       </div>
-      <div class="list-group-item list-group-item-action">
+      <div class="list-group-item list-group-item-action" *ngIf="groups.length !== 0">
           <div class="custom-control custom-checkbox">
               <input
                 type="checkbox"

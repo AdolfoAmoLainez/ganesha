@@ -11,7 +11,7 @@
   >
     No hi ha cap professor en aquest grup!!
   </li>
-  <li class="list-group-item list-group-item-action">
+  <li class="list-group-item list-group-item-action" *ngIf="professors.length !== 0">
     <div class="custom-control custom-checkbox">
         <input
           type="checkbox"
