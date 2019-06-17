@@ -4,6 +4,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { MymodalyesnoComponent } from 'src/app/shared/mymodalyesno/mymodalyesno.component';
 import { DataBaseService } from 'src/app/shared/database.service';
 import { Subscription } from 'rxjs';
+import { Perfil } from 'src/app/shared/perfil.model';
 
 @Component({
   selector: 'app-usuaris-list',
@@ -12,11 +13,13 @@ import { Subscription } from 'rxjs';
 })
 export class UsuarisListComponent implements OnInit, OnDestroy {
 
+  perfils: Perfil[];
   usuaris: Usuari[];
   isLoading = true;
 
   usuarisUpdatedSubs: Subscription;
   usuarisChangedSubs: Subscription;
+  perfilsUpdatedSubs: Subscription;
 
   constructor(private modalService: NgbModal,
               private dbService: DataBaseService) { }
@@ -25,7 +28,13 @@ export class UsuarisListComponent implements OnInit, OnDestroy {
     this.usuarisUpdatedSubs = this.dbService.usuarisUpdated.subscribe(
       (usuaris) => {
         this.usuaris = usuaris;
-        this.isLoading = false;
+
+        this.perfilsUpdatedSubs = this.dbService.perfilsUpdated.subscribe(
+          (perfils) => {
+            this.perfils = perfils;
+            this.isLoading = false;
+          }
+        )
       }
     );
 
@@ -37,11 +46,13 @@ export class UsuarisListComponent implements OnInit, OnDestroy {
     );
 
     this.dbService.getUsuaris();
+    this.dbService.getPerfils();
   }
 
   ngOnDestroy() {
     this.usuarisUpdatedSubs.unsubscribe();
     this.usuarisChangedSubs.unsubscribe();
+    this.perfilsUpdatedSubs.unsubscribe();
   }
 
   onGuardar(usuari: Usuari) {

@@ -12,6 +12,7 @@ import {environment} from '../../environments/environment';
 import { Router } from '@angular/router';
 import { stringify } from '@angular/core/src/render3/util';
 import { Usuari } from './usuari.model';
+import { Perfil } from './perfil.model';
 
 @Injectable()
 export class DataBaseService {
@@ -43,6 +44,7 @@ export class DataBaseService {
   profesChanged = new Subject();
   usuarisUpdated = new Subject<Usuari[]>();
   usuarisChanged = new Subject();
+  perfilsUpdated = new Subject<Perfil[]>();
 
   constructor(private http: HttpClient,
               private router: Router) {}
@@ -351,5 +353,13 @@ export class DataBaseService {
     );
   }
 
+  getPerfils() {
+    return this.http.get<{result: string, json: any, length: number}>(environment.apiCrudUrl + 'perfils').subscribe(
+      (data) => {
+        // console.log(data);
 
+        this.perfilsUpdated.next(data.json);
+      }
+    );
+  }
 }
