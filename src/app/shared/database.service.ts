@@ -339,7 +339,8 @@ export class DataBaseService {
       passwd
     };
 
-    return this.http.post<{status: string , message: string, perfils: [{perfil: string}]}>(environment.selfApiUrl + 'valida_usuari', obj);
+    return this.http.post<{status: string , message: string, perfils: [{perfil: string, id: number}]}>
+      (environment.selfApiUrl + 'valida_usuari', obj);
   }
 
   getPerfil(username: string) {

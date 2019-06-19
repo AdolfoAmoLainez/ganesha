@@ -370,7 +370,7 @@ exports.validaUsuari = (req, res) => {
   console.log(req.body);
   console.log("\nValida usuari!!!");
   dbconfig.connection.query(
-      "SELECT perfils.perfil FROM `perfils` LEFT JOIN `usuaris` ON perfils.id = usuaris.perfil_id " +
+      "SELECT usuaris.id as id, perfils.perfil FROM `perfils` LEFT JOIN `usuaris` ON perfils.id = usuaris.perfil_id " +
       "WHERE usuaris.niu='"+req.body.username+"';",
       (errorSel, perfils) => {
       if (!errorSel){
