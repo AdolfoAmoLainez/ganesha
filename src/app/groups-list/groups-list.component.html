@@ -5,9 +5,9 @@
 </div>
 
 <div class="row " *ngIf="!isLoading">
-  <div class="col-sm-6">
+  <div [class.col-sm-6]="perfil==='adm'" [class.col-sm-12]="perfil!=='adm'">
     <div class="list-group">
-      <div class="list-group-item list-group-item-primary mt-4" *ngIf="perfil == 'profe'">
+      <div class="list-group-item list-group-item-primary mt-4" *ngIf="perfil == 'professor'">
         <div class="row align-items-center" >
           <div class="col-sm-1">
             <i
@@ -18,7 +18,7 @@
           </div>
           <div class="col-sm ml-2">
             <h5>
-              {{assignatura.nom}}
+              Grups de {{assignatura.nom}}
             </h5>
           </div>
         </div>
@@ -59,7 +59,7 @@
             </div>
           </div>
           <h2 class="col-sm-6">
-            <a *ngIf="perfil == 'profe'" [routerLink]="['/professor','alumnes', group.id]" class="btn btn-link">{{
+            <a *ngIf="perfil == 'professor'" [routerLink]="['/professor','alumnes', group.id]" class="btn btn-link">{{
               assignatura.codi + '-g' + group.ordre
             }}</a>
             <a *ngIf="perfil == 'adm'" [routerLink]="['alumnes', group.id]" class="btn btn-link">{{
@@ -85,7 +85,7 @@
         <button class="btn btn-primary mt-2 ml-2" (click)="onDeleteGroups()" [disabled]="selectedGroups.length === 0">
           Esborrar Selecció
         </button>
-    </div>
+      </div>
     </div>
   </div>
   <div class="col-sm-6">

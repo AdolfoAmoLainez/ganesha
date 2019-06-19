@@ -9,19 +9,19 @@ import { AuthService } from './auth/auth.service';
 })
 export class AppComponent implements AfterViewInit {
   title = 'ganesha';
-  perfil = 'profe';
-  viewSideBar = false;
+  perfil = 'professor';
+
 
   constructor(private router: Router,
               private authService: AuthService) {}
 
   ngAfterViewInit(): void {
 
-    this.authService.getPerfil().subscribe(
+/*     this.authService.getPerfil().subscribe(
       (data) => {
         this.perfil = data.perfils[0].perfil;
       }
-    )
+    ) */
     if (this.perfil === 'adm') {
       //console.log('por aqui');
 
@@ -33,8 +33,6 @@ export class AppComponent implements AfterViewInit {
     }
   }
 
-  onToggleSideBar() {
-    this.viewSideBar = !this.viewSideBar;
-  }
+
 
 }

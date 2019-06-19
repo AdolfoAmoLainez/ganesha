@@ -6,7 +6,7 @@
 <ul class="list-group mt-4" *ngIf="!isLoading">
   <li class="list-group-item list-group-item-primary">
     <div class="row align-items-center">
-      <div class="col-sm-1" *ngIf="perfil == 'profe'">
+      <div class="col-sm-1" *ngIf="perfil == 'professor'">
         <i
           class="fas fa-backspace fa-2x text-primary"
           style="cursor: pointer;"
@@ -14,7 +14,7 @@
         ></i>
       </div>
       <div class="col-sm ml-2">
-        <h5>{{ assignaturaCodi }}-g{{ grup?.ordre }}</h5>
+        <h5>Alumnes del grup {{ assignaturaCodi }}-g{{ grup?.ordre }}</h5>
       </div>
     </div>
   </li>

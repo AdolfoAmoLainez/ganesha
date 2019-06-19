@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy} from '@angular/core';
+import { Component, OnInit, OnDestroy, AfterViewInit} from '@angular/core';
 import { ActivatedRoute, ParamMap } from '@angular/router';
 import { Location } from '@angular/common';
 
@@ -9,6 +9,7 @@ import { DataBaseService } from '../shared/database.service';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { Assignatura } from '../shared/assignatura.model';
 import { Grup } from '../shared/grup.model';
+import { AuthService } from '../auth/auth.service';
 
 
 @Component({
@@ -16,9 +17,9 @@ import { Grup } from '../shared/grup.model';
   templateUrl: './groups-list.component.html',
   styleUrls: ['./groups-list.component.css']
 })
-export class GroupsListComponent implements OnInit, OnDestroy {
+export class GroupsListComponent implements  OnDestroy, OnInit {
 
-  perfil = 'profe';
+  perfil = 'professor';
   groups = [];
   selectedGroups = [];
   selectAll = false; // per seleccionar tota els grups
@@ -38,18 +39,50 @@ export class GroupsListComponent implements OnInit, OnDestroy {
   constructor(private modalService: NgbModal,
               private activatedRoute: ActivatedRoute,
               private myLocation: Location,
-              private dbService: DataBaseService) { }
+              private dbService: DataBaseService,
+              private authService: AuthService) { }
 
   ngOnInit() {
 
-    if (this.activatedRoute.parent.snapshot.data.perfil) {
+    this.authService.getPerfil().subscribe(
+      (data) => {
+
+        this.perfil = data.perfils[0].perfil;
+
+        if (this.perfil === 'adm') {
+
+          if (this.activatedRoute.parent.paramMap) {
+            this.paramsSubs = this.activatedRoute.parent.paramMap.subscribe(
+              (paramMap: ParamMap) => {
+                if (paramMap.has('assignaturaid')) {
+                  this.assignaturaId = paramMap.get('assignaturaid');
+                  this.loadGrups();
+                }
+              });
+          }
+        } else {
+          if (this.activatedRoute.paramMap) {
+            this.paramsSubs = this.activatedRoute.paramMap.subscribe(
+              (paramMap: ParamMap) => {
+                if (paramMap.has('assignaturaid')) {
+                  this.assignaturaId = paramMap.get('assignaturaid');
+                  this.loadGrups();
+                }
+              });
+          }
+        }
+      }
+    );
+/*     if (this.activatedRoute.parent.snapshot.data.perfil) {
       this.perfil = this.activatedRoute.parent.snapshot.data.perfil;
-    }
+    } */
 
     this.grupsUpdatedSubs = this.dbService.grupsUpdated.subscribe(
       (grups) => {
         this.groups = grups;
         this.isLoading = false;
+
+
       }
     );
 
@@ -59,31 +92,6 @@ export class GroupsListComponent implements OnInit, OnDestroy {
       }
     );
 
-    if (this.perfil === 'adm') {
-
-      if (this.activatedRoute.parent.paramMap) {
-        this.paramsSubs = this.activatedRoute.parent.paramMap.subscribe(
-          (paramMap: ParamMap) => {
-            if (paramMap.has('assignaturaid')) {
-              this.assignaturaId = paramMap.get('assignaturaid');
-              this.loadGrups();
-            }
-          });
-      }
-
-    } else {
-
-      if (this.activatedRoute.paramMap) {
-        this.paramsSubs = this.activatedRoute.paramMap.subscribe(
-          (paramMap: ParamMap) => {
-            if (paramMap.has('assignaturaid')) {
-              this.assignaturaId = paramMap.get('assignaturaid');
-              this.loadGrups();
-            }
-          });
-      }
-
-    }
 
     this.dbService.getFactorUnitats().subscribe(
       (resultat) => {

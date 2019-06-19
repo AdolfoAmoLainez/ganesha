@@ -4,7 +4,9 @@ import { DataBaseService } from '../shared/database.service';
 import { Subject } from 'rxjs';
 
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class AuthService {
   isLogged = false;
   username = '';
@@ -28,11 +30,15 @@ export class AuthService {
       }
     );
 
-
-
   }
 
   getPerfil() {
     return this.dbService.getPerfil(this.username);
+  }
+
+  logout() {
+    this.isLogged = false;
+    this.username = '';
+    this.router.navigate(['/' , 'login']);
   }
 }

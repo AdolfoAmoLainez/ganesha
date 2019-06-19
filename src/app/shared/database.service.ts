@@ -217,7 +217,6 @@ export class DataBaseService {
   }
 
   getGrupsAssignatura(assignaturaId: string) {
-    //return this.http.get<{grups: Grup[]}> (environment.apiCrudUrl + 'grups?assignatura_id[LIKE]=' + assignaturaId);
     const obj = {
       id: assignaturaId
     };
@@ -225,8 +224,6 @@ export class DataBaseService {
     return this.http.post<{message: string, consulta: Grup[]}>
       (environment.selfApiUrl + 'get_grups_assignatura', obj).subscribe(
       (response) => {
-        console.log(response);
-
         this.grupsUpdated.next(...[response.consulta]);
       }
     );

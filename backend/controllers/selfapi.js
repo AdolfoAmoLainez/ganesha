@@ -376,7 +376,7 @@ exports.validaUsuari = (req, res) => {
 
 exports.getPerfilUsuari = (req, res) => {
   console.log(req.body);
-  console.log("\nValida usuari!!!");
+  console.log("\nGet Perfil Usuari!!!");
   dbconfig.connection.query(
       "SELECT perfils.perfil FROM `perfils` LEFT JOIN `usuaris` ON perfils.id = usuaris.perfil_id " +
       "WHERE usuaris.niu='"+req.body.username+"';",
@@ -387,7 +387,7 @@ exports.getPerfilUsuari = (req, res) => {
           res.status(200).json({status: 'success', message: 'Usuari validat correctament!', perfils: consulta});
 
         } else {
-          res.status(200).json({status: 'error', message: 'Aquest usuari no pot accedir a l\'aplicació', perfils: consulta[0].perfils});
+          res.status(200).json({status: 'error', message: 'Aquest usuari no pot accedir a l\'aplicació', perfils: []});
         }
         //res.status(200).json({message: 'Fet!', consulta});
       } else {

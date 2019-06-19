@@ -15,7 +15,7 @@ import { Grup } from '../shared/grup.model';
   styleUrls: ['./alumnes-list.component.css']
 })
 export class AlumnesListComponent implements OnInit, OnDestroy {
-  perfil = 'profe';
+  perfil = 'professor';
 
   alumnes: Alumne[] = [];
 

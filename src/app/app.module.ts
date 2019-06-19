@@ -21,6 +21,7 @@ import {NgbAccordionModule} from '@ng-bootstrap/ng-bootstrap';
 import { UsuarisListComponent } from './usuaris/usuaris-list/usuaris-list.component';
 import { LoginComponent } from './auth/login/login.component';
 import { AuthService } from './auth/auth.service';
+import { AdminviewComponent } from './adminview/adminview.component';
 
 @NgModule({
   declarations: [
@@ -34,7 +35,8 @@ import { AuthService } from './auth/auth.service';
     AssignaturaViewComponent,
     MymodalyesnoComponent,
     UsuarisListComponent,
-    LoginComponent
+    LoginComponent,
+    AdminviewComponent
   ],
   imports: [
     BrowserModule,

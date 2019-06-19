@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
 import { DataBaseService } from 'src/app/shared/database.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
@@ -11,7 +11,7 @@ import { AuthService } from 'src/app/auth/auth.service';
   templateUrl: './assignatures-list.component.html',
   styleUrls: ['./assignatures-list.component.css']
 })
-export class AssignaturesListComponent implements OnInit, OnDestroy {
+export class AssignaturesListComponent implements OnInit, OnDestroy, AfterViewInit {
 
   assignatures = [];
   perfil = 'adm';
@@ -22,12 +22,10 @@ export class AssignaturesListComponent implements OnInit, OnDestroy {
               private router: Router,
               private authService: AuthService) { }
 
-  ngOnInit() {
-    //this.assignatures = this.dbService.getAssignatures();
+
+  ngAfterViewInit(): void {
     this.authService.getPerfil().subscribe(
       (data) => {
-        //console.log(data);
-
         this.perfil = data.perfils[0].perfil;
         this.assignaturesUpdatedSubs = this.dbService.assignaturesUpdated.subscribe(
           (assignatures: Assignatura[]) => {
@@ -37,6 +35,11 @@ export class AssignaturesListComponent implements OnInit, OnDestroy {
         this.dbService.getAssignatures();
       }
     );
+  }
+
+  ngOnInit() {
+    //this.assignatures = this.dbService.getAssignatures();
+
 
 /*     if (this.route.snapshot.data.perfil) {
       this.perfil = this.route.snapshot.data.perfil;
