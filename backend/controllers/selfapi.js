@@ -325,3 +325,73 @@ exports.addUsuari = (req, res) => {
       }
     });
 }
+
+
+/**
+ * Verifica si l'usuari té permís per accedir i amb quin perfil
+ *
+ * Request:
+ *  username
+ *  passwd
+ *
+ * Response:
+ *    status: success, error
+ *    message: missatge d'error
+ *    perfil: perfil de l'usuari
+ */
+
+exports.validaUsuari = (req, res) => {
+  console.log(req.body);
+  console.log("\nValida usuari!!!");
+  dbconfig.connection.query(
+      "SELECT perfils.perfil FROM `perfils` LEFT JOIN `usuaris` ON perfils.id = usuaris.perfil_id " +
+      "WHERE usuaris.niu='"+req.body.username+"';",
+      (errorSel, perfils) => {
+      if (!errorSel){
+        console.log(perfils);
+        if (perfils.length === 1) {
+          res.status(200).json({status: 'success', message: 'Usuari validat correctament!', perfils});
+
+        } else {
+          res.status(200).json({status: 'error', message: 'Aquest usuari no pot accedir a l\'aplicació', perfils});
+        }
+        //res.status(200).json({message: 'Fet!', consulta});
+      } else {
+        res.status(500).json({message: "No s'ha pogut consultar l'usuari!"});
+      }
+    });
+}
+
+
+
+/**
+ * Verifica si l'usuari té permís per accedir i amb quin perfil
+ *
+ * Request:
+ *  username
+ *
+ * Response:
+    perfil
+ */
+
+exports.getPerfilUsuari = (req, res) => {
+  console.log(req.body);
+  console.log("\nValida usuari!!!");
+  dbconfig.connection.query(
+      "SELECT perfils.perfil FROM `perfils` LEFT JOIN `usuaris` ON perfils.id = usuaris.perfil_id " +
+      "WHERE usuaris.niu='"+req.body.username+"';",
+      (errorSel, consulta) => {
+      if (!errorSel){
+        console.log(consulta);
+        if (consulta.length === 1) {
+          res.status(200).json({status: 'success', message: 'Usuari validat correctament!', perfils: consulta});
+
+        } else {
+          res.status(200).json({status: 'error', message: 'Aquest usuari no pot accedir a l\'aplicació', perfils: consulta[0].perfils});
+        }
+        //res.status(200).json({message: 'Fet!', consulta});
+      } else {
+        res.status(500).json({message: "No s'ha pogut consultar l'usuari!"});
+      }
+    });
+}

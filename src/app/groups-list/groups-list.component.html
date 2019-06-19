@@ -120,7 +120,7 @@
         </div>
         <div class="form-group">
             <label for="disponibles">Minuts disponibles:</label>
-            <input type="number" readonly class="form-control" name="disponibles" id="disponibles" formControlName="disponibles"/>
+            <input type="number" readonly class="form-control" name="disponibles" id="disponibles" formControlName="disponibles" #disponiblesInput/>
           </div>
       </form>
     </div>
@@ -129,7 +129,7 @@
         type="button"
         class="btn btn-primary"
         (click)="modal.close({quantitat: quantitat.value, quota: quota.value})"
-        [disabled]="!addGroupsFrom.valid"
+        [disabled]="!addGroupsFrom.valid || disponiblesInput.value<0"
       >
         Crear
       </button>

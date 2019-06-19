@@ -4,6 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { Assignatura } from 'src/app/shared/assignatura.model';
 import { relative } from 'path';
+import { AuthService } from 'src/app/auth/auth.service';
 
 @Component({
   selector: 'app-assignatures-list',
@@ -18,19 +19,28 @@ export class AssignaturesListComponent implements OnInit, OnDestroy {
 
   constructor(private dbService: DataBaseService,
               private route: ActivatedRoute,
-              private router: Router) { }
+              private router: Router,
+              private authService: AuthService) { }
 
   ngOnInit() {
     //this.assignatures = this.dbService.getAssignatures();
-    this.assignaturesUpdatedSubs = this.dbService.assignaturesUpdated.subscribe(
-      (assignatures: Assignatura[]) => {
-        this.assignatures = assignatures;
+    this.authService.getPerfil().subscribe(
+      (data) => {
+        //console.log(data);
+
+        this.perfil = data.perfils[0].perfil;
+        this.assignaturesUpdatedSubs = this.dbService.assignaturesUpdated.subscribe(
+          (assignatures: Assignatura[]) => {
+            this.assignatures = assignatures;
+          }
+        );
+        this.dbService.getAssignatures();
       }
     );
-    this.dbService.getAssignatures();
-    if (this.route.snapshot.data.perfil) {
+
+/*     if (this.route.snapshot.data.perfil) {
       this.perfil = this.route.snapshot.data.perfil;
-    }
+    } */
   }
 
 ngOnDestroy() {

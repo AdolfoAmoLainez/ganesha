@@ -46,6 +46,7 @@ export class DataBaseService {
   usuarisChanged = new Subject();
   perfilsUpdated = new Subject<Perfil[]>();
 
+
   constructor(private http: HttpClient,
               private router: Router) {}
 
@@ -361,5 +362,22 @@ export class DataBaseService {
         this.perfilsUpdated.next(data.json);
       }
     );
+  }
+
+  validaUsuari(username: string, passwd: string) {
+    const obj = {
+      username,
+      passwd
+    };
+
+    return this.http.post<{status: string , message: string, perfils: [{perfil: string}]}>(environment.selfApiUrl + 'valida_usuari', obj);
+  }
+
+  getPerfil(username: string) {
+    const obj = {
+      username
+    };
+
+    return this.http.post<{status: string , message: string, perfils: [{perfil: string}]}>(environment.selfApiUrl + 'get_perfil_usuari', obj);
   }
 }

@@ -8,12 +8,15 @@ import { ProfessorsListComponent } from './professors-list/professors-list.compo
 import { AssignaturaInfoComponent } from './assignatures/assignatura-info/assignatura-info.component';
 import { AssignaturaViewComponent } from './assignatures/assignatura-view/assignatura-view.component';
 import { UsuarisListComponent } from './usuaris/usuaris-list/usuaris-list.component';
+import { LoginComponent } from './auth/login/login.component';
 
 const routes: Routes = [
+  {path: '', redirectTo:'/login', pathMatch: 'full'},
+  {path: 'login', component: LoginComponent},
   { path: 'professor', component: AssignaturesListComponent, data: {perfil: 'profe'}},
     { path: 'professor/grups/:assignaturaid', component: GroupsListComponent},
     { path: 'professor/alumnes/:grupid', component: AlumnesListComponent},
-  { path: 'adm', children: [
+  { path: 'adm', component: AssignaturesListComponent, children: [
     { path: 'assignatura/:assignaturaid', component: AssignaturaViewComponent, data: {perfil: 'adm'}, children: [
       { path: 'grups', component: GroupsListComponent, data: {perfil: 'adm'}, children: [
         { path: 'alumnes/:grupid', component: AlumnesListComponent}

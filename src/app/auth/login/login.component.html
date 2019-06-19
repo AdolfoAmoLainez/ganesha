@@ -1,0 +1,20 @@
+<div class="container login-container">
+  <div class="row justify-content-center">
+      <div class="col-md-6 login-form-1">
+          <form [formGroup]="loginForm" (ngSubmit)="onLogin()">
+              <div class="form-group">
+                  <input type="text" formControlName="niu" class="form-control" placeholder="NIU*" value="" />
+              </div>
+              <div class="form-group">
+                  <input type="password" formControlName = "passwd" class="form-control" placeholder="Contrasenya*" value="" />
+              </div>
+              <div class="form-group" *ngIf="errorMsg!=''">
+                    {{errorMsg}}
+              </div>
+              <div class="form-group">
+                  <input type="submit" class="btnSubmit" value="Entrar" />
+              </div>
+          </form>
+      </div>
+  </div>
+</div>

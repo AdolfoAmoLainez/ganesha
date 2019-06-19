@@ -19,6 +19,8 @@ import { MymodalyesnoComponent } from './shared/mymodalyesno/mymodalyesno.compon
 import {NgbModalModule} from '@ng-bootstrap/ng-bootstrap';
 import {NgbAccordionModule} from '@ng-bootstrap/ng-bootstrap';
 import { UsuarisListComponent } from './usuaris/usuaris-list/usuaris-list.component';
+import { LoginComponent } from './auth/login/login.component';
+import { AuthService } from './auth/auth.service';
 
 @NgModule({
   declarations: [
@@ -31,7 +33,8 @@ import { UsuarisListComponent } from './usuaris/usuaris-list/usuaris-list.compon
     AssignaturaInfoComponent,
     AssignaturaViewComponent,
     MymodalyesnoComponent,
-    UsuarisListComponent
+    UsuarisListComponent,
+    LoginComponent
   ],
   imports: [
     BrowserModule,
@@ -42,7 +45,7 @@ import { UsuarisListComponent } from './usuaris/usuaris-list/usuaris-list.compon
     HttpClientModule,
     ReactiveFormsModule
   ],
-  providers: [DataBaseService],
+  providers: [DataBaseService, AuthService],
   bootstrap: [AppComponent],
   entryComponents: [MymodalyesnoComponent]
 })

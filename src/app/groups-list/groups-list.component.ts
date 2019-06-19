@@ -34,6 +34,7 @@ export class GroupsListComponent implements OnInit, OnDestroy {
   grupsUpdatedSubs: Subscription;
   grupsChangedSubs: Subscription;
 
+
   constructor(private modalService: NgbModal,
               private activatedRoute: ActivatedRoute,
               private myLocation: Location,
@@ -47,8 +48,6 @@ export class GroupsListComponent implements OnInit, OnDestroy {
 
     this.grupsUpdatedSubs = this.dbService.grupsUpdated.subscribe(
       (grups) => {
-        console.log(grups);
-
         this.groups = grups;
         this.isLoading = false;
       }
@@ -107,13 +106,7 @@ export class GroupsListComponent implements OnInit, OnDestroy {
         this.assignatura = assig;
 
         this.dbService.getGrupsAssignatura(this.assignaturaId);
-        /*.subscribe(
-          (data: any) => {
-            this.groups = data.json;
-            this.isLoading = false;
-            this.selectedGroups = [];
-          }
-        );*/
+
       }
     );
 
@@ -156,7 +149,8 @@ export class GroupsListComponent implements OnInit, OnDestroy {
         this.addGroupsFrom = new FormGroup({
             quantitat: new FormControl(1, [ Validators.required, Validators.pattern(/^-?([1-9]\d*)?$/)]),
             quota: new FormControl(1, [ Validators.required, Validators.pattern(/^-?([1-9]\d*)?$/)]),
-            disponibles: new FormControl(this.assignatura.tamany - this.minutsConsumits)
+            disponibles: new FormControl(this.assignatura.tamany - this.minutsConsumits,
+                                         [ Validators.pattern(/^-?([1-9]\d*)?$/)])
           }
         );
 
