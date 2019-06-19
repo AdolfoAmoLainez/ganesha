@@ -1,9 +1,8 @@
 import { Component, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
 import { DataBaseService } from 'src/app/shared/database.service';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { Assignatura } from 'src/app/shared/assignatura.model';
-import { relative } from 'path';
 import { AuthService } from 'src/app/auth/auth.service';
 
 @Component({
@@ -11,19 +10,20 @@ import { AuthService } from 'src/app/auth/auth.service';
   templateUrl: './assignatures-list.component.html',
   styleUrls: ['./assignatures-list.component.css']
 })
-export class AssignaturesListComponent implements OnInit, OnDestroy, AfterViewInit {
+export class AssignaturesListComponent implements OnInit, OnDestroy {
 
   assignatures = [];
   perfil = 'adm';
   assignaturesUpdatedSubs: Subscription;
 
   constructor(private dbService: DataBaseService,
-              private route: ActivatedRoute,
               private router: Router,
               private authService: AuthService) { }
 
 
-  ngAfterViewInit(): void {
+/**TODO: Falta hacer control de si es professor solo cargar sus assignatures!! */
+
+  ngOnInit() {
     this.authService.getPerfil().subscribe(
       (data) => {
         this.perfil = data.perfils[0].perfil;
@@ -35,15 +35,6 @@ export class AssignaturesListComponent implements OnInit, OnDestroy, AfterViewIn
         this.dbService.getAssignatures();
       }
     );
-  }
-
-  ngOnInit() {
-    //this.assignatures = this.dbService.getAssignatures();
-
-
-/*     if (this.route.snapshot.data.perfil) {
-      this.perfil = this.route.snapshot.data.perfil;
-    } */
   }
 
 ngOnDestroy() {
