@@ -77,7 +77,6 @@ export class AlumnesListComponent implements OnInit, OnDestroy {
 
     this.dbService.getGrupInfo(this.grupId).subscribe(
       (grupInfo: any) => {
-
         this.grup = grupInfo.grup;
         this.assignaturaCodi = grupInfo.assignatura_codi;
 

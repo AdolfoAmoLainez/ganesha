@@ -92,6 +92,32 @@ exports.deleteGrups = (req, res) => {
 }
 
 /**
+ * Obtenir un grup amb el codi de la seva assignatura
+ *
+ * Request:
+ *  id: grup_id
+ *
+ * Resposta:
+ *  message:
+ *  consuta: grup amb el codi de l'assignatura
+ */
+
+exports.getGrupInfo = (req, res) => {
+  console.log("\nGet grup Info!");
+  console.log(req.body);
+  dbconfig.connection.query(
+    'SELECT assignatures.codi, grups.* FROM `grups` INNER JOIN assignatures on assignatures.id = grups.assignatura_id ' +
+    'WHERE grups.id=' + req.body.grup_id,
+      (errorSel, consulta) => {
+      if (!errorSel){
+        res.status(200).json(consulta);
+      } else {
+        res.status(500).json({message: "No s'ha pogut consultar la info de grup!"});
+      }
+    });
+}
+
+/**
  * Request:
  *  alumne
  *  grupNom: Nomcomplert del grup

@@ -5,6 +5,7 @@ const router = express.Router();
 
 router.post('/add_grups', SelfApiController.addGrups);
 router.post('/delete_grups', SelfApiController.deleteGrups);
+router.post('/get_grup_info', SelfApiController.getGrupInfo);
 router.post('/add_alumne_grup', SelfApiController.addAlumneGrup);
 router.post('/delete_alumnes_grup', SelfApiController.deleteAlumnesGrup);
 router.post('/add_professor_assignatura', SelfApiController.addProfeAssignatura);

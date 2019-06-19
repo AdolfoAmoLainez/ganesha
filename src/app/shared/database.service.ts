@@ -58,12 +58,11 @@ export class DataBaseService {
   getAssignatures() {
     return this.http.get<{assignatures: Assignatura[]}>(environment.apiCrudUrl + 'assignatures').subscribe(
       (data: any) => {
-        // console.log(data);
 
         this.assignaturesUpdated.next(data.json);
       }
     );
-    // return this.assignatures;
+
   }
 
   getAssignatura(id: string) {
@@ -87,7 +86,8 @@ export class DataBaseService {
   }
 
   addAssignatura(assignatura: Assignatura) {
-    return this.http.post<{message: string, assignaturaId: number}>(environment.selfApiUrl + 'add_assignatura', assignatura).subscribe(
+    return this.http.post<{message: string, assignaturaId: number}>
+      (environment.selfApiUrl + 'add_assignatura', assignatura).subscribe(
       (data) => {
         console.log(data);
         this.getAssignatures();
@@ -135,15 +135,6 @@ export class DataBaseService {
       );
   }
 
-  // deleteProfessorAssignatura(profeId: number) {
-  //   return this.http.delete(environment.apiCrudUrl + 'professors/' + profeId).subscribe(
-  //     (data) => {
-  //       console.log(data);
-  //       this.profesChanged.next();
-  //     }
-  //   );
-  // }
-
   deleteProfessorsAssignatura(profes: Professor[], assigCodi: string) {
     const obj = {
       profes,
@@ -157,14 +148,7 @@ export class DataBaseService {
 
           this.profesChanged.next();
 
-        }
-      );
-
-    // const query = {
-    //   query: 'DELETE FROM professors WHERE id IN (' + profeList + ');'
-    // };
-
-    // return this.http.post(environment.apiCustomUrl + '', query);
+        });
   }
 
   addProfessorAssignatura(professor: Professor, assignaturaCodi: string) {
@@ -229,22 +213,23 @@ export class DataBaseService {
     );
   }
 
-  getGrupInfo(id: string) {
-    const query = {
-      query: 'SELECT assignatures.codi, grups.* FROM `grups` INNER JOIN assignatures on assignatures.id = grups.assignatura_id WHERE grups.id=' + id
+  getGrupInfo(grup_id: string) {
+    const obj = {
+      grup_id
     };
 
-    return this.http.post<{result: string, json: any, length: number}>(environment.apiCustomUrl + '', query).pipe(
+    return this.http.post<[{id: number, ordre: number, quota: number, assignatura_id: number, codi: string}]>
+      (environment.selfApiUrl + 'get_grup_info', obj).pipe(
       map(
-        (data: any) => {
+        (data) => {
           const grup: Grup = {
-            id: data.json[0].id,
-            assignatura_id: data.json[0].assignatura_id,
-            quota: data.json[0].quota,
-            ordre: data.json[0].ordre,
-            alumnes:  data.json[0].alumnes
+            id: data[0].id,
+            assignatura_id: data[0].assignatura_id,
+            quota: data[0].quota,
+            ordre: data[0].ordre,
+            alumnes:  0
           }
-          return {assignatura_codi: data.json[0].codi, grup: grup};
+          return {assignatura_codi: data[0].codi, grup: grup};
         }
       )
     );
@@ -261,7 +246,8 @@ export class DataBaseService {
   }
 
   getAlumnesGrup(grupId: string) {
-    return this.http.get<{result: string, json: any, length: number}>(environment.apiCrudUrl + 'alumnes?grup_id[LIKE]=' + grupId).subscribe(
+    return this.http.get<{result: string, json: any, length: number}>
+      (environment.apiCrudUrl + 'alumnes?grup_id[LIKE]=' + grupId).subscribe(
       (data) => {
         this.alumnesUpdated.next([...data.json]);
       }
@@ -302,14 +288,6 @@ export class DataBaseService {
       );
   }
 
-  // deleteAlumnesGrup(alumneList: string) {
-  //   const query = {
-  //     query: 'DELETE FROM alumnes WHERE id IN (' + alumneList + ');'
-  //   };
-
-  //   return this.http.post(environments.selfApiCustom + '', query);
-  // }
-
   getFactorUnitats() {
     return this.http.get<{result: string, json: any, length: number}> (environment.apiCrudUrl + 'factorunitats/1');
   }
@@ -317,8 +295,6 @@ export class DataBaseService {
   getUsuaris() {
     return this.http.get<{result: string, json: any, length: number}>(environment.apiCrudUrl + 'usuaris').subscribe(
       (data) => {
-        // console.log(data);
-
         this.usuarisUpdated.next(data.json);
       }
     );
@@ -327,8 +303,6 @@ export class DataBaseService {
   addUsuari() {
     return this.http.get<{result: string, json: any, length: number}>(environment.selfApiUrl + 'add_usuari').subscribe(
       (data) => {
-        // console.log(data);
-
         this.usuarisChanged.next();
       }
     );
@@ -354,8 +328,6 @@ export class DataBaseService {
   getPerfils() {
     return this.http.get<{result: string, json: any, length: number}>(environment.apiCrudUrl + 'perfils').subscribe(
       (data) => {
-        // console.log(data);
-
         this.perfilsUpdated.next(data.json);
       }
     );
@@ -375,6 +347,7 @@ export class DataBaseService {
       username
     };
 
-    return this.http.post<{status: string , message: string, perfils: [{perfil: string}]}>(environment.selfApiUrl + 'get_perfil_usuari', obj);
+    return this.http.post<{status: string , message: string, perfils: [{perfil: string}]}>
+      (environment.selfApiUrl + 'get_perfil_usuari', obj);
   }
 }
