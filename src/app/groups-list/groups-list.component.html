@@ -1,7 +1,13 @@
-<div class="row">
-  <div class="col-sm-6">
+<div class="text-center" *ngIf="isLoading">
+  <div class="spinner-border" style="width: 3rem; height: 3rem;" role="status" >
+    <span class="sr-only">Carregant...</span>
+  </div>
+</div>
+
+<div class="row " *ngIf="!isLoading">
+  <div [class.col-sm-6]="perfil==='adm'" [class.col-sm-12]="perfil!=='adm'">
     <div class="list-group">
-      <div class="list-group-item list-group-item-primary mt-4" *ngIf="perfil == 'profe'">
+      <div class="list-group-item list-group-item-primary mt-4" *ngIf="perfil == 'professor'">
         <div class="row align-items-center" >
           <div class="col-sm-1">
             <i
@@ -12,62 +18,121 @@
           </div>
           <div class="col-sm ml-2">
             <h5>
-              Assignatura tal y cual
+              Grups de {{assignatura.nom}}
             </h5>
           </div>
         </div>
       </div>
       <div class="list-group-item list-group-item-action" *ngIf="groups.length === 0">
           No hi ha cap grup!!
-        </div>
+      </div>
+      <div class="list-group-item list-group-item-action" *ngIf="groups.length !== 0">
+          <div class="custom-control custom-checkbox">
+              <input
+                type="checkbox"
+                class="custom-control-input"
+                [(ngModel)]="selectAll"
+                name="selectAll"
+                id="selectAll"
+                #selectAllStatus
+                (click)="onSelectAll(selectAllStatus.checked);"
+              />
+              <label class="custom-control-label" for="selectAll">Selecciona tots</label>
+            </div>
+      </div>
       <div
         class="list-group-item list-group-item-action"
         *ngFor="let group of groups; index as i"
       >
         <div class="row align-items-center">
           <div class="col-sm-1">
-            <div class="custom-control custom-checkbox">
+            <div class="custom-control custom-checkbox" *ngIf="group.alumnes === 0">
               <input
                 type="checkbox"
                 class="custom-control-input"
                 [attr.id]="group.id"
+                [checked]="selectAll"
                 #checkgroup
-                (click)="onCheckGroupClick(group.id, checkgroup.checked)"
+                (click)="onCheckGroupClick(group, checkgroup.checked)"
               />
               <label class="custom-control-label" [attr.for]="group.id"></label>
             </div>
           </div>
-          <h2 class="col-sm-5">
-            <a *ngIf="perfil == 'profe'" [routerLink]="['/professor','alumnes', group.id]" class="btn btn-link">{{
-              group.nom
+          <h2 class="col-sm-6">
+            <a *ngIf="perfil == 'professor'" [routerLink]="['/professor','alumnes', group.id]" class="btn btn-link">{{
+              assignatura.codi + '-g' + group.ordre
             }}</a>
             <a *ngIf="perfil == 'adm'" [routerLink]="['alumnes', group.id]" class="btn btn-link">{{
-              group.nom
+              assignatura.codi + '-g' + group.ordre
             }}</a>
+            <i *ngIf="group.alumnes === 0"
+            class="fas fa-times text-danger "
+            style="cursor: pointer;"
+            (click)="onDeleteIconClick(group)"
+          ></i>
           </h2>
-          <div class="col-sm-1">
-            <i
-              class="fas fa-times fa-2x text-danger "
-              style="cursor: pointer;"
-              (click)="onDeleteIconClick(i,group.nom)"
-            ></i>
-          </div>
         </div>
       </div>
       <div class="list-group-item">
         <button
           class="btn btn-primary mt-2"
-          (click)="onAfegirClick(afegirGrupModal)"
+          (click)="onAfegirClick(afegirGrupsModal)"
         >
           Afegir Grups
         </button>
-        <button class="btn btn-primary mt-2 ml-2" (click)="onDeleteGroups()">
-          Esborrar Sel·lecció
+        <button class="btn btn-primary mt-2 ml-2" (click)="onDeleteGroups()" [disabled]="selectedGroups.length === 0">
+          Esborrar Selecció
         </button>
-    </div>
+      </div>
     </div>
   </div>
   <div class="col-sm-6">
     <router-outlet></router-outlet>
   </div>
 </div>
+
+<ng-template #afegirGrupsModal let-modal>
+    <div class="modal-header">
+      <h4 class="modal-title" id="modal-basic-title">Afegir Grups</h4>
+      <button
+        type="button"
+        class="close"
+        aria-label="Close"
+        (click)="modal.dismiss()"
+      >
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <form [formGroup]="addGroupsFrom">
+        <div class="form-group">
+          <label for="quantitat">Quants grups vols afegir?:</label>
+          <input type="number" class="form-control" name="quantitat" id="quantitat" #quantitat formControlName="quantitat"
+                  min="0"
+                  (input)="onAddGroupFormChangeValues($event.target.value)"/>
+        </div>
+        <div class="form-group">
+          <label for="quota">De quants minuts?:</label>
+          <input type="number" class="form-control" name="quota" id="quota" #quota formControlName="quota" min="0"
+                 (input)="onAddGroupFormChangeValues($event.target.value)"/>
+        </div>
+        <div class="form-group">
+            <label for="disponibles">Minuts disponibles:</label>
+            <input type="number" readonly class="form-control" name="disponibles" id="disponibles" formControlName="disponibles" #disponiblesInput/>
+          </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button
+        type="button"
+        class="btn btn-primary"
+        (click)="modal.close({quantitat: quantitat.value, quota: quota.value})"
+        [disabled]="!addGroupsFrom.valid || disponiblesInput.value<0"
+      >
+        Crear
+      </button>
+      <button type="button" class="btn btn-danger" (click)="modal.dismiss()">
+        Cancel·lar
+      </button>
+    </div>
+  </ng-template>

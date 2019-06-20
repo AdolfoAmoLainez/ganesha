@@ -1,10 +1,15 @@
-import { Component, OnInit, OnDestroy} from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { Component, OnInit, OnDestroy, AfterViewInit} from '@angular/core';
+import { ActivatedRoute, ParamMap } from '@angular/router';
 import { Location } from '@angular/common';
 
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import { Subscription } from 'rxjs';
 import { MymodalyesnoComponent } from '../shared/mymodalyesno/mymodalyesno.component';
+import { DataBaseService } from '../shared/database.service';
+import { FormGroup, FormControl, Validators } from '@angular/forms';
+import { Assignatura } from '../shared/assignatura.model';
+import { Grup } from '../shared/grup.model';
+import { AuthService } from '../auth/auth.service';
 
 
 @Component({
@@ -12,74 +17,107 @@ import { MymodalyesnoComponent } from '../shared/mymodalyesno/mymodalyesno.compo
   templateUrl: './groups-list.component.html',
   styleUrls: ['./groups-list.component.css']
 })
-export class GroupsListComponent implements OnInit, OnDestroy {
+export class GroupsListComponent implements  OnDestroy, OnInit {
 
-  perfil = 'profe';
+  perfil = 'professor';
   groups = [];
   selectedGroups = [];
-  groupToDel: string;
+  selectAll = false; // per seleccionar tota els grups
+  assignaturaId;
+  assignatura: Assignatura;
+  isLoading = true;
+  factorUnitats: number;
+  minutsConsumits = 0;
+
+  addGroupsFrom: FormGroup;
 
   paramsSubs: Subscription;
+  grupsUpdatedSubs: Subscription;
+  grupsChangedSubs: Subscription;
+
 
   constructor(private modalService: NgbModal,
               private activatedRoute: ActivatedRoute,
-              private myLocation: Location) { }
+              private myLocation: Location,
+              private dbService: DataBaseService,
+              private authService: AuthService) { }
 
   ngOnInit() {
 
-    if (this.activatedRoute.parent.snapshot.data.perfil) {
-      this.perfil = this.activatedRoute.parent.snapshot.data.perfil;
-    }
+    this.authService.getPerfil().subscribe(
+      (data) => {
 
-    if (this.perfil === 'adm') {
-      this.paramsSubs = this.activatedRoute.parent.params.subscribe(
-        (params) => {
-          this.groups = [
-            {
-              id: 1 + params.assignaturaid * 10,
-              nom: '11223311-g01',
-              ordre: 1
-            },
-            {
-              id: 2 + params.assignaturaid * 10,
-              nom: '11223311-g02',
-              ordre: 2
-            },
-            {
-              id: 3 + params.assignaturaid * 10,
-              nom: '11223311-g03',
-              ordre: 3
-            }
-          ];
+        this.perfil = data.perfils[0].perfil;
+
+        if (this.perfil === 'adm') {
+
+          if (this.activatedRoute.parent.paramMap) {
+            this.paramsSubs = this.activatedRoute.parent.paramMap.subscribe(
+              (paramMap: ParamMap) => {
+                if (paramMap.has('assignaturaid')) {
+                  this.assignaturaId = paramMap.get('assignaturaid');
+                  this.loadGrups();
+                }
+              });
+          }
+        } else {
+          if (this.activatedRoute.paramMap) {
+            this.paramsSubs = this.activatedRoute.paramMap.subscribe(
+              (paramMap: ParamMap) => {
+                if (paramMap.has('assignaturaid')) {
+                  this.assignaturaId = paramMap.get('assignaturaid');
+                  this.loadGrups();
+                }
+              });
+          }
         }
-        );
-    } else {
-      this.paramsSubs = this.activatedRoute.params.subscribe(
-        (params) => {
-          this.groups = [
-            {
-              id: 1 + params.assignaturaid * 10,
-              nom: '11223311-g01',
-              ordre: 1
-            },
-            {
-              id: 2 + params.assignaturaid * 10,
-              nom: '11223311-g02',
-              ordre: 2
-            },
-            {
-              id: 3 + params.assignaturaid * 10,
-              nom: '11223311-g03',
-              ordre: 3
-            }
-          ];
-        }
-        );
       }
+    );
+/*     if (this.activatedRoute.parent.snapshot.data.perfil) {
+      this.perfil = this.activatedRoute.parent.snapshot.data.perfil;
+    } */
+
+    this.grupsUpdatedSubs = this.dbService.grupsUpdated.subscribe(
+      (grups) => {
+        this.groups = grups;
+        this.isLoading = false;
+
+
+      }
+    );
+
+    this.grupsChangedSubs = this.dbService.grupsChanged.subscribe(
+      () => {
+        this.loadGrups();
+      }
+    );
+
+
+    this.dbService.getFactorUnitats().subscribe(
+      (resultat) => {
+        this.factorUnitats = resultat.json[0].factor;
+      }
+    );
   }
 
   ngOnDestroy() {
     this.paramsSubs.unsubscribe();
+    this.grupsUpdatedSubs.unsubscribe();
+    this.grupsChangedSubs.unsubscribe();
+  }
+
+  loadGrups() {
+    this.isLoading = true;
+
+    this.dbService.getAssignatura(this.assignaturaId).subscribe(
+      (assig: Assignatura) => {
+        this.assignatura = assig;
+
+        this.dbService.getGrupsAssignatura(this.assignaturaId);
+
+      }
+    );
+
   }
 
   onDeleteGroups() {
@@ -89,15 +127,8 @@ export class GroupsListComponent implements OnInit, OnDestroy {
     modalRef.result.then(
       (resposta) => {
         console.log('Vol esborrar tots els grups.');
-        this.selectedGroups.forEach(
-          (selectedGroup) => {
-            this.groups = this.groups.filter(
-              (value) => {
-                return value.id !== selectedGroup;
-              }
-            );
-          }
-        );
+        this.dbService.deleteGrupsAssignatura(this.selectedGroups, this.assignatura.codi);
+        this.selectAll = false;
       },
       () => {
         console.log('Cancelado');
@@ -105,35 +136,61 @@ export class GroupsListComponent implements OnInit, OnDestroy {
     );
   }
 
-  onCheckGroupClick(groupId: number, value: boolean) {
+  onCheckGroupClick(groupId: Grup, value: boolean) {
 
     if (value) {
       this.selectedGroups.push(groupId);
     } else {
       this.selectedGroups.splice(this.selectedGroups.indexOf(groupId), 1);
     }
+    console.log(this.selectedGroups);
   }
 
   onAfegirClick(content) {
-    this.modalService.open(content, {ariaLabelledBy: 'modal-basic-title'}).result.then(
-      (quantitat) => {
-        console.log('Vol crear ' + quantitat + ' grups.');
-      },
-      () => {
-        console.log('Cancelado');
+
+    this.dbService.getMinutsConsumits(this.assignaturaId).subscribe(
+      (respostaMinuts) => {
+        console.log(respostaMinuts);
+
+        this.minutsConsumits = respostaMinuts.consulta[0].consumits;
+
+        this.addGroupsFrom = new FormGroup({
+            quantitat: new FormControl(1, [ Validators.required, Validators.pattern(/^-?([1-9]\d*)?$/)]),
+            quota: new FormControl(1, [ Validators.required, Validators.pattern(/^-?([1-9]\d*)?$/)]),
+            disponibles: new FormControl(this.assignatura.tamany - this.minutsConsumits,
+                                         [ Validators.pattern(/^-?([1-9]\d*)?$/)])
+          }
+        );
+
+        this.modalService.open(content, {ariaLabelledBy: 'modal-basic-title'}).result.then(
+          (resposta) => {
+            if (this.addGroupsFrom.get('disponibles').value > 0){
+            console.log('Vol crear ' + resposta.quantitat + ' grups.');
+            console.log('Amb quota ' + resposta.quota + ' minuts. Que son ' + (resposta.quota * this.factorUnitats).toFixed(1) + 'Gb.');
+            this.dbService.addGrupsAssignatura(this.assignatura, resposta.quantitat, resposta.quota, (resposta.quota * this.factorUnitats).toFixed(1) );
+            } else {
+              console.log("No es poden crear tants grups amb aquesta quota!!!!");
+
+            }
+          },
+          () => {
+            console.log('Cancelado');
+          }
+        );
       }
+
     );
   }
 
-  onDeleteIconClick(id: number, grupNom: string) {
+  onDeleteIconClick(grup: Grup) {
 
     const modalRef = this.modalService.open(MymodalyesnoComponent);
     modalRef.componentInstance.titol = 'Esborrar Grup';
-    modalRef.componentInstance.missatge = 'Vols esborrar els grups ' + grupNom + '?';
+    modalRef.componentInstance.missatge = 'Vols esborrar el grup ' + this.assignatura.codi + '-g' + grup.ordre + '?';
     modalRef.result.then(
       (resposta) => {
         console.log('Vol esborrar el grup!' + resposta);
-        this.groups.splice(id, 1);
+        this.dbService.deleteGrupsAssignatura([grup], this.assignatura.codi);
       },
       () => {
         console.log('Cancelado');
@@ -144,6 +201,28 @@ export class GroupsListComponent implements OnInit, OnDestroy {
 
   onBackClick() {
     this.myLocation.back();
+  }
+
+  onAddGroupFormChangeValues(quantitat: number) {
+    this.addGroupsFrom.patchValue({
+      disponibles: (this.assignatura.tamany - this.minutsConsumits) -
+                  (this.addGroupsFrom.get('quantitat').value * this.addGroupsFrom.get('quota').value)
+    });
+  }
+
+  onSelectAll(selectAllStatus: boolean) {
+    if (selectAllStatus) {
+      this.groups.forEach( element => {
+        if (element.alumnes === 0) {
+          this.selectedGroups.push(element);
+        }
+      });
+    } else {
+      this.selectedGroups = [];
+    }
+
+    console.log(this.selectedGroups);
+
   }
 
 }

@@ -3,7 +3,7 @@
       <div class="row align-items-center">
         <div class="col-sm">
           <h5>
-            Assignatura tal y cual
+            {{assignaturaNom}}
           </h5>
         </div>
       </div>
@@ -13,13 +13,13 @@
   <div class="col">
     <ul class="nav nav-tabs nav-fill">
       <li class="nav-item">
-        <a class="nav-link active" [routerLink]="['grups']" routerLinkActive="active">Grups</a>
+        <a class="nav-link" [routerLink]="['grups']" routerLinkActive="active">Grups</a>
       </li>
       <li class="nav-item">
         <a class="nav-link" [routerLink]="['professors']" routerLinkActive="active">Professors</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" [routerLink]="['info']" routerLinkActive="active">Info</a>
+        <a class="nav-link" [routerLink]="['info']" routerLinkActive="active">Gestió</a>
       </li>
     </ul>
   </div>

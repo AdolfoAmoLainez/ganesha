@@ -1,65 +1,102 @@
-import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { ActivatedRoute, ParamMap } from '@angular/router';
 import { Location } from '@angular/common';
 
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import { MymodalyesnoComponent } from '../shared/mymodalyesno/mymodalyesno.component';
+import { Subscription } from 'rxjs';
+import { DataBaseService } from '../shared/database.service';
+import { Alumne } from '../shared/alumne.model';
+import { Grup } from '../shared/grup.model';
 
 @Component({
   selector: 'app-alumnes-list',
   templateUrl: './alumnes-list.component.html' ,
   styleUrls: ['./alumnes-list.component.css']
 })
-export class AlumnesListComponent implements OnInit {
-  perfil = 'profe';
+export class AlumnesListComponent implements OnInit, OnDestroy {
+  perfil = 'professor';
 
-  alumnes = [];
+  alumnes: Alumne[] = [];
 
   selectedAlumnes = [];
+  selectAllAlumnes = false;
+
+  isLoading = true;
+
+  assignaturaCodi = '';
+  grupId;
+  grup: Grup;
+  paramsSubs: Subscription;
+  alumnesUpdatedSubs: Subscription;
+  alumnesChangedSubs: Subscription;
 
   constructor(private modalService: NgbModal,
               private activatedRoute: ActivatedRoute,
-              private myLocation: Location) { }
+              private myLocation: Location,
+              private dbService: DataBaseService) { }
+
+  ngOnDestroy() {
+    this.paramsSubs.unsubscribe();
+    this.alumnesUpdatedSubs.unsubscribe();
+    this.alumnesChangedSubs.unsubscribe();
+  }
 
   ngOnInit() {
     if (this.activatedRoute.parent.snapshot.data.perfil) {
       this.perfil = this.activatedRoute.parent.snapshot.data.perfil;
-      console.log(this.activatedRoute.parent);
-
     }
 
-    this.activatedRoute.params.subscribe(
-      (params) => {
-        this.alumnes = [
-          {
-            id: 1,
-            niu: 1112233,
-            nom: 'Aitor Tilla Fria'
-          },
-          {
-            id: 2,
-            niu: 1112244,
-            nom: 'Carmelo Cotón Maduro'
-          },
-          {
-            id: 3,
-            niu: 1112255,
-            nom: 'Olga Rapata Perro'
+    this.alumnesUpdatedSubs = this.dbService.alumnesUpdated.subscribe(
+      (alumnes) => {
+        this.alumnes = alumnes;
+        this.isLoading = false;
+        this.selectAllAlumnes = false;
+      }
+    );
+
+    this.alumnesChangedSubs = this.dbService.alumnesChanged.subscribe(
+      () => {
+        this.loadAlumnes();
+      }
+    );
+
+    if (this.activatedRoute.paramMap) {
+      this.paramsSubs = this.activatedRoute.paramMap.subscribe(
+        (paramMap: ParamMap) => {
+          if (paramMap.has('grupid')) {
+            this.grupId = paramMap.get('grupid');
+            this.loadAlumnes();
           }
-        ];
-        this.selectedAlumnes = [];
+        });
+    }
+  }
+
+  loadAlumnes() {
+    this.isLoading = true;
+
+    this.dbService.getGrupInfo(this.grupId).subscribe(
+      (grupInfo: any) => {
+        this.grup = grupInfo.grup;
+        this.assignaturaCodi = grupInfo.assignatura_codi;
+
+        this.dbService.getAlumnesGrup(this.grupId);
+
       }
     );
   }
 
-  onDeleteIconClick(id: number, alumneNom: string) {
+  onDeleteIconClick(alumne: Alumne) {
     const modalRef = this.modalService.open(MymodalyesnoComponent);
     modalRef.componentInstance.titol = 'Esborrar Alumne';
-    modalRef.componentInstance.missatge = 'Vols esborrar l\'alumne ' + alumneNom + '?';
+    modalRef.componentInstance.missatge = 'Vols esborrar l\'alumne ' + alumne.nom + '?';
     modalRef.result.then(
       (resposta) => {
-        console.log('Vol esborrar l\'alumne!' + resposta);
-        this.alumnes.splice(id, 1);
+        // console.log('Vol esborrar l\'alumne!' + resposta);
+        this.dbService.deleteAlumnesGrup([alumne],
+                                         this.assignaturaCodi + '-g' + this.grup.ordre,
+                                        this.assignaturaCodi );
+        this.selectAllAlumnes = false;
       },
       () => {
         console.log('Cancelado');
@@ -67,18 +104,27 @@ export class AlumnesListComponent implements OnInit {
     );
   }
 
-  onCheckAlumneClick(alumneId: number, value: boolean) {
+  onCheckAlumneClick(alumne: Alumne, value: boolean) {
     if (value) {
-      this.selectedAlumnes.push(alumneId);
+      this.selectedAlumnes.push(alumne);
     } else {
-      this.selectedAlumnes.splice(this.selectedAlumnes.indexOf(alumneId), 1);
+      this.selectedAlumnes.splice(this.selectedAlumnes.indexOf(alumne), 1);
     }
+    console.log(this.selectedAlumnes);
+
   }
 
   onAfegirClick(content) {
     this.modalService.open(content, {ariaLabelledBy: 'modal-basic-title'}).result.then(
       (niu) => {
-        console.log('Vol afegir el niu ' + niu + '.');
+        // console.log('Vol afegir el niu ' + niu + '.');
+        const al: Alumne = {
+          id: null,
+          niu,
+          nom: 'El busquem a LDAP?',
+          grup_id: this.grupId
+        };
+        this.dbService.addAlumneGrup(al, this.assignaturaCodi + '-g' + this.grup.ordre, this.assignaturaCodi);
       },
       () => {
         console.log('Cancelado');
@@ -97,20 +143,26 @@ export class AlumnesListComponent implements OnInit {
     modalRef.result.then(
       (resposta) => {
         console.log('Vol esborrar tots els alumnes.');
-        this.selectedAlumnes.forEach(
-          (selectedAlumne) => {
-            this.alumnes = this.alumnes.filter(
-              (value) => {
-                return value.id !== selectedAlumne;
-              }
-            );
-          }
-        );
+        this.dbService.deleteAlumnesGrup(this.selectedAlumnes,
+                                         this.assignaturaCodi + '-g' + this.grup.ordre,
+                                         this.assignaturaCodi);
+        this.selectAllAlumnes = false;
       },
       () => {
         console.log('Cancelado');
       }
     );
+  }
+
+  onSelectAllAlumnes(selectAllStatus: boolean) {
+    if (selectAllStatus) {
+      this.alumnes.forEach( element => {
+          this.selectedAlumnes.push(element);
+      });
+    } else {
+      this.selectedAlumnes = [];
+    }
+
   }
 
 }
