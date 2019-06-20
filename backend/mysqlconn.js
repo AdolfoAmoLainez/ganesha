@@ -8,6 +8,13 @@ var mysqlOptions = {
   database:'ganesha'
 };
 
+var mysqlOptions = {
+  host:'minerva.ccomunicacio',
+  user:'desa_ganesha',
+  password:'O9VS5OYU1TmB2gdz',
+  database:'desa_ganesha'
+};
+
 var connection=mysql.createPool(mysqlOptions);
 
 /* Setting parameters for API url customization */
