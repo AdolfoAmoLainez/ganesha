@@ -126,7 +126,7 @@ export class DataBaseService {
 
   getProfessorsAssignatura(assignaturaId: string) {
     return this.http.get<{result: string, json: Professor[], length: number}>
-      (environment.apiCrudUrl + 'professors?assignatura_id[LIKE]=' + assignaturaId).subscribe(
+      (environment.apiCrudUrl + 'professors?assignatura_id[LIKE]=' + assignaturaId + '&_order[niu]=ASC').subscribe(
         (data) => {
           console.log(data);
 
@@ -247,7 +247,7 @@ export class DataBaseService {
 
   getAlumnesGrup(grupId: string) {
     return this.http.get<{result: string, json: any, length: number}>
-      (environment.apiCrudUrl + 'alumnes?grup_id[LIKE]=' + grupId).subscribe(
+      (environment.apiCrudUrl + 'alumnes?grup_id[LIKE]=' + grupId + '&_order[niu]=ASC').subscribe(
       (data) => {
         this.alumnesUpdated.next([...data.json]);
       }

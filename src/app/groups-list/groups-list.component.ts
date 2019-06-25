@@ -206,11 +206,36 @@ export class GroupsListComponent implements  OnDestroy, OnInit {
     this.myLocation.back();
   }
 
-  onAddGroupFormChangeValues(quantitat: number) {
-    this.addGroupsFrom.patchValue({
-      disponibles: (this.assignatura.tamany - this.minutsConsumits) -
-                  (this.addGroupsFrom.get('quantitat').value * this.addGroupsFrom.get('quota').value)
-    });
+  onAddGroupFormChangeQuantitatValues(valorInput: number) {
+
+    const minutsDisponibles = (this.assignatura.tamany - this.minutsConsumits) -
+    (this.addGroupsFrom.get('quantitat').value * this.addGroupsFrom.get('quota').value);
+    if ( minutsDisponibles < 0) {
+      this.addGroupsFrom.patchValue({
+        quantitat: valorInput - 1
+      });
+    } else {
+      this.addGroupsFrom.patchValue({
+        disponibles: minutsDisponibles
+      });
+    }
+
+  }
+
+  onAddGroupFormChangeQuotaValues(valorInput: number) {
+
+    const minutsDisponibles = (this.assignatura.tamany - this.minutsConsumits) -
+    (this.addGroupsFrom.get('quantitat').value * this.addGroupsFrom.get('quota').value);
+    if ( minutsDisponibles < 0) {
+      this.addGroupsFrom.patchValue({
+        quota: valorInput - 1
+      });
+    } else {
+      this.addGroupsFrom.patchValue({
+        disponibles: minutsDisponibles
+      });
+    }
+
   }
 
   onSelectAll(selectAllStatus: boolean) {
