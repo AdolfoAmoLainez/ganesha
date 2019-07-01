@@ -56,7 +56,7 @@ export class DataBaseService {
   }
 
   getAssignatures() {
-    return this.http.get<{assignatures: Assignatura[]}>(environment.apiCrudUrl + 'assignatures').subscribe(
+    return this.http.get<{assignatures: Assignatura[]}>(environment.apiCrudUrl + 'assignatures' + '&_order[codi]=ASC').subscribe(
       (data: any) => {
 
         this.assignaturesUpdated.next(data.json);
