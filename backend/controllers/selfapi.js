@@ -1,4 +1,5 @@
 var dbconfig = require('../mysqlconn');
+const shell = require('shelljs');
 
 /**
  * Request:
@@ -251,17 +252,36 @@ exports.addProfeAssignatura = (req, res) => {
 exports.addAssignatura = (req, res) => {
   console.log(req.body);
   console.log("\nadd Assignatura!");
-  dbconfig.connection.query( //Afegir assignatura
-    "INSERT INTO `assignatures` (`id`, `codi`, `nom`, `unitat_id`, `tamany`, `unitatstamany`) " +
-    "VALUES (NULL, '"+req.body.codi+"', '"+req.body.nom+"','"+req.body.unitat_id+"', '"+req.body.tamany+"', '"+req.body.unitatstamany+"');",
-    (errorinsert, result) =>{
 
-      if (!errorinsert){
-        res.status(200).json({message: 'Fet!', assignaturaId: result.insertId});
-      } else {
-        res.status(500).json({message: "No s'ha pogut insertar l'assigantura en la BBDD"});
-      }
-    });
+  shell.exec('ganesha-add-assignatura ' + req.body.codi, {silent: true}, function(code, stdout, stderr){
+
+    if (stdout) {
+        console.log("Stdout", stdout);
+
+        const stdjson = JSON.parse(stdout);
+        if (stdjson.codi == 200) {
+          dbconfig.connection.query( //Afegir assignatura
+            "INSERT INTO `assignatures` (`id`, `codi`, `nom`, `unitat_id`, `tamany`, `unitatstamany`) " +
+            "VALUES (NULL, '"+req.body.codi+"', '"+req.body.nom+"','"+req.body.unitat_id+"', '"+req.body.tamany+"', '"+req.body.unitatstamany+"');",
+            (errorinsert, result) =>{
+
+              if (!errorinsert){
+                res.status(200).json({message: 'Fet!', assignaturaId: result.insertId});
+                console.log("Assignatura " + req.body.codi + " creada correctament.");
+              } else {
+                res.status(500).json({message: "No s'ha pogut insertar l'assignatura en la BBDD"});
+                console.log("ERROR: No s'ha pogut insertar l'assignatura " + req.body.codi + " en la BBDD.");
+              }
+            });
+        } else {
+          res.status(stdjson.codi).json({message: stdjson.message});
+          console.log("ERROR: " + stdjson.message);
+        }
+
+    }
+  });
+
+
 }
 
 /**
