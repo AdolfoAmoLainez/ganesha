@@ -37,9 +37,10 @@ export class AssignaturaInfoComponent implements OnInit, OnDestroy {
   ngOnInit() {
     // this.assignatura.codi = "1212"
 
+    // El codi d'assignatura ha de començar per a i no pot tenir caracters especials
     this.assignaturaForm = new FormGroup({
       id: new FormControl(''),
-      codi: new FormControl('', [Validators.required]),
+      codi: new FormControl('', [Validators.required, , Validators.pattern(/^(a.+[^?¿*!|'\^\(\){}@\"$%&\/\\`´])$/)]),
       nom: new FormControl('', [Validators.required]),
       //unitat_id: new FormControl('', [Validators.required]),
       tamany: new FormControl('', [Validators.required]),
