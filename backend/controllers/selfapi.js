@@ -33,13 +33,13 @@ exports.addGrups = (req, res) => {
                 valuesInsert.push("("+req.body.assignatura.id +","+ req.body.quotaMin+","+ (max+i)+")");
               }
               console.log("Crear "+ req.body.quantitat+" grups començant per " + max);
-              console.log("Grups: " + nomGrups.join());
+              console.log("Grups: " + nomGrups.join(' '));
 
               nius.forEach(element => {
                 niusProfes.push(element.niu);
               });
 
-              console.log(niusProfes.join());
+              console.log("Profes: " + niusProfes.join(' '));
               console.log("Creació de grups!");
 
               sqlInsert= "INSERT INTO `grups` (assignatura_id,quota,ordre) VALUES "+valuesInsert.join() +";";
@@ -195,7 +195,7 @@ exports.deleteProfesAssignatura = (req, res) => {
 }
 
 exports.getLvmInfo = (req, res) => {
-  const volinfo = {
+/*   const volinfo = {
       codi: 200,
       message: 'Informació obtinguda correctament.',
       json: [
@@ -205,11 +205,23 @@ exports.getLvmInfo = (req, res) => {
           disponible: '4,2g'
         }
       ]
-    };
+    }; */
   console.log("\nget LVM Info!");
 
+  shell.exec('ganesha-lvm-info ', {silent: true}, function(code, stdout, stderr){
 
-  res.status(200).json(volinfo);
+    if (stdout) {
+
+      const response = JSON.parse(stdout);
+
+      res.status(response.codi).json(response);
+    } else {
+      res.status(500).json({message: "No s'ha pogut obtenir la informació del Volum"});
+    }
+  });
+
+  //res.status(200).json(volinfo);
+
 
 }
 
@@ -279,6 +291,7 @@ exports.addAssignatura = (req, res) => {
         }
 
     }
+    res.status(500).json({message: "No s'ha pogut insertar l'assignatura"});
   });
 
 

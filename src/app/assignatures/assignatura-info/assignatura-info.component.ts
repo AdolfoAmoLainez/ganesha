@@ -24,8 +24,9 @@ export class AssignaturaInfoComponent implements OnInit, OnDestroy {
   editMode = false;
   lvmInfo = {
     volname: '',
-    tamany: '',
-    disponible: ''
+    espacio_total: '',
+    espacio_usado: '',
+    espacio_libre: ''
   };
 
   factorUnitats = 1;
@@ -109,6 +110,7 @@ export class AssignaturaInfoComponent implements OnInit, OnDestroy {
       (data) => {
         this.dbService.getLvmInfo().subscribe(
           (info) => {
+
             this.lvmInfo = info.json[0];
           }
         );

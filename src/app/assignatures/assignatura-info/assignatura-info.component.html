@@ -143,13 +143,13 @@
               <div class="form-group row">
                 <label for="tamanyvol" class="col-sm-3 col-form-label">Tamany</label>
                 <div class="col-sm-9">
-                  <input type="text" readonly class="form-control-plaintext" id="tamanyvol" [value]="lvmInfo.tamany">
+                  <input type="text" readonly class="form-control-plaintext" id="tamanyvol" [value]="lvmInfo?.espacio_total">
                 </div>
               </div>
               <div class="form-group row">
                 <label for="disponible" class="col-sm-3 col-form-label">Disponible</label>
                 <div class="col-sm-9">
-                  <input type="text" readonly class="form-control-plaintext" id="disponible" [value]="lvmInfo.disponible">
+                  <input type="text" readonly class="form-control-plaintext" id="disponible" [value]="lvmInfo?.espacio_libre">
                 </div>
               </div>
             </form>
