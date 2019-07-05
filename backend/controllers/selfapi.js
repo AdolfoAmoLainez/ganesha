@@ -20,7 +20,7 @@ exports.addGrups = (req, res) => {
           (errorProf, nius) =>{
             if(!errorProf){
               nomGrups=[];
-              arrayGrups=[];
+              arrayGrups=[]; // Per obtenir després l'ordre segon el nom del grup tornat
               niusProfes=[];
               max = 0;
               valuesInsert=[];
@@ -34,11 +34,8 @@ exports.addGrups = (req, res) => {
                 arrayGrups[nom] = {
                   ordre: (max+i)
                 };
-/*                 arrayGrups.push({nom: {
-                  ordre: (max+i)
-                }}); */
+
                 nomGrups.push(nom);
-                //valuesInsert.push("("+req.body.assignatura.id +","+ req.body.quotaMin+","+ (max+i)+")");
               }
               console.log("Crear "+ req.body.quantitat+" grups començant per " + max);
               console.log("Grups: " + nomGrups.join(' '));
@@ -51,8 +48,6 @@ exports.addGrups = (req, res) => {
               console.log("Profes: " + niusProfes.join(' '));
               console.log("Creació de grups!");
 
-              //TODO: Al recoger la salida del comando hay que recorrerla y hacer los
-              // inserts SOLO de los grupos que estan ok
               shell.exec('ganesha-add-grups ' + req.body.assignatura.codi +
                          ' "' + nomGrups.join(' ') + '" ' +
                          '"' + niusProfes.join(' ') + '"', {silent: true}, function(code, stdout, stderr){
@@ -74,7 +69,6 @@ exports.addGrups = (req, res) => {
                                             req.body.quotaMin + "," +
                                             arrayGrups[grupElement.json.nomgrup].ordre + ")");
                     }
-
                   });
 
                   if (valuesInsert.length > 0) { // S'ha creat algun grup
@@ -98,10 +92,6 @@ exports.addGrups = (req, res) => {
                   }
                 }
               });
-
-
-
-              //res.status(200).json({message: 'Fet!'});
             }
           }
         );
