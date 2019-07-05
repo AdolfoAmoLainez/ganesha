@@ -20,6 +20,7 @@ exports.addGrups = (req, res) => {
           (errorProf, nius) =>{
             if(!errorProf){
               nomGrups=[];
+              arrayGrups=[];
               niusProfes=[];
               max = 0;
               valuesInsert=[];
@@ -29,11 +30,19 @@ exports.addGrups = (req, res) => {
               }
 
               for (i=1; i<=req.body.quantitat; i++){
-                nomGrups.push(req.body.assignatura.codi+"-g"+ (max+i));
-                valuesInsert.push("("+req.body.assignatura.id +","+ req.body.quotaMin+","+ (max+i)+")");
+                nom = req.body.assignatura.codi+"-g"+ (max+i);
+                arrayGrups[nom] = {
+                  ordre: (max+i)
+                };
+/*                 arrayGrups.push({nom: {
+                  ordre: (max+i)
+                }}); */
+                nomGrups.push(nom);
+                //valuesInsert.push("("+req.body.assignatura.id +","+ req.body.quotaMin+","+ (max+i)+")");
               }
               console.log("Crear "+ req.body.quantitat+" grups començant per " + max);
               console.log("Grups: " + nomGrups.join(' '));
+              console.log("GrupsArray: ", arrayGrups);
 
               nius.forEach(element => {
                 niusProfes.push(element.niu);
@@ -42,19 +51,55 @@ exports.addGrups = (req, res) => {
               console.log("Profes: " + niusProfes.join(' '));
               console.log("Creació de grups!");
 
-              sqlInsert= "INSERT INTO `grups` (assignatura_id,quota,ordre) VALUES "+valuesInsert.join() +";";
-              console.log(sqlInsert);
+              //TODO: Al recoger la salida del comando hay que recorrerla y hacer los
+              // inserts SOLO de los grupos que estan ok
+              shell.exec('ganesha-add-grups ' + req.body.assignatura.codi +
+                         ' "' + nomGrups.join(' ') + '" ' +
+                         '"' + niusProfes.join(' ') + '"', {silent: true}, function(code, stdout, stderr){
 
-              // Insercio a la BBDD
-               dbconfig.connection.query( //Afegir grups
-                 sqlInsert,
-                 (errorIns, consulta) => {
-                 if (!errorIns){
-                   res.status(200).json({message: 'Fet!', consulta});
-                 } else {
-                   res.status(500).json({message: "No s'ha pogut insertar els grups!"});
-                 }
-               });
+                if (stdout) {
+                  console.log("Stdout", stdout);
+                  var resultjson = '';
+                  try {
+                    resultjson = JSON.parse(stdout);
+                  } catch ( err) {
+                    console.log("Error en la resposta de l'script ganesha-add-grups!");
+                    res.status(500).json({message: "Error en la resposta de l'script ganesha-add-grups!"});
+                    return;
+                  }
+                  resultjson.forEach( grupElement => {
+
+                    if(grupElement.codi == 200) {
+                      valuesInsert.push("(" + req.body.assignatura.id + "," +
+                                            req.body.quotaMin + "," +
+                                            arrayGrups[grupElement.json.nomgrup].ordre + ")");
+                    }
+
+                  });
+
+                  if (valuesInsert.length > 0) { // S'ha creat algun grup
+                    sqlInsert= "INSERT INTO `grups` (assignatura_id,quota,ordre) VALUES "+valuesInsert.join() +";";
+                    console.log(sqlInsert);
+
+                    // Insercio a la BBDD
+                      dbconfig.connection.query( //Afegir grups
+                      sqlInsert,
+                      (errorIns, consulta) => {
+                      if (!errorIns){
+                        res.status(200).json({message: 'Fet!', consulta});
+                      } else {
+                        res.status(500).json({message: "No s'ha pogut insertar els grups!"});
+                      }
+                    });
+                  } else {
+                    console.log("Error: No s'ha pogut crear cap grup!");
+                    res.status(500).json({message: "Error: No s'ha pogut crear cap grup!"});
+                    return;
+                  }
+                }
+              });
+
+
 
               //res.status(200).json({message: 'Fet!'});
             }
@@ -290,8 +335,10 @@ exports.addAssignatura = (req, res) => {
           console.log("ERROR: " + stdjson.message);
         }
 
+    } else {
+      console.log("Error en la resposta de l'script ganesha-add-assignatura!");
+      res.status(500).json({message: "Error en la resposta de l'script ganesha-add-assignatura!"});
     }
-    res.status(500).json({message: "No s'ha pogut insertar l'assignatura"});
   });
 
 
