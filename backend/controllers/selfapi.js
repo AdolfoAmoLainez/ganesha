@@ -316,7 +316,7 @@ exports.addAssignatura = (req, res) => {
             (errorinsert, result) =>{
 
               if (!errorinsert){
-                res.status(200).json({message: 'Fet!', assignaturaId: result.insertId});
+                res.status(200).json({message: stdjson.message, assignaturaId: result.insertId});
                 console.log("Assignatura " + req.body.codi + " creada correctament.");
               } else {
                 res.status(500).json({message: "No s'ha pogut insertar l'assignatura en la BBDD"});

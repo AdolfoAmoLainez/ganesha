@@ -13,6 +13,7 @@ import { Router } from '@angular/router';
 import { stringify } from '@angular/core/src/render3/util';
 import { Usuari } from './usuari.model';
 import { Perfil } from './perfil.model';
+import { ToastrService } from 'ngx-toastr';
 
 @Injectable()
 export class DataBaseService {
@@ -48,7 +49,8 @@ export class DataBaseService {
 
 
   constructor(private http: HttpClient,
-              private router: Router) {}
+              private router: Router,
+              private toastr: ToastrService) {}
 
 
   getLvmInfo() {
@@ -90,8 +92,13 @@ export class DataBaseService {
       (environment.selfApiUrl + 'add_assignatura', assignatura).subscribe(
       (data) => {
         console.log(data);
+        this.toastr.success(data.message);
         this.getAssignatures();
         this.router.navigate(['/', 'adm', 'assignatura', data.assignaturaId, 'professors']);
+      },
+      (err) => {
+        console.log(err);
+        this.toastr.error(err.error.message);
       }
     );
   }
