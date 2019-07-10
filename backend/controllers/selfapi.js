@@ -130,20 +130,64 @@ exports.deleteGrups = (req, res) => {
   console.log("\nEsborrar grups!");
   console.log(req.body);
   grupsId = [];
+  nomGrups = [];
+  arrayGrups = []; // Array amb els grups identificats pel nom
+
 
   req.body.grups.forEach(element => {
-    grupsId.push(element.id);
+
+    const nom = req.body.assigCodi + '-g' + element.ordre;
+    nomGrups.push(nom);
+    arrayGrups[nom]=element;
+
   });
 
-  dbconfig.connection.query( //Esborrar grups
-    "DELETE FROM `grups` WHERE id IN ("+grupsId.join()+");" ,
-    (errorDel) =>{
-      if (!errorDel){
-        res.status(200).json({message: 'Fet!'});
-      } else {
-        res.status(500).json({message: "No s'han pogut esborrar els grups"});
+    const { stdout, stderr, code } = shell.exec('ganesha-del-grups ' + req.body.assigCodi + ' "' +
+    nomGrups.join(' ') + '" TRUE', {silent: true}); //, function(code, stdout, stderr){
+
+      if (stdout) {
+        console.log("Stdout", stdout);
+        var resultjson = '';
+        grupsWithError = [];
+        try {
+          resultjson = JSON.parse(stdout);
+        } catch ( err) {
+          console.log("Error en la resposta de l'script ganesha-del-grups!");
+          res.status(520).json({problemes: -1, grups:[{message: "Error en la resposta de l'script ganesha-del-grups!"}] });
+          return;
+        }
+        console.log(arrayGrups);
+
+        resultjson.forEach( grupElement => {
+          console.log(grupElement);
+
+          if(grupElement.codi == 200) {
+            grupsId.push(arrayGrups[grupElement.json.nomgrup].id);
+          } else {
+            grupsWithError.push(grupElement);
+          }
+        });
+
+        dbconfig.connection.query( //Esborrar grups
+          "DELETE FROM `grups` WHERE id IN ("+grupsId.join()+");" ,
+          (errorDel) =>{
+            if (!errorDel){
+              if (grupsWithError.length == 0) { // No hi ha cap error de creació de grups
+                res.status(200).json({problemes: 0, grups:[{message: 'Grups esborrats correctament!'}]});
+              } else {
+                res.status(521).json({problemes: grupsWithError.length, grups: grupsWithError});
+              }
+              //res.status(200).json({message: 'Fet!'});
+            } else {
+              res.status(520).json({problemes: grupsId.length, grups: [{message: "No s'ha pogut esborrar els grups de la BBDD!"}]});
+              //res.status(500).json({message: "No s'han pogut esborrar els grups"});
+            }
+          });
+
       }
-    });
+    //});
+
+
   //res.status(200).json({message: 'Fet!'});
 }
 

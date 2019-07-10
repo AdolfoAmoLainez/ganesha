@@ -36,6 +36,12 @@ export class GroupsListComponent implements  OnDestroy, OnInit {
   grupsChangedSubs: Subscription;
 
 
+  /** TODO: Falta controlar si se quieren borrar los datos o
+   * no de los grupos en caso de ser administrador.
+   * En el caso de profe no se puede borrar un grupo con alumnos
+   *
+   */
+
   constructor(private modalService: NgbModal,
               private activatedRoute: ActivatedRoute,
               private myLocation: Location,
@@ -126,12 +132,17 @@ export class GroupsListComponent implements  OnDestroy, OnInit {
     modalRef.componentInstance.missatge = 'Vols esborrar els grups sel·leccionats?';
     modalRef.result.then(
       (resposta) => {
-        console.log('Vol esborrar tots els grups.');
-        this.dbService.deleteGrupsAssignatura(this.selectedGroups, this.assignatura.codi);
+
+        this.groups = this.groups.filter( grup => {
+          return !this.selectedGroups.includes(grup);
+        }); // Esborrem de la vista els grups sel·leccionats
         this.selectAll = false;
+
+        this.dbService.deleteGrupsAssignatura(this.selectedGroups, this.assignatura.codi);
+        this.selectedGroups = [];
       },
       () => {
-        console.log('Cancelado');
+        // console.log('Cancelado');
       }
     );
   }
@@ -143,14 +154,13 @@ export class GroupsListComponent implements  OnDestroy, OnInit {
     } else {
       this.selectedGroups.splice(this.selectedGroups.indexOf(groupId), 1);
     }
-    console.log(this.selectedGroups);
+
   }
 
   onAfegirClick(content) {
 
     this.dbService.getMinutsConsumits(this.assignaturaId).subscribe(
       (respostaMinuts) => {
-        console.log(respostaMinuts);
 
         this.minutsConsumits = respostaMinuts.consulta[0].consumits;
 
@@ -177,7 +187,7 @@ export class GroupsListComponent implements  OnDestroy, OnInit {
             }
           },
           () => {
-            console.log('Cancelado');
+            // console.log('Cancelado');
           }
         );
       }
@@ -196,7 +206,7 @@ export class GroupsListComponent implements  OnDestroy, OnInit {
         this.dbService.deleteGrupsAssignatura([grup], this.assignatura.codi);
       },
       () => {
-        console.log('Cancelado');
+        // console.log('Cancelado');
       }
     );
 
@@ -249,7 +259,7 @@ export class GroupsListComponent implements  OnDestroy, OnInit {
       this.selectedGroups = [];
     }
 
-    console.log(this.selectedGroups);
+    // console.log(this.selectedGroups);
 
   }
 

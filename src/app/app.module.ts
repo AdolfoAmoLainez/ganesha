@@ -24,6 +24,7 @@ import { AdminviewComponent } from './adminview/adminview.component';
 import {NgbModalModule} from '@ng-bootstrap/ng-bootstrap';
 import {NgbAccordionModule} from '@ng-bootstrap/ng-bootstrap';
 import { ToastrModule } from 'ngx-toastr';
+import { MymodalwaitComponent } from './shared/mymodalwait/mymodalwait.component';
 
 @NgModule({
   declarations: [
@@ -38,7 +39,8 @@ import { ToastrModule } from 'ngx-toastr';
     MymodalyesnoComponent,
     UsuarisListComponent,
     LoginComponent,
-    AdminviewComponent
+    AdminviewComponent,
+    MymodalwaitComponent
   ],
   imports: [
     BrowserModule,
@@ -59,6 +61,6 @@ import { ToastrModule } from 'ngx-toastr';
   ],
   providers: [DataBaseService, AuthService],
   bootstrap: [AppComponent],
-  entryComponents: [MymodalyesnoComponent]
+  entryComponents: [MymodalyesnoComponent, MymodalwaitComponent]
 })
 export class AppModule { }

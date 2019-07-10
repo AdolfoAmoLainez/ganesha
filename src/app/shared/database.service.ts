@@ -14,6 +14,8 @@ import { stringify } from '@angular/core/src/render3/util';
 import { Usuari } from './usuari.model';
 import { Perfil } from './perfil.model';
 import { ToastrService } from 'ngx-toastr';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { MymodalwaitComponent } from './mymodalwait/mymodalwait.component';
 
 @Injectable()
 export class DataBaseService {
@@ -50,7 +52,8 @@ export class DataBaseService {
 
   constructor(private http: HttpClient,
               private router: Router,
-              private toastr: ToastrService) {}
+              private toastr: ToastrService,
+              private modalService: NgbModal) {}
 
 
   getLvmInfo() {
@@ -215,11 +218,33 @@ export class DataBaseService {
       grups,
       assigCodi
     };
-    return this.http.post(environment.selfApiUrl + 'delete_grups', obj).subscribe(
-      (response) => {
-        console.log(response);
+    const modalRef = this.modalService.open(MymodalwaitComponent,{backdrop: 'static', keyboard: false});
+    modalRef.componentInstance.titol = 'Operació en procés';
+    modalRef.componentInstance.missatge = 'Esperi mentre esborrem els grups....';
 
+    return this.http.post<{problemes: number, grups: any}>(environment.selfApiUrl + 'delete_grups', obj).subscribe(
+      (response) => {
+
+        if (response.problemes === 0) {
+          this.toastr.success(response.grups[0].message);
+        } else {
+          response.grups.forEach(grup => {
+            this.toastr.error(grup.message);
+          });
+        }
         this.grupsChanged.next();
+        modalRef.dismiss();
+      },
+      (err) => {
+        if (err.error.problemes === -1) {
+          this.toastr.error(err.error.grups[0].message);
+        } else {
+          err.error.grups.forEach(grup => {
+            this.toastr.error(grup.message + ' ' + grup.json.nomgrup);
+          });
+        }
+        this.grupsChanged.next();
+        modalRef.dismiss();
       }
     );
 
