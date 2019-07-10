@@ -2,6 +2,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import { HttpClientModule} from '@angular/common/http';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { AppComponent } from './app.component';
 import { AssignaturesListComponent } from './assignatures/assignatures-list/assignatures-list.component';
@@ -14,14 +15,15 @@ import { ProfessorsListComponent } from './professors-list/professors-list.compo
 import { AssignaturaInfoComponent } from './assignatures/assignatura-info/assignatura-info.component';
 import { AssignaturaViewComponent } from './assignatures/assignatura-view/assignatura-view.component';
 import { MymodalyesnoComponent } from './shared/mymodalyesno/mymodalyesno.component';
-
-
-import {NgbModalModule} from '@ng-bootstrap/ng-bootstrap';
-import {NgbAccordionModule} from '@ng-bootstrap/ng-bootstrap';
 import { UsuarisListComponent } from './usuaris/usuaris-list/usuaris-list.component';
 import { LoginComponent } from './auth/login/login.component';
 import { AuthService } from './auth/auth.service';
 import { AdminviewComponent } from './adminview/adminview.component';
+
+
+import {NgbModalModule} from '@ng-bootstrap/ng-bootstrap';
+import {NgbAccordionModule} from '@ng-bootstrap/ng-bootstrap';
+import { ToastrModule } from 'ngx-toastr';
 
 @NgModule({
   declarations: [
@@ -45,7 +47,15 @@ import { AdminviewComponent } from './adminview/adminview.component';
     NgbAccordionModule,
     AppRoutingModule,
     HttpClientModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    BrowserAnimationsModule,
+    ToastrModule.forRoot({
+      timeOut: 3000,
+      positionClass: 'toast-bottom-left',
+      preventDuplicates: true,
+      tapToDismiss: true,
+      newestOnTop: true
+    })
   ],
   providers: [DataBaseService, AuthService],
   bootstrap: [AppComponent],
