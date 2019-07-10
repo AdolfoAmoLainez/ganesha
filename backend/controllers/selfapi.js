@@ -6,6 +6,19 @@ const shell = require('shelljs');
  *  assignatura
  *  quantitat de grups
  *  quota en Gb
+ *
+ * Response:
+ * {
+ *    problemes:
+ *              0 => Tot ok (codi 200)
+ *              numero de grups amb problemes (codi 521)
+ *             -1 => problema script / problema amb la BBDD (codi 520)
+ *                   no s'ha pogut crear cap grup
+ *
+ *    grups:
+ *             [{codi, message, json}] => array de missatges de grups amb problemes
+ *             [{message: }] => altres
+ *
  */
 exports.addGrups = (req, res) => {
   console.log("\nInsertar grups!");
@@ -55,11 +68,12 @@ exports.addGrups = (req, res) => {
                 if (stdout) {
                   console.log("Stdout", stdout);
                   var resultjson = '';
+                  var grupsWithError = [];
                   try {
                     resultjson = JSON.parse(stdout);
                   } catch ( err) {
                     console.log("Error en la resposta de l'script ganesha-add-grups!");
-                    res.status(500).json({message: "Error en la resposta de l'script ganesha-add-grups!"});
+                    res.status(520).json({problemes: -1, grups:[{message: "Error en la resposta de l'script ganesha-add-grups!"}] });
                     return;
                   }
                   resultjson.forEach( grupElement => {
@@ -68,6 +82,8 @@ exports.addGrups = (req, res) => {
                       valuesInsert.push("(" + req.body.assignatura.id + "," +
                                             req.body.quotaMin + "," +
                                             arrayGrups[grupElement.json.nomgrup].ordre + ")");
+                    } else {
+                      grupsWithError.push(grupElement);
                     }
                   });
 
@@ -80,14 +96,18 @@ exports.addGrups = (req, res) => {
                       sqlInsert,
                       (errorIns, consulta) => {
                       if (!errorIns){
-                        res.status(200).json({message: 'Fet!', consulta});
+                        if (grupsWithError.length == 0) { // No hi ha cap error de creació de grups
+                          res.status(200).json({problemes: 0, grups:[{message: 'Grups creats correctament!'}]});
+                        } else {
+                          res.status(521).json({problemes: grupsWithError.length, grups: grupsWithError});
+                        }
                       } else {
-                        res.status(500).json({message: "No s'ha pogut insertar els grups!"});
+                        res.status(520).json({problemes: valuesInsert.length, grups: [{message: "No s'ha pogut insertar els grups a la BBDD!"}]});
                       }
                     });
                   } else {
                     console.log("Error: No s'ha pogut crear cap grup!");
-                    res.status(500).json({message: "Error: No s'ha pogut crear cap grup!"});
+                    res.status(520).json({problemes: -1, grups: [{message: "Error: No s'ha pogut crear cap grup!"}]});
                     return;
                   }
                 }

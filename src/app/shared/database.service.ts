@@ -182,10 +182,28 @@ export class DataBaseService {
       quotaGb
     };
 
-    return this.http.post(environment.selfApiUrl + 'add_grups', obj).subscribe(
+    return this.http.post<{problemes: number, grups: any}>(environment.selfApiUrl + 'add_grups', obj).subscribe(
       (response) => {
         console.log(response);
+        if (response.problemes === 0) {
+          this.toastr.success(response.grups[0].message);
+        } else {
+          response.grups.forEach(grup => {
+            this.toastr.error(grup.message);
+          });
+        }
+        this.grupsChanged.next();
+      },
+      (err) => {
 
+        if (err.error.problemes === -1) {
+          this.toastr.error(err.error.grups[0].message);
+        } else {
+          err.error.grups.forEach(grup => {
+            console.log(grup);
+            this.toastr.error(grup.message + ' ' + grup.json.nomgrup);
+          });
+        }
         this.grupsChanged.next();
       }
     );
