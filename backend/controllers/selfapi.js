@@ -294,13 +294,16 @@ exports.addProfeAssignatura = (req, res) => {
  * Resposta:
  *   message
  *   assignaturaId: Id de l'assignatura insertada
+ *
+ * TODO: Gestionar las unidades de quota desdel frontend K, M, G.... ?
  */
 
 exports.addAssignatura = (req, res) => {
   console.log(req.body);
   console.log("\nadd Assignatura!");
 
-  shell.exec('ganesha-add-assignatura ' + req.body.codi, {silent: true}, function(code, stdout, stderr){
+  shell.exec('ganesha-add-assignatura ' + req.body.codi + " " +
+             req.body.tamanygb + "G", {silent: true}, function(code, stdout, stderr){
 
     if (stdout) {
         console.log("Stdout", stdout);
