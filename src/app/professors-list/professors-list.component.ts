@@ -8,6 +8,7 @@ import { DataBaseService } from '../shared/database.service';
 import { Professor } from '../shared/professor.model';
 import { Subscription } from 'rxjs';
 import { Assignatura } from '../shared/assignatura.model';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-professors-list',
@@ -34,7 +35,8 @@ export class ProfessorsListComponent implements OnInit, OnDestroy {
   constructor(private modalService: NgbModal,
               private activatedRoute: ActivatedRoute,
               private myLocation: Location,
-              private dbService: DataBaseService) { }
+              private dbService: DataBaseService,
+              private toastr: ToastrService) { }
 
   ngOnInit() {
 
@@ -114,14 +116,22 @@ export class ProfessorsListComponent implements OnInit, OnDestroy {
     this.modalService.open(content, {ariaLabelledBy: 'modal-basic-title'}).result.then(
       (niu) => {
         console.log('Vol afegir el niu ' + niu + '.');
-        const professor: Professor = {
-          id: null,
-          niu: niu,
-          nom: 'Buscar a LDAP?',
-          assignatura_id: this.assignaturaId
-        };
+        let duplicat = null;
 
-        this.dbService.addProfessorAssignatura(professor, this.assignatura.codi);
+        duplicat = this.professors.find( profe => profe.niu === niu);
+
+        if (duplicat) {
+          this.toastr.error('Aquest niu ja està afegit com professor!!');
+        } else {
+          const professor: Professor = {
+            id: null,
+            niu: niu,
+            nom: 'Buscar a LDAP?',
+            assignatura_id: this.assignaturaId
+          };
+
+          this.dbService.addProfessorAssignatura(professor, this.assignatura.codi);
+        }
       },
       () => {
         console.log('Cancelado');

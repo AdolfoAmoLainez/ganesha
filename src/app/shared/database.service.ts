@@ -166,10 +166,14 @@ export class DataBaseService {
       assignaturaCodi,
       professor
     };
-    return this.http.post(environment.selfApiUrl + 'add_professor_assignatura', profObj).subscribe(
+    return this.http.post<{message: string}>(environment.selfApiUrl + 'add_professor_assignatura', profObj).subscribe(
       (response) => {
         console.log(response);
-
+        this.toastr.success(response.message);
+        this.profesChanged.next();
+      },
+      (err) => {
+        this.toastr.error(err.error.message);
         this.profesChanged.next();
       }
     );
@@ -220,7 +224,7 @@ export class DataBaseService {
     };
     const modalRef = this.modalService.open(MymodalwaitComponent,{backdrop: 'static', keyboard: false});
     modalRef.componentInstance.titol = 'Operació en procés';
-    modalRef.componentInstance.missatge = 'Esperi mentre esborrem els grups....';
+    modalRef.componentInstance.missatge = 'Esperi mentre esborrem els grups. Aquesta acció pot trigar uns minuts....';
 
     return this.http.post<{problemes: number, grups: any}>(environment.selfApiUrl + 'delete_grups', obj).subscribe(
       (response) => {

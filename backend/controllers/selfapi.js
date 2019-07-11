@@ -18,7 +18,7 @@ const shell = require('shelljs');
  *    grups:
  *             [{codi, message, json}] => array de missatges de grups amb problemes
  *             [{message: }] => altres
- *
+ * }
  */
 exports.addGrups = (req, res) => {
   console.log("\nInsertar grups!");
@@ -124,6 +124,20 @@ exports.addGrups = (req, res) => {
  * Request:
  *  grups: llista en format array de grups
  * assigCodi: codi de l'assignatura
+ *
+ * Response:
+ * {
+ *    problemes:
+ *              0 => Tot ok (codi 200)
+ *              numero de grups amb problemes (codi 521)
+ *             -1 => problema script / problema amb la BBDD (codi 520)
+ *                   no s'ha pogut crear cap grup
+ *
+ *    grups:
+ *             [{codi, message, json}] => array de missatges de grups amb problemes
+ *             [{message: }] => altres
+ * }
+ *
  */
 
 exports.deleteGrups = (req, res) => {
@@ -328,7 +342,10 @@ exports.getLvmInfo = (req, res) => {
  * Request:
  * {
  *  assignaturaCodi,
- *  professor
+ *  professor: { id: ,
+            niu: ,
+            nom: ,
+            assignatura_id: }
  * }
  *
  * Resposta:
@@ -339,16 +356,43 @@ exports.getLvmInfo = (req, res) => {
 exports.addProfeAssignatura = (req, res) => {
   console.log("\nAssignar profe a assignatura!");
   console.log(req.body);
-  dbconfig.connection.query( //Afegir profe assignatura
-    "INSERT INTO `professors` (`id`, `niu`, `nom`, `assignatura_id`) " +
-    "VALUES (NULL, '"+req.body.professor.niu+"', '"+req.body.professor.nom+"','"+req.body.professor.assignatura_id+"');",
-    (errorinsert) =>{
-      if (!errorinsert){
-        res.status(200).json({message: 'Fet!'});
-      } else {
-        res.status(500).json({message: "No s'ha pogut insertar el professor a la BBDD"});
-      }
-    });
+
+  const { stdout, stderr, code } = shell.exec('ganesha-add-profe-assignatura ' + req.body.professor.niu + " " +
+  req.body.assignaturaCodi, {silent: true});
+
+  if (stdout) {
+    console.log("Stdout", stdout);
+    var resultjson = '';
+
+    try {
+      resultjson = JSON.parse(stdout);
+    } catch ( err) {
+      console.log("Error en la resposta de l'script ganesha-add-profe-assignatura!");
+      res.status(520).json({problemes: -1, grups:[{message: "Error en la resposta de l'script ganesha-add-profe-assignatura!"}] });
+      return;
+    }
+
+
+    switch (resultjson.codi){
+      case 200:
+          dbconfig.connection.query( //Afegir profe assignatura
+            "INSERT INTO `professors` (`id`, `niu`, `nom`, `assignatura_id`) " +
+            "VALUES (NULL, '"+req.body.professor.niu+"', '"+req.body.professor.nom+"','"+req.body.professor.assignatura_id+"');",
+            (errorinsert) =>{
+              if (!errorinsert){
+                res.status(200).json({message: resultjson.message});
+              } else {
+                res.status(520).json({message: "No s'ha pogut insertar el professor a la BBDD"});
+              }
+            });
+        break;
+      case 501: //Problema des de l'script
+          res.status(501).json({message: resultjson.message});
+        break;
+    }
+
+  }
+
 }
 
 /**
