@@ -30,6 +30,7 @@ export class ProfessorsListComponent implements OnInit, OnDestroy {
   perfil = 'adm';
   paramsSubs: Subscription;
   profesUpdatedSubs: Subscription;
+  profesNamesUpdatedSubs: Subscription;
   profesChangedSubs: Subscription;
 
   constructor(private modalService: NgbModal,
@@ -60,6 +61,9 @@ export class ProfessorsListComponent implements OnInit, OnDestroy {
 
         this.professors = profes;
         this.isLoading = false;
+        this.selectedProfessors = []
+
+        this.dbService.getAlumnesNames(this.professors);
       }
     );
 
@@ -67,12 +71,26 @@ export class ProfessorsListComponent implements OnInit, OnDestroy {
       () => {
         this.loadProfessors();
       }
-    )
+    );
+
+    this.profesNamesUpdatedSubs = this.dbService.alumnesNamesUpdated.subscribe(
+      (data: any) => {
+        console.log(data);
+        if (data.length > 0) {
+          data.forEach(element => {
+            this.professors[this.professors.findIndex(alumne => {
+              return element.dn.includes(alumne.niu);
+            })].nom = element.cn[0] + ' ' + element.sn[0];
+          });
+        }
+      }
+    );
 
   }
   ngOnDestroy() {
     this.paramsSubs.unsubscribe();
     this.profesUpdatedSubs.unsubscribe();
+    this.profesNamesUpdatedSubs.unsubscribe();
     this.profesChangedSubs.unsubscribe();
   }
 
