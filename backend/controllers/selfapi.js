@@ -436,7 +436,7 @@ exports.deleteProfesAssignatura = (req, res) => {
     arrayProfes['n'+niu] = profe;
   });
 
-  const { stdout, stderr, code } = shell.exec('ganesha-del-profes-assignatura.adolfo "' +
+  const { stdout, stderr, code } = shell.exec('ganesha-del-profes-assignatura "' +
        profesNius.join(' ') + '" ' +
        req.body.assigCodi, {silent: true});
 
