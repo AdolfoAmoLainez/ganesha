@@ -17,6 +17,6 @@ router.post('/get_minuts_consumits', SelfApiController.getMinutsConsumits);
 router.post('/get_grups_assignatura', SelfApiController.getGrupsAssignatura);
 router.get('/add_usuari', SelfApiController.addUsuari);
 router.post('/valida_usuari', SelfApiController.validaUsuari);
+router.post('/get_alumnes_names', SelfApiController.getAlumnesNames);
 router.post('/get_perfil_usuari', SelfApiController.getPerfilUsuari);
-
 module.exports = router;

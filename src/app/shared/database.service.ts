@@ -43,6 +43,7 @@ export class DataBaseService {
   grupsChanged = new Subject();
   alumnesUpdated = new Subject<Alumne[]>();
   alumnesChanged = new Subject();
+  alumnesNamesUpdated = new Subject();
   profesUpdated = new Subject<Professor[]>();
   profesChanged = new Subject();
   usuarisUpdated = new Subject<Usuari[]>();
@@ -455,5 +456,18 @@ export class DataBaseService {
 
     return this.http.post<{status: string , message: string, perfils: [{perfil: string}]}>
       (environment.selfApiUrl + 'get_perfil_usuari', obj);
+  }
+
+  getAlumnesNames(alumnes: Alumne[]) {
+
+    const obj = {
+      alumnes
+    };
+
+    return this.http.post(environment.selfApiUrl + 'get_alumnes_names', obj).subscribe(
+      (data: any[]) => {
+        this.alumnesNamesUpdated.next(data);
+      }
+    );
   }
 }

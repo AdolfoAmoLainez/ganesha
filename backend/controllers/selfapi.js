@@ -1,5 +1,75 @@
 var dbconfig = require('../mysqlconn');
 const shell = require('shelljs');
+var LDAP = require('ldap-client');
+
+var ldap = new LDAP({
+    uri:             'ldap://montblanc.uab.es',   // string
+    validatecert:    false,             // Verify server certificate
+    connecttimeout:  -1,                // seconds, default is -1 (infinite timeout), connect timeout
+    base:            'o=sids',          // default base for all future searches
+    attrs:           '*',               // default attribute list for future searches
+    filter:          '(objectClass=*)', // default filter for all future searches
+    scope:           LDAP.SUBTREE,      // default scope for all future searches
+}, function(err) {
+    // connected and ready
+});
+
+/**
+ * Request:
+ *  alumnes: Array d'alumnes
+ *
+ * Resposta:
+ * [ {
+  *  uid: [ 'NIU1' ],
+      displayName: [ 'NOMBRE1' ],
+      dn: 'uid=NIU1,ou=CC,ou=Users,o=sids'
+    },
+    { uid: [ 'NIU2' ],
+      displayName: [ 'NOMBRE2' ],
+      dn: 'uid=NIU2,ou=CC,ou=Users,o=sids'
+    }
+  ]
+
+ */
+
+exports.getAlumnesNames = (req, res) => {
+
+  console.log("\nBusca Noms Alumnes!");
+  console.log(req.body);
+
+
+  filtro = '(|';
+
+  req.body.alumnes.forEach(alumne => {
+    filtro += '(uid=' + alumne.niu + ')';
+  });
+  filtro += ')';
+
+  ldap.bind({
+    binddn: 'cn=proxyCC,ou=CC,ou=users,o=sids',
+    password: 'proxy135'
+},
+(errBind) => {
+  if (!errBind) {
+     ldap.search({
+                      base: 'o=sids',
+                      scope: LDAP.SUBTREE,
+                      filter: filtro,
+                      attrs: 'cn, sn'
+                    },
+                    (err, data) => {
+                      if (err) {
+                        res.status(200).json([]);
+                      } else {
+                        res.status(200).json(data);
+                      }
+
+                    });
+  }
+
+});
+
+}
 
 /**
  * Request:

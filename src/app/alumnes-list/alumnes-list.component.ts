@@ -31,6 +31,7 @@ export class AlumnesListComponent implements OnInit, OnDestroy {
   paramsSubs: Subscription;
   alumnesUpdatedSubs: Subscription;
   alumnesChangedSubs: Subscription;
+  alumnesNamesUpdatedSubs: Subscription;
 
   // TODO: Controlar si se borran todos los alumnos o si se borra el último
   // para informar que los datos del grupo se borraran OnDeleteAlumnes y onDeleteIconClick
@@ -44,8 +45,9 @@ export class AlumnesListComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.paramsSubs.unsubscribe();
-    this.alumnesUpdatedSubs.unsubscribe();
     this.alumnesChangedSubs.unsubscribe();
+    this.alumnesUpdatedSubs.unsubscribe();
+    this.alumnesNamesUpdatedSubs.unsubscribe();
   }
 
   ngOnInit() {
@@ -58,12 +60,28 @@ export class AlumnesListComponent implements OnInit, OnDestroy {
         this.alumnes = alumnes;
         this.isLoading = false;
         this.selectAllAlumnes = false;
+        this.selectedAlumnes = [];
+        console.log("aqui!");
+
+        this.dbService.getAlumnesNames(alumnes);
       }
     );
 
     this.alumnesChangedSubs = this.dbService.alumnesChanged.subscribe(
       () => {
         this.loadAlumnes();
+      }
+    );
+    this.alumnesNamesUpdatedSubs = this.dbService.alumnesNamesUpdated.subscribe(
+      (data: any) => {
+        console.log(data);
+        if (data.length > 0) {
+          data.forEach(element => {
+            this.alumnes[this.alumnes.findIndex(alumne => {
+              return element.dn.includes(alumne.niu);
+            })].nom = element.cn[0] + ' ' + element.sn[0];
+          });
+        }
       }
     );
 
