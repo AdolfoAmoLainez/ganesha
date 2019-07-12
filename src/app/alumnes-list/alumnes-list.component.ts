@@ -87,6 +87,7 @@ export class AlumnesListComponent implements OnInit, OnDestroy {
         this.assignaturaCodi = grupInfo.assignatura_codi;
 
         this.dbService.getAlumnesGrup(this.grupId);
+        this.selectedAlumnes = [];
 
       }
     );
@@ -148,13 +149,29 @@ export class AlumnesListComponent implements OnInit, OnDestroy {
     this.myLocation.back();
   }
 
+  /**
+   * TODO: Falta borrar ficheros del grupo si se borran todos los alumnos
+   */
+
   onDeleteAlumnes() {
     const modalRef = this.modalService.open(MymodalyesnoComponent);
     modalRef.componentInstance.titol = 'Esborrar Alumnes';
+/*    let esborrarDades = false;
+
+    if (this.selectedAlumnes.length === this.alumnes.length) { // Hi ha tots els alumnes seleccionats, hem d'esborrar dades
+
+      modalRef.componentInstance.missatge = 'Vols esborrar els alumnes sel·leccionats?' +
+                                            'Atenció! S\'esborraran els fitxers d\'aquest grup!';
+      esborrarDades = true;
+    } else {
+      modalRef.componentInstance.missatge = 'Vols esborrar els alumnes sel·leccionats?';
+      esborrarDades = false;
+    } */
     modalRef.componentInstance.missatge = 'Vols esborrar els alumnes sel·leccionats?';
+
     modalRef.result.then(
       (resposta) => {
-        console.log('Vol esborrar tots els alumnes.');
+
         this.dbService.deleteAlumnesGrup(this.selectedAlumnes,
                                          this.assignaturaCodi + '-g' + this.grup.ordre,
                                          this.assignaturaCodi);
