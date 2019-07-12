@@ -252,7 +252,7 @@ exports.addAlumneGrup = (req, res) => {
   console.log(req.body);
 
 
-  const { stdout, stderr, code } = shell.exec('ganesha-add-usuari-grup ' + req.body.alumne.niu + ' ' +
+  const { stdout, stderr, code } = shell.exec('ganesha-add-alumne-grup ' + req.body.alumne.niu + ' ' +
   req.body.assigCodi + ' ' + req.body.grupName, {silent: true});
 
   if (stdout) {
