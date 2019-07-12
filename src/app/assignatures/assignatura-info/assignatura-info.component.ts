@@ -43,12 +43,8 @@ export class AssignaturaInfoComponent implements OnInit, OnDestroy {
       id: new FormControl(''),
       codi: new FormControl('', [Validators.required, , Validators.pattern(/^(a.+[^?¿*!|'\^\(\){}@\"$%&\/\\`´])$/)]),
       nom: new FormControl('', [Validators.required]),
-      //unitat_id: new FormControl('', [Validators.required]),
-      tamany: new FormControl('', [Validators.required]),
+      tamany: new FormControl('', [Validators.required, Validators.min(1)]),
       tamanygb: new FormControl(0)
-      //unitatstamany: new FormControl('', [Validators.required]),
-      // quota: new FormControl('', [Validators.required]),
-      // unitatsquota: new FormControl('', [Validators.required])
     });
 
 
@@ -152,6 +148,16 @@ export class AssignaturaInfoComponent implements OnInit, OnDestroy {
         console.log('Cancelado');
       }
     );
+  }
+
+  onChangeTamanyValues(valorInput: number) {
+
+    if (valorInput < 0 ) {
+      this.assignaturaForm.patchValue({
+        tamany: 0
+      });
+    }
+
   }
 
 }
