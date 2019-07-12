@@ -327,7 +327,7 @@ exports.deleteAlumnesGrup = (req, res) => {
     arrayAlumnes['n'+niu] = alumne;
   });
 
-  const { stdout, stderr, code } = shell.exec('ganesha-del-alumnes-grup.adolfo "' +
+  const { stdout, stderr, code } = shell.exec('ganesha-del-alumnes-grup "' +
        alumnesNius.join(' ') + '" ' +
        req.body.assigCodi + ' ' +
        req.body.grupName, {silent: true});

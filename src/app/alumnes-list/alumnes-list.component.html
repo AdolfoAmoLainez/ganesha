@@ -48,12 +48,12 @@
           <input
             type="checkbox"
             class="custom-control-input"
-            [attr.id]="alumne.id"
+            [attr.id]="alumne.niu"
             #checkalumne
             [checked]="selectAllAlumnes"
             (click)="onCheckAlumneClick(alumne, checkalumne.checked)"
           />
-          <label class="custom-control-label" [attr.for]="alumne.id"></label>
+          <label class="custom-control-label" [attr.for]="alumne.niu"></label>
         </div>
       </div>
       <div class="col-sm-11">

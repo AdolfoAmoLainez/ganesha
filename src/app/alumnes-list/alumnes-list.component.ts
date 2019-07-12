@@ -8,6 +8,7 @@ import { Subscription } from 'rxjs';
 import { DataBaseService } from '../shared/database.service';
 import { Alumne } from '../shared/alumne.model';
 import { Grup } from '../shared/grup.model';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-alumnes-list',
@@ -31,10 +32,15 @@ export class AlumnesListComponent implements OnInit, OnDestroy {
   alumnesUpdatedSubs: Subscription;
   alumnesChangedSubs: Subscription;
 
+  // TODO: Controlar si se borran todos los alumnos o si se borra el último
+  // para informar que los datos del grupo se borraran OnDeleteAlumnes y onDeleteIconClick
+
+
   constructor(private modalService: NgbModal,
               private activatedRoute: ActivatedRoute,
               private myLocation: Location,
-              private dbService: DataBaseService) { }
+              private dbService: DataBaseService,
+              private toastr: ToastrService) { }
 
   ngOnDestroy() {
     this.paramsSubs.unsubscribe();
@@ -117,14 +123,20 @@ export class AlumnesListComponent implements OnInit, OnDestroy {
   onAfegirClick(content) {
     this.modalService.open(content, {ariaLabelledBy: 'modal-basic-title'}).result.then(
       (niu) => {
-        // console.log('Vol afegir el niu ' + niu + '.');
-        const al: Alumne = {
-          id: null,
-          niu,
-          nom: 'El busquem a LDAP?',
-          grup_id: this.grupId
-        };
-        this.dbService.addAlumneGrup(al, this.assignaturaCodi + '-g' + this.grup.ordre, this.assignaturaCodi);
+        let duplicat = null;
+        duplicat = this.alumnes.find( profe => profe.niu === niu);
+
+        if (duplicat) {
+          this.toastr.error('Aquest niu ja està afegit com alumne en aquest grup!!');
+        } else {
+          const al: Alumne = {
+            id: null,
+            niu,
+            nom: 'El busquem a LDAP?',
+            grup_id: this.grupId
+          };
+          this.dbService.addAlumneGrup(al, this.assignaturaCodi + '-g' + this.grup.ordre, this.assignaturaCodi);
+        }
       },
       () => {
         console.log('Cancelado');
