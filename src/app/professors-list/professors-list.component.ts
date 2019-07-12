@@ -57,8 +57,6 @@ export class ProfessorsListComponent implements OnInit, OnDestroy {
 
     this.profesUpdatedSubs = this.dbService.profesUpdated.subscribe(
       (profes: Professor[]) => {
-        console.log(profes);
-
         this.professors = profes;
         this.isLoading = false;
         this.selectedProfessors = []
@@ -75,7 +73,6 @@ export class ProfessorsListComponent implements OnInit, OnDestroy {
 
     this.profesNamesUpdatedSubs = this.dbService.alumnesNamesUpdated.subscribe(
       (data: any) => {
-        console.log(data);
         if (data.length > 0) {
           data.forEach(element => {
             this.professors[this.professors.findIndex(alumne => {
@@ -113,7 +110,6 @@ export class ProfessorsListComponent implements OnInit, OnDestroy {
     modalRef.componentInstance.missatge = 'Vols esborrar el professor ' + profeNom + '?';
     modalRef.result.then(
       (resposta) => {
-        console.log('Vol esborrar el professor!' + resposta);
         this.dbService.deleteProfessorsAssignatura([profe], this.assignatura.codi);
       },
       () => {
@@ -167,7 +163,6 @@ export class ProfessorsListComponent implements OnInit, OnDestroy {
     modalRef.componentInstance.missatge = 'Vols esborrar els professors sel·leccionats?';
     modalRef.result.then(
       (resposta) => {
-        console.log('Vol esborrar tots els professors.');
         this.dbService.deleteProfessorsAssignatura(this.selectedProfessors, this.assignatura.codi);
         this.selectAll = false;
       },
