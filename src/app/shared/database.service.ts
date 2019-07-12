@@ -151,14 +151,37 @@ export class DataBaseService {
       assigCodi
     };
 
-    return this.http.post<{result: string, json: any, length: number}>
+    const modalRef = this.modalService.open(MymodalwaitComponent,{backdrop: 'static', keyboard: false});
+    modalRef.componentInstance.titol = 'Operació en procés';
+    modalRef.componentInstance.missatge = 'Esperi mentre esborrem els professors. Aquesta acció pot trigar uns minuts....';
+
+    return this.http.post<{problemes: number, profes: any}>
       (environment.selfApiUrl + 'delete_professors_assignatura', obj).subscribe(
         (data) => {
-          console.log(data);
 
+          if (data.problemes === 0) {
+            this.toastr.success(data.profes[0].message);
+          } else {
+            data.profes.forEach(profe => {
+              this.toastr.error(profe.message);
+            });
+          }
           this.profesChanged.next();
+          modalRef.dismiss();
 
-        });
+        },
+        (err) => {
+          if (err.error.problemes === -1) {
+            this.toastr.error(err.error.profes[0].message);
+          } else {
+            err.error.profes.forEach(profe => {
+              this.toastr.error(profe.message + ' ' + profe.json.nomgrup);
+            });
+          }
+          this.profesChanged.next();
+          modalRef.dismiss();
+        }
+        );
   }
 
   addProfessorAssignatura(professor: Professor, assignaturaCodi: string) {
@@ -168,7 +191,7 @@ export class DataBaseService {
     };
     return this.http.post<{message: string}>(environment.selfApiUrl + 'add_professor_assignatura', profObj).subscribe(
       (response) => {
-        console.log(response);
+
         this.toastr.success(response.message);
         this.profesChanged.next();
       },
@@ -314,12 +337,17 @@ export class DataBaseService {
       grupName,
       assigCodi
     };
+    console.log(obj);
 
-    return this.http.post<{result: string, json: any, length: number}>
+    return this.http.post<{message: string}>
       (environment.selfApiUrl + 'add_alumne_grup', obj).subscribe(
-      (data) => {
+      (response) => {
+        this.toastr.success(response.message);
         this.alumnesChanged.next();
         this.grupsChanged.next();
+      },
+      (err) => {
+        this.toastr.error(err.error.message);
       }
     );
   }
@@ -331,13 +359,36 @@ export class DataBaseService {
       assigCodi
     };
 
-    return this.http.post<{result: string, json: any, length: number}>
-      (environment.selfApiUrl + 'delete_alumnes_grup', obj).subscribe(
-        (data) => {
-          console.log(data);
+    const modalRef = this.modalService.open(MymodalwaitComponent,{backdrop: 'static', keyboard: false});
+    modalRef.componentInstance.titol = 'Operació en procés';
+    modalRef.componentInstance.missatge = 'Esperi mentre esborrem els alumnes. Aquesta acció pot trigar uns minuts....';
 
+    return this.http.post<{problemes: number, alumnes: any}>
+      (environment.selfApiUrl + 'delete_alumnes_grup', obj).subscribe(
+        (response) => {
+
+          if (response.problemes === 0) {
+            this.toastr.success(response.alumnes[0].message);
+          } else {
+            response.alumnes.forEach(alumne => {
+              this.toastr.error(alumne.message);
+            });
+          }
           this.alumnesChanged.next();
           this.grupsChanged.next();
+          modalRef.dismiss();
+        },
+        (err) => {
+          if (err.error.problemes === -1) {
+            this.toastr.error(err.error.alumnes[0].message);
+          } else {
+            err.error.alumnes.forEach(alumne => {
+              this.toastr.error(alumne.message + ' ' + alumne.json.grupo_asignatura);
+            });
+          }
+          this.alumnesChanged.next();
+          this.grupsChanged.next();
+          modalRef.dismiss();
         }
       );
   }

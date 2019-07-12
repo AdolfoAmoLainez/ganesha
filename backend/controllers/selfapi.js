@@ -157,7 +157,7 @@ exports.deleteGrups = (req, res) => {
   });
 
     const { stdout, stderr, code } = shell.exec('ganesha-del-grups ' + req.body.assigCodi + ' "' +
-    nomGrups.join(' ') + '" TRUE', {silent: true}); //, function(code, stdout, stderr){
+    nomGrups.join(' ') + '" TRUE', {silent: true});
 
       if (stdout) {
         console.log("Stdout", stdout);
@@ -233,24 +233,62 @@ exports.getGrupInfo = (req, res) => {
 
 /**
  * Request:
- *  alumne
- *  grupNom: Nomcomplert del grup
- *  AssigCodi: Codi de l'assignatura
+ *  alumne:
+ *    id: number;
+      niu: string;
+      nom: string;
+      grup_id: string;
+ *  grupName: Nomcomplert del grup
+ *  assigCodi: Codi de l'assignatura
+ *
+ *  * Resposta:
+ *  message:
+ *      ok => codi 200
+ *      error => 520 problema amb l'script / insertar en BBDD
+ *               501,502 problema al afegir l'alumne des de l'script
  */
 exports.addAlumneGrup = (req, res) => {
   console.log("\nAssignar usuari grup!");
   console.log(req.body);
-  dbconfig.connection.query( //Afegir alumne a grup
-    "INSERT INTO `alumnes` (`id`, `niu`, `nom`, `grup_id`) " +
-    "VALUES (NULL, '"+req.body.alumne.niu+"', '"+req.body.alumne.nom+"','"+req.body.alumne.grup_id+"');",
-    (errorinsert) =>{
-      if (!errorinsert){
-        res.status(200).json({message: 'Fet!'});
-      } else {
-        res.status(500).json({message: "No s'ha pogut insertar l'alumne a la BBDD"});
-      }
-    });
-  //res.status(200).json({message: 'Fet!'});
+
+
+  const { stdout, stderr, code } = shell.exec('ganesha-add-usuari-grup ' + req.body.alumne.niu + ' ' +
+  req.body.assigCodi + ' ' + req.body.grupName, {silent: true});
+
+  if (stdout) {
+    console.log("Stdout", stdout);
+    var resultjson = '';
+
+    try {
+      resultjson = JSON.parse(stdout);
+    } catch ( err) {
+      console.log("Error en la resposta de l'script ganesha-add-usuari-grup!");
+      res.status(520).json({problemes: -1, grups:[{message: "Error en la resposta de l'script ganesha-add-usuari-grup!"}] });
+      return;
+    }
+
+
+    switch (resultjson.codi){
+      case 200:
+          dbconfig.connection.query( //Afegir profe assignatura
+            "INSERT INTO `alumnes` (`id`, `niu`, `nom`, `grup_id`) " +
+            "VALUES (NULL, '"+req.body.alumne.niu+"', '"+req.body.alumne.nom+"','"+req.body.alumne.grup_id+"');",
+            (errorinsert) =>{
+              if (!errorinsert){
+                res.status(200).json({message: resultjson.message});
+              } else {
+                res.status(520).json({message: "No s'ha pogut insertar l'alumne a la BBDD"});
+              }
+            });
+        break;
+      case 501: //Problema des de l'script
+      case 502:
+          res.status(501).json({message: resultjson.message});
+        break;
+    }
+
+  }
+
 }
 
 /**
@@ -258,12 +296,94 @@ exports.addAlumneGrup = (req, res) => {
  *  alumnes: llista d'alumnes
  *  grupName: nom del grup (carpeta)
  *  assigCodi: codi assignatura
+ *
+ *   Response:
+ * {
+ *    problemes:
+ *              0 => Tot ok (codi 200)
+ *              numero d'alumnes amb problemes (codi 521)
+ *             -1 => problema script / problema amb la BBDD (codi 520)
+ *                   no s'ha pogut esborrar cap alumne
+ *
+ *    alumnes:
+ *             [{codi, message, json}] => array de missatges d'alumnes amb problemes
+ *             [{message: }] => altres
+ * }
  */
 
 exports.deleteAlumnesGrup = (req, res) => {
   console.log("\nEsborrar alumnes grup!");
   console.log(req.body);
-  alumnesId = [];
+
+  alumnesNius = [];
+  arrayAlumnes = [];
+  alumnesIdToDel = [];
+
+  req.body.alumnes.forEach(alumne => {
+    const niu = alumne.niu
+    alumnesNius.push(niu);
+    //console.log(element.niu);
+
+    arrayAlumnes['n'+niu] = alumne;
+  });
+
+  const { stdout, stderr, code } = shell.exec('ganesha-del-alumnes-grup.adolfo "' +
+       alumnesNius.join(' ') + '" ' +
+       req.body.assigCodi + ' ' +
+       req.body.grupName, {silent: true});
+
+    if (stdout) {
+      console.log("Stdout", stdout);
+      var resultjson = '';
+      alumnesWithError = [];
+      try {
+        resultjson = JSON.parse(stdout);
+      } catch ( err) {
+        console.log("Error en la resposta de l'script ganesha-del-profes-assignatura.adolfo!");
+        res.status(520).json({problemes: -1, alumnes:[{message: "Error en la resposta de l'script ganesha-del-profes-assignatura.adolfo!"}] });
+        return;
+      }
+
+      resultjson.forEach( alumneElement => {
+        console.log('n'+alumneElement.json.usuario);
+        console.log(arrayAlumnes['n'+alumneElement.json.usuario].id);
+        if(alumneElement.codi == 200) {
+          alumnesIdToDel.push(arrayAlumnes['n'+alumneElement.json.usuario].id);
+        } else {
+          alumnesWithError.push(alumneElement);
+        }
+      });
+
+      console.log("alumnesIdToDel: ",alumnesIdToDel);
+      console.log(arrayAlumnes);
+
+
+
+      if (alumnesIdToDel.length > 0) {
+        dbconfig.connection.query( //Esborrar profes
+          "DELETE FROM `alumnes` WHERE id IN ("+alumnesIdToDel.join()+");" ,
+          (errorDel) =>{
+            if (!errorDel){
+              if (alumnesWithError.length == 0) { // No hi ha cap error de creació de grups
+                res.status(200).json({problemes: 0, alumnes:[{message: 'Alumnes esborrats correctament!'}]});
+              } else {
+                res.status(521).json({problemes: alumnesWithError.length, alumnes: alumnesWithError});
+              }
+            } else {
+              res.status(520).json({problemes: alumnesIdToDel.length, alumnes: [{message: "No s'ha pogut esborrar els alumnes de la BBDD!"}]});
+            }
+          });
+      } else {
+        console.log("Error: No s'ha pogut esborrar cap professor!");
+        res.status(520).json({problemes: -1, alumnes: [{message: "Error:  No s'ha pogut esborrar cap alumne!"}]});
+        return;
+      }
+    }
+
+
+
+
+/*   alumnesId = [];
 
   req.body.alumnes.forEach(element => {
     alumnesId.push(element.id);
@@ -277,7 +397,7 @@ exports.deleteAlumnesGrup = (req, res) => {
       } else {
         res.status(500).json({message: "No s'han pogut esborrar els alumnes"});
       }
-    });
+    }); */
 }
 
 /**
@@ -285,26 +405,89 @@ exports.deleteAlumnesGrup = (req, res) => {
  *  profes: llista de profes
  *
  *  assigCodi: codi assignatura
+ *
+ *  Response:
+ * {
+ *    problemes:
+ *              0 => Tot ok (codi 200)
+ *              numero de profes amb problemes (codi 521)
+ *             -1 => problema script / problema amb la BBDD (codi 520)
+ *                   no s'ha pogut esborrar cap professor
+ *
+ *    profes:
+ *             [{codi, message, json}] => array de missatges de profes amb problemes
+ *             [{message: }] => altres
+ * }
  */
 
 exports.deleteProfesAssignatura = (req, res) => {
   console.log("\nEsborrar profesors assignatura!");
   console.log(req.body);
-  profesId = [];
 
-  req.body.profes.forEach(element => {
-    profesId.push(element.id);
+  profesNius = [];
+  arrayProfes = [];
+  profesIdToDel = [];
+
+  req.body.profes.forEach(profe => {
+    const niu = profe.niu
+    profesNius.push(niu);
+    //console.log(element.niu);
+
+    arrayProfes['n'+niu] = profe;
   });
 
-  dbconfig.connection.query( //Esborrar grups
-    "DELETE FROM `professors` WHERE id IN ("+profesId.join()+");" ,
-    (errorDel) =>{
-      if (!errorDel){
-        res.status(200).json({message: 'Fet!'});
-      } else {
-        res.status(500).json({message: "No s'han pogut esborrar els professors"});
+  const { stdout, stderr, code } = shell.exec('ganesha-del-profes-assignatura.adolfo "' +
+       profesNius.join(' ') + '" ' +
+       req.body.assigCodi, {silent: true});
+
+    if (stdout) {
+      console.log("Stdout", stdout);
+      var resultjson = '';
+      profesWithError = [];
+      try {
+        resultjson = JSON.parse(stdout);
+      } catch ( err) {
+        console.log("Error en la resposta de l'script ganesha-del-profes-assignatura.adolfo!");
+        res.status(520).json({problemes: -1, profes:[{message: "Error en la resposta de l'script ganesha-del-profes-assignatura.adolfo!"}] });
+        return;
       }
-    });
+
+      resultjson.forEach( profeElement => {
+        console.log('n'+profeElement.json.usuario);
+        console.log(arrayProfes['n'+profeElement.json.usuario].id);
+        if(profeElement.codi == 200) {
+          profesIdToDel.push(arrayProfes['n'+profeElement.json.usuario].id);
+        } else {
+          profesWithError.push(profeElement);
+        }
+      });
+
+      console.log("profeidtodel: ",profesIdToDel);
+      console.log(arrayProfes);
+
+
+
+      if (profesIdToDel.length > 0) {
+        dbconfig.connection.query( //Esborrar profes
+          "DELETE FROM `professors` WHERE id IN ("+profesIdToDel.join()+");" ,
+          (errorDel) =>{
+            if (!errorDel){
+              if (profesWithError.length == 0) { // No hi ha cap error de creació de grups
+                res.status(200).json({problemes: 0, profes:[{message: 'Professors esborrats correctament!'}]});
+              } else {
+                res.status(521).json({problemes: profesWithError.length, profes: profesWithError});
+              }
+            } else {
+              res.status(520).json({problemes: profesIdToDel.length, profes: [{message: "No s'ha pogut esborrar els professors de la BBDD!"}]});
+            }
+          });
+      } else {
+        console.log("Error: No s'ha pogut esborrar cap professor!");
+        res.status(520).json({problemes: -1, profes: [{message: "Error:  No s'ha pogut esborrar cap professor!"}]});
+        return;
+      }
+    }
+
 }
 
 exports.getLvmInfo = (req, res) => {
@@ -349,8 +532,10 @@ exports.getLvmInfo = (req, res) => {
  * }
  *
  * Resposta:
- * message
- *
+ *  message:
+ *      ok => codi 200
+ *      error => 520 problema amb l'script / insertar en BBDD
+ *               501 problema al afegir el profe des de l'script
  */
 
 exports.addProfeAssignatura = (req, res) => {
