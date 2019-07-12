@@ -144,7 +144,7 @@ export class ProfessorsListComponent implements OnInit, OnDestroy {
           const professor: Professor = {
             id: null,
             niu: niu,
-            nom: 'Buscar a LDAP?',
+            nom: 'Nom no trobat',
             assignatura_id: this.assignaturaId
           };
 
