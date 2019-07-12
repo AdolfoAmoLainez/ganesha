@@ -61,7 +61,6 @@ export class AlumnesListComponent implements OnInit, OnDestroy {
         this.isLoading = false;
         this.selectAllAlumnes = false;
         this.selectedAlumnes = [];
-        console.log("aqui!");
 
         this.dbService.getAlumnesNames(alumnes);
       }
@@ -151,7 +150,7 @@ export class AlumnesListComponent implements OnInit, OnDestroy {
           const al: Alumne = {
             id: null,
             niu,
-            nom: 'El busquem a LDAP?',
+            nom: 'Nom no trobat',
             grup_id: this.grupId
           };
           this.dbService.addAlumneGrup(al, this.assignaturaCodi + '-g' + this.grup.ordre, this.assignaturaCodi);
