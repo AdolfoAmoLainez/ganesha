@@ -1035,7 +1035,7 @@ exports.validaUsuari = (req, res) => {
         } else {
           res.status(200).json({status: 'error', message: 'Aquest usuari no pot accedir a l\'aplicació', perfils});
         }
-        //res.status(200).json({message: 'Fet!', consulta});
+
       } else {
         res.status(500).json({message: "No s'ha pogut consultar l'usuari!"});
       }
@@ -1069,7 +1069,7 @@ exports.getPerfilUsuari = (req, res) => {
         } else {
           res.status(200).json({status: 'error', message: 'Aquest usuari no pot accedir a l\'aplicació', perfils: []});
         }
-        //res.status(200).json({message: 'Fet!', consulta});
+
       } else {
         res.status(500).json({message: "No s'ha pogut consultar l'usuari!"});
       }

@@ -118,14 +118,14 @@ export class DataBaseService {
         console.log(data);
         this.toastr.success(data.message);
         this.getAssignatures();
-        this.router.navigate(['/', 'adm', 'addassignatura']);
+        this.router.navigate(['/', 'adm']);
         modalRef.dismiss();
       },
       (err) => {
         console.log(err);
         this.toastr.error(err.error.message);
         this.getAssignatures();
-        this.router.navigate(['/', 'adm', 'addassignatura']);
+        this.router.navigate(['/', 'adm']);
         modalRef.dismiss();
       }
     );
