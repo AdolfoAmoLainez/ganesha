@@ -142,6 +142,9 @@ export class DataBaseService {
     return this.http.put(environment.apiCrudUrl + 'assignatures/' + assignatura.id, assignatura).subscribe(
       (data: any) => {
         this.assignaturaChanged.next(assignatura);
+      },
+      (err) => {
+        this.toastr.error(err.error.message);
       }
     );
   }
@@ -302,6 +305,9 @@ export class DataBaseService {
       (environment.selfApiUrl + 'get_grups_assignatura', obj).subscribe(
       (response) => {
         this.grupsUpdated.next(...[response.consulta]);
+      },
+      (err) => {
+        this.toastr.error('No s\'ha pogut consultar els grups de l\'assignatura!');
       }
     );
   }
@@ -323,6 +329,9 @@ export class DataBaseService {
             alumnes:  0
           }
           return {assignatura_codi: data[0].codi, grup: grup};
+        },
+        (err) => {
+          this.toastr.error('No s\'ha pogut consultar la informació del grup!');
         }
       )
     );

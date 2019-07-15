@@ -125,6 +125,15 @@ exports.getAlumnesNames = (req, res) => {
 exports.addGrups = (req, res) => {
   console.log("\nInsertar grups!");
   console.log(req.body);
+
+  var logEntry = {
+    niu: 'Username',
+    accio: 'addGrups',
+    parametres: JSON.stringify(req.body),
+    resposta: '',
+    resultat: ''
+  };
+
   dbconfig.connection.query( //Busquem el max ordre del grup
     "SELECT MAX(ordre) as max FROM grups WHERE assignatura_id="+req.body.assignatura.id,
     (errorMax, maxGrup) =>{
@@ -175,7 +184,11 @@ exports.addGrups = (req, res) => {
                     resultjson = JSON.parse(stdout);
                   } catch ( err) {
                     console.log("Error en la resposta de l'script ganesha-add-grups!");
-                    res.status(520).json({problemes: -1, grups:[{message: "Error en la resposta de l'script ganesha-add-grups!"}] });
+                    const resposta = {problemes: -1, grups:[{message: "Error en la resposta de l'script ganesha-add-grups!"}]};
+                    res.status(520).json(resposta);
+                    logEntry.resultat = 'error';
+                    logEntry.resposta = resposta.stringify();
+                    insertaLog(logEntry);
                     return;
                   }
                   resultjson.forEach( grupElement => {
@@ -200,16 +213,30 @@ exports.addGrups = (req, res) => {
                       if (!errorIns){
                         if (grupsWithError.length == 0) { // No hi ha cap error de creació de grups
                           res.status(200).json({problemes: 0, grups:[{message: 'Grups creats correctament!'}]});
+                          logEntry.resultat = 'success';
+                          logEntry.resposta = 'Grups creats correctament!';
+                          insertaLog(logEntry);
                         } else {
-                          res.status(521).json({problemes: grupsWithError.length, grups: grupsWithError});
+                          const resposta = {problemes: grupsWithError.length, grups: grupsWithError};
+                          res.status(521).json(resposta);
+                          logEntry.resultat = 'error';
+                          logEntry.resposta = resposta.stringify();
+                          insertaLog(logEntry);
                         }
                       } else {
-                        res.status(520).json({problemes: valuesInsert.length, grups: [{message: "No s'ha pogut insertar els grups a la BBDD!"}]});
+                        const resposta = {problemes: valuesInsert.length, grups: [{message: "No s'ha pogut insertar els grups a la BBDD!"}]};
+                        res.status(520).json(resposta);
+                        logEntry.resultat = 'error';
+                        logEntry.resposta = resposta.stringify();
+                        insertaLog(logEntry);
                       }
                     });
                   } else {
                     console.log("Error: No s'ha pogut crear cap grup!");
                     res.status(520).json({problemes: -1, grups: [{message: "Error: No s'ha pogut crear cap grup!"}]});
+                    logEntry.resultat = 'error';
+                    logEntry.resposta = "No s'ha pogut crear cap grup!";
+                    insertaLog(logEntry);
                     return;
                   }
                 }
@@ -245,6 +272,14 @@ exports.addGrups = (req, res) => {
 exports.deleteGrups = (req, res) => {
   console.log("\nEsborrar grups!");
   console.log(req.body);
+
+  logEntry = {
+    niu: 'Username',
+    accio: 'deleteGrups',
+    resposta: '',
+    resultat: ''
+  };
+
   grupsId = [];
   nomGrups = [];
   arrayGrups = []; // Array amb els grups identificats pel nom
@@ -270,6 +305,9 @@ exports.deleteGrups = (req, res) => {
         } catch ( err) {
           console.log("Error en la resposta de l'script ganesha-del-grups!");
           res.status(520).json({problemes: -1, grups:[{message: "Error en la resposta de l'script ganesha-del-grups!"}] });
+          logEntry.resultat = 'error';
+          logEntry.resposta = "Error en la resposta de l'script ganesha-del-grups!";
+          insertaLog(logEntry);
           return;
         }
         console.log(arrayGrups);
@@ -290,21 +328,28 @@ exports.deleteGrups = (req, res) => {
             if (!errorDel){
               if (grupsWithError.length == 0) { // No hi ha cap error de creació de grups
                 res.status(200).json({problemes: 0, grups:[{message: 'Grups esborrats correctament!'}]});
+                logEntry.resultat = 'success';
+                logEntry.resposta = 'Grups esborrats correctament!';
+                insertaLog(logEntry);
               } else {
-                res.status(521).json({problemes: grupsWithError.length, grups: grupsWithError});
+                const resultat = {problemes: grupsWithError.length, grups: grupsWithError};
+                res.status(521).json(resultat);
+                logEntry.resultat = 'error';
+                logEntry.resposta = resultat.stringify();
+                insertaLog(logEntry);
               }
-              //res.status(200).json({message: 'Fet!'});
+
             } else {
-              res.status(520).json({problemes: grupsId.length, grups: [{message: "No s'ha pogut esborrar els grups de la BBDD!"}]});
-              //res.status(500).json({message: "No s'han pogut esborrar els grups"});
+              const resultat = {problemes: grupsId.length, grups: [{message: "No s'ha pogut esborrar els grups de la BBDD!"}]};
+              res.status(520).json(resultat);
+              logEntry.resultat = 'error';
+              logEntry.resposta = resultat.stringify();
+              insertaLog(logEntry);
             }
           });
 
       }
-    //});
 
-
-  //res.status(200).json({message: 'Fet!'});
 }
 
 /**
@@ -314,8 +359,8 @@ exports.deleteGrups = (req, res) => {
  *  id: grup_id
  *
  * Resposta:
- *  message:
- *  consuta: grup amb el codi de l'assignatura
+ *  520 => message:
+ *  200 => consulta: grup amb el codi de l'assignatura
  */
 
 exports.getGrupInfo = (req, res) => {
@@ -328,7 +373,7 @@ exports.getGrupInfo = (req, res) => {
       if (!errorSel){
         res.status(200).json(consulta);
       } else {
-        res.status(500).json({message: "No s'ha pogut consultar la info de grup!"});
+        res.status(520).json({message: "No s'ha pogut consultar la info de grup!"});
       }
     });
 }
@@ -352,7 +397,7 @@ exports.getGrupInfo = (req, res) => {
 exports.addAlumneGrup = (req, res) => {
   logEntry = {
     niu: 'Username',
-    accio: 'addAlumneGru',
+    accio: 'addAlumneGrup',
     resposta: '',
     resultat: ''
   };
@@ -432,14 +477,16 @@ exports.addAlumneGrup = (req, res) => {
  */
 
 exports.deleteAlumnesGrup = (req, res) => {
+
+  console.log("\nEsborrar alumnes grup!");
+  console.log(req.body);
+
   logEntry = {
     niu: 'Username',
     accio: 'deleteAlumnesGrup',
     resposta: '',
     resultat: ''
   };
-  console.log("\nEsborrar alumnes grup!");
-  console.log(req.body);
 
   alumnesNius = [];
   arrayAlumnes = [];
@@ -546,6 +593,13 @@ exports.deleteProfesAssignatura = (req, res) => {
   console.log("\nEsborrar profesors assignatura!");
   console.log(req.body);
 
+  logEntry = {
+    niu: 'Username',
+    accio: 'deleteProfesAssignatura',
+    resposta: '',
+    resultat: ''
+  };
+
   profesNius = [];
   arrayProfes = [];
   profesIdToDel = [];
@@ -569,8 +623,11 @@ exports.deleteProfesAssignatura = (req, res) => {
       try {
         resultjson = JSON.parse(stdout);
       } catch ( err) {
-        console.log("Error en la resposta de l'script ganesha-del-profes-assignatura.adolfo!");
-        res.status(520).json({problemes: -1, profes:[{message: "Error en la resposta de l'script ganesha-del-profes-assignatura.adolfo!"}] });
+        console.log("Error en la resposta de l'script ganesha-del-profes-assignatura!");
+        res.status(520).json({problemes: -1, profes:[{message: "Error en la resposta de l'script ganesha-del-profes-assignatura!"}] });
+        logEntry.resultat = 'error';
+        logEntry.resposta = "Error en la resposta de l'script ganesha-del-profes-assignatura!";
+        insertaLog(logEntry);
         return;
       }
 
@@ -596,16 +653,30 @@ exports.deleteProfesAssignatura = (req, res) => {
             if (!errorDel){
               if (profesWithError.length == 0) { // No hi ha cap error de creació de grups
                 res.status(200).json({problemes: 0, profes:[{message: 'Professors esborrats correctament!'}]});
+                logEntry.resultat = 'success';
+                logEntry.resposta = 'Professors esborrats correctament!';
+                insertaLog(logEntry);
               } else {
-                res.status(521).json({problemes: profesWithError.length, profes: profesWithError});
+                const resultat = {problemes: profesWithError.length, profes: profesWithError};
+                res.status(521).json(resultat);
+                logEntry.resultat = 'error';
+                logEntry.resposta = resultat.stringify();
+                insertaLog(logEntry);
               }
             } else {
-              res.status(520).json({problemes: profesIdToDel.length, profes: [{message: "No s'ha pogut esborrar els professors de la BBDD!"}]});
+              const resultat = {problemes: profesIdToDel.length, profes: [{message: "No s'ha pogut esborrar els professors de la BBDD!"}]};
+              res.status(520).json(resultat);
+              logEntry.resultat = 'error';
+              logEntry.resposta = resultat.stringify();
+              insertaLog(logEntry);
             }
           });
       } else {
         console.log("Error: No s'ha pogut esborrar cap professor!");
         res.status(520).json({problemes: -1, profes: [{message: "Error:  No s'ha pogut esborrar cap professor!"}]});
+        logEntry.resultat = 'error';
+        logEntry.resposta = "Error:  No s'ha pogut esborrar cap professor!";
+        insertaLog(logEntry);
         return;
       }
     }
@@ -613,17 +684,7 @@ exports.deleteProfesAssignatura = (req, res) => {
 }
 
 exports.getLvmInfo = (req, res) => {
-/*   const volinfo = {
-      codi: 200,
-      message: 'Informació obtinguda correctament.',
-      json: [
-        {
-          volname: 'MinisivaVol',
-          tamany: '4,99g',
-          disponible: '4,2g'
-        }
-      ]
-    }; */
+
   console.log("\nget LVM Info!");
 
   shell.exec('ganesha-lvm-info ', {silent: true}, function(code, stdout, stderr){
@@ -661,14 +722,16 @@ exports.getLvmInfo = (req, res) => {
  */
 
 exports.addProfeAssignatura = (req, res) => {
+
+  console.log("\nAssignar profe a assignatura!");
+  console.log(req.body);
+
   logEntry = {
     niu: 'Username',
     accio: 'addProfeAssignatura',
     resposta: '',
     resultat: ''
   };
-  console.log("\nAssignar profe a assignatura!");
-  console.log(req.body);
 
   const { stdout, stderr, code } = shell.exec('ganesha-add-profe-assignatura ' + req.body.professor.niu + " " +
   req.body.assignaturaCodi, {silent: true});
@@ -733,6 +796,10 @@ exports.addProfeAssignatura = (req, res) => {
  */
 
 exports.addAssignatura = (req, res) => {
+
+  console.log(req.body);
+  console.log("\nadd Assignatura!");
+
   var logEntry = {
     niu: 'Username',
     accio: 'addAssignatura',
@@ -740,8 +807,6 @@ exports.addAssignatura = (req, res) => {
     resposta: '',
     resultat: ''
   };
-  console.log(req.body);
-  console.log("\nadd Assignatura!");
 
   const { stdout, stderr, code } = shell.exec('ganesha-add-assignatura ' + req.body.codi + " " +
              req.body.tamanygb + "G", {silent: true});
@@ -858,8 +923,8 @@ exports.deleteAssignatura = (req, res) => {
  *  id: assignatura_id
  *
  * Resposta:
- *  message:
- *  conjunt de grups de l'assignatura + la quantitat d'alumnes que té cada grup
+ *  520 => message:
+ *  200 => conjunt de grups de l'assignatura + la quantitat d'alumnes que té cada grup
  */
 
 exports.getGrupsAssignatura = (req, res) => {
@@ -872,7 +937,7 @@ exports.getGrupsAssignatura = (req, res) => {
       if (!errorSel){
         res.status(200).json({message: 'Fet!', consulta});
       } else {
-        res.status(500).json({message: "No s'ha pogut consultar els grups de l'assignatura!"});
+        res.status(520).json({message: "No s'ha pogut consultar els grups de l'assignatura!"});
       }
     });
 }
@@ -895,7 +960,7 @@ exports.getMinutsConsumits = (req, res) => {
       if (!errorSel){
         res.status(200).json({message: 'Fet!', consulta});
       } else {
-        res.status(500).json({message: "No s'ha pogut consultar els minuts consumits!"});
+        res.status(520).json({message: "No s'ha pogut consultar els minuts consumits!"});
       }
     });
 }
@@ -911,14 +976,17 @@ exports.getMinutsConsumits = (req, res) => {
  */
 
 exports.addUsuari = (req, res) => {
+
+  console.log("\nAfegir Usuari!");
+  console.log(req.body);
+
   logEntry = {
     niu: 'Username',
     accio: 'addUsuari',
     resposta: '',
     resultat: ''
   };
-  console.log("\nAfegir Usuari!");
-  console.log(req.body);
+
   dbconfig.connection.query( //Afegir usuari
     "INSERT INTO `usuaris` (`id`, `niu`, `perfil_id`) " +
     "VALUES (NULL, 'Escriu Niu', '2');",
