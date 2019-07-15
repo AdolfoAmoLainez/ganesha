@@ -108,10 +108,25 @@ export class DataBaseService {
   }
 
   deleteAssignatura(assignatura: Assignatura) {
+
+    const modalRef = this.modalService.open(MymodalwaitComponent, {backdrop: 'static', keyboard: false});
+    modalRef.componentInstance.titol = 'Operació en procés';
+    modalRef.componentInstance.missatge = 'Esperi mentre esborrem l\'assignatura. Aquesta acció pot trigar uns minuts....';
+
     return this.http.post<{message: string}>(environment.selfApiUrl + 'delete_assignatura', assignatura).subscribe(
       (data) => {
         console.log(data);
+        this.toastr.success(data.message);
         this.getAssignatures();
+        this.router.navigate(['/', 'adm', 'addassignatura']);
+        modalRef.dismiss();
+      },
+      (err) => {
+        console.log(err);
+        this.toastr.error(err.error.message);
+        this.getAssignatures();
+        this.router.navigate(['/', 'adm', 'addassignatura']);
+        modalRef.dismiss();
       }
     );
   }
