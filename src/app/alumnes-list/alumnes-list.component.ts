@@ -113,13 +113,23 @@ export class AlumnesListComponent implements OnInit, OnDestroy {
   onDeleteIconClick(alumne: Alumne) {
     const modalRef = this.modalService.open(MymodalyesnoComponent);
     modalRef.componentInstance.titol = 'Esborrar Alumne';
-    modalRef.componentInstance.missatge = 'Vols esborrar l\'alumne ' + alumne.nom + '?';
+    let esborrarDades = false;
+
+    if (this.alumnes.length === 1) { // Només queda un alumne, hem d'esborrar dades
+
+      modalRef.componentInstance.missatge = 'Vols esborrar l\'alumne ' + alumne.nom + '?' +
+                                            'Atenció! S\'esborraran els fitxers d\'aquest grup!';
+      esborrarDades = true;
+    } else {
+      modalRef.componentInstance.missatge = 'Vols esborrar l\'alumne ' + alumne.nom + '?';
+      esborrarDades = false;
+    }
+
     modalRef.result.then(
       (resposta) => {
-        // console.log('Vol esborrar l\'alumne!' + resposta);
         this.dbService.deleteAlumnesGrup([alumne],
                                          this.assignaturaCodi + '-g' + this.grup.ordre,
-                                        this.assignaturaCodi );
+                                        this.assignaturaCodi, esborrarDades );
         this.selectAllAlumnes = false;
       },
       () => {
@@ -173,7 +183,7 @@ export class AlumnesListComponent implements OnInit, OnDestroy {
   onDeleteAlumnes() {
     const modalRef = this.modalService.open(MymodalyesnoComponent);
     modalRef.componentInstance.titol = 'Esborrar Alumnes';
-/*    let esborrarDades = false;
+    let esborrarDades = false;
 
     if (this.selectedAlumnes.length === this.alumnes.length) { // Hi ha tots els alumnes seleccionats, hem d'esborrar dades
 
@@ -183,7 +193,7 @@ export class AlumnesListComponent implements OnInit, OnDestroy {
     } else {
       modalRef.componentInstance.missatge = 'Vols esborrar els alumnes sel·leccionats?';
       esborrarDades = false;
-    } */
+    }
     modalRef.componentInstance.missatge = 'Vols esborrar els alumnes sel·leccionats?';
 
     modalRef.result.then(
@@ -191,7 +201,7 @@ export class AlumnesListComponent implements OnInit, OnDestroy {
 
         this.dbService.deleteAlumnesGrup(this.selectedAlumnes,
                                          this.assignaturaCodi + '-g' + this.grup.ordre,
-                                         this.assignaturaCodi);
+                                         this.assignaturaCodi, esborrarDades);
         this.selectAllAlumnes = false;
       },
       () => {

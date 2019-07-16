@@ -461,6 +461,8 @@ exports.addAlumneGrup = (req, res) => {
  *  alumnes: llista d'alumnes
  *  grupName: nom del grup (carpeta)
  *  assigCodi: codi assignatura
+ *  esborrarDades: true/false. Si no quedaran alumnes, s'ha d'esborrar el contingut de
+ *                 la carpeta del grup.
  *
  *   Response:
  * {
@@ -500,10 +502,13 @@ exports.deleteAlumnesGrup = (req, res) => {
     arrayAlumnes['n'+niu] = alumne;
   });
 
+  const esborrarDades = req.body.esborrarDades? 'TRUE':'FALSE';
+
   const { stdout, stderr, code } = shell.exec('ganesha-del-alumnes-grup "' +
        alumnesNius.join(' ') + '" ' +
        req.body.assigCodi + ' ' +
-       req.body.grupName, {silent: true});
+       req.body.grupName + ' ' +
+       esborrarDades, {silent: true});
 
     if (stdout) {
       console.log("Stdout", stdout);

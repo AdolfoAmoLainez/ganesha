@@ -377,11 +377,12 @@ export class DataBaseService {
     );
   }
 
-  deleteAlumnesGrup(alumnes: Alumne[], grupName: string, assigCodi: string) {
+  deleteAlumnesGrup(alumnes: Alumne[], grupName: string, assigCodi: string, esborrarDades: boolean) {
     const obj = {
       alumnes,
       grupName,
-      assigCodi
+      assigCodi,
+      esborrarDades
     };
 
     const modalRef = this.modalService.open(MymodalwaitComponent,{backdrop: 'static', keyboard: false});
