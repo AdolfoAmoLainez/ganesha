@@ -21,7 +21,7 @@ import { AuthService } from './auth/auth.service';
 import { AdminviewComponent } from './adminview/adminview.component';
 
 
-import {NgbModalModule} from '@ng-bootstrap/ng-bootstrap';
+import {NgbModalModule, NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {NgbAccordionModule} from '@ng-bootstrap/ng-bootstrap';
 import { ToastrModule } from 'ngx-toastr';
 import { MymodalwaitComponent } from './shared/mymodalwait/mymodalwait.component';
@@ -59,7 +59,8 @@ import { GroupEditModalComponent } from './groups/group-edit-modal/group-edit-mo
       preventDuplicates: true,
       tapToDismiss: true,
       newestOnTop: true
-    })
+    }),
+    NgbModule
   ],
   providers: [DataBaseService, AuthService],
   bootstrap: [AppComponent],
