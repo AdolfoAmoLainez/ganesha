@@ -4,12 +4,13 @@ import { Location } from '@angular/common';
 
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import { Subscription } from 'rxjs';
-import { MymodalyesnoComponent } from '../shared/mymodalyesno/mymodalyesno.component';
-import { DataBaseService } from '../shared/database.service';
+import { MymodalyesnoComponent } from '../../shared/mymodalyesno/mymodalyesno.component';
+import { DataBaseService } from '../../shared/database.service';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
-import { Assignatura } from '../shared/assignatura.model';
-import { Grup } from '../shared/grup.model';
-import { AuthService } from '../auth/auth.service';
+import { Assignatura } from '../../shared/assignatura.model';
+import { Grup } from '../../shared/grup.model';
+import { AuthService } from '../../auth/auth.service';
+import { GroupEditModalComponent } from '../group-edit-modal/group-edit-modal.component';
 
 
 @Component({
@@ -261,6 +262,28 @@ export class GroupsListComponent implements  OnDestroy, OnInit {
 
     // console.log(this.selectedGroups);
 
+  }
+
+  /** TODO: Falta implementar modificar grup al backend */
+
+  onEditGrup(nomGrup: string, quotaGrup: number) {
+    const disponibles = this.assignatura.tamany - this.minutsConsumits;
+
+    const modalRef = this.modalService.open(GroupEditModalComponent);
+    modalRef.componentInstance.nomGrup = nomGrup;
+    modalRef.componentInstance.quota = quotaGrup;
+    modalRef.componentInstance.minutsDisponibles = disponibles;
+
+    modalRef.result.then(
+      (resposta) => {
+        console.log('Vol modificar el grup!');
+        console.log(resposta);
+
+      },
+      () => {
+        // console.log('Cancelado');
+      }
+    );
   }
 
 }

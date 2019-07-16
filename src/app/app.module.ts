@@ -7,7 +7,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AppComponent } from './app.component';
 import { AssignaturesListComponent } from './assignatures/assignatures-list/assignatures-list.component';
 import { HeaderComponent } from './header/header.component';
-import { GroupsListComponent } from './groups-list/groups-list.component';
+import { GroupsListComponent } from './groups/groups-list/groups-list.component';
 import { AlumnesListComponent } from './alumnes-list/alumnes-list.component';
 import { AppRoutingModule } from './app-routing.module';
 import { DataBaseService } from './shared/database.service';
@@ -25,6 +25,7 @@ import {NgbModalModule} from '@ng-bootstrap/ng-bootstrap';
 import {NgbAccordionModule} from '@ng-bootstrap/ng-bootstrap';
 import { ToastrModule } from 'ngx-toastr';
 import { MymodalwaitComponent } from './shared/mymodalwait/mymodalwait.component';
+import { GroupEditModalComponent } from './groups/group-edit-modal/group-edit-modal.component';
 
 @NgModule({
   declarations: [
@@ -40,7 +41,8 @@ import { MymodalwaitComponent } from './shared/mymodalwait/mymodalwait.component
     UsuarisListComponent,
     LoginComponent,
     AdminviewComponent,
-    MymodalwaitComponent
+    MymodalwaitComponent,
+    GroupEditModalComponent
   ],
   imports: [
     BrowserModule,
@@ -61,6 +63,6 @@ import { MymodalwaitComponent } from './shared/mymodalwait/mymodalwait.component
   ],
   providers: [DataBaseService, AuthService],
   bootstrap: [AppComponent],
-  entryComponents: [MymodalyesnoComponent, MymodalwaitComponent]
+  entryComponents: [MymodalyesnoComponent, MymodalwaitComponent, GroupEditModalComponent]
 })
 export class AppModule { }

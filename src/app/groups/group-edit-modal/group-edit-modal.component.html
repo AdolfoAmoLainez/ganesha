@@ -1,0 +1,41 @@
+<div class="modal-header">
+  <h4 class="modal-title" id="modal-basic-title">Editar Grup</h4>
+  <button
+    type="button"
+    class="close"
+    aria-label="Close"
+    (click)="activeModal.dismiss()"
+  >
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+<div class="modal-body">
+  <form [formGroup]="editForm">
+    <div class="form-group">
+      <label for="nom">Nom:</label>
+      <input type="text" readonly class="form-control" name="nom" id="nom" #nom formControlName="nom"/>
+    </div>
+    <div class="form-group">
+      <label for="quota">Minuts:</label>
+      <input type="number" class="form-control" name="quota" id="quota" #quota formControlName="quota" min="0"
+             (input)="onEditGroupFormChangeQuotaValues($event.target.value)"/>
+    </div>
+    <div class="form-group">
+        <label for="disponibles">Minuts disponibles:</label>
+        <input type="number" readonly class="form-control" name="disponibles" id="disponibles" formControlName="disponibles" #disponiblesInput/>
+      </div>
+  </form>
+</div>
+<div class="modal-footer">
+  <button
+    type="button"
+    class="btn btn-primary"
+    (click)="activeModal.close({nomGrup: nom.value, quota: quota.value})"
+    [disabled]="!editForm.valid || disponiblesInput.value<0"
+  >
+    Modificar
+  </button>
+  <button type="button" class="btn btn-danger" (click)="activeModal.dismiss()">
+    Cancel·lar
+  </button>
+</div>

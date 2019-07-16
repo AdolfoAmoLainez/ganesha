@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { AssignaturesListComponent } from './assignatures/assignatures-list/assignatures-list.component';
-import { GroupsListComponent } from './groups-list/groups-list.component';
+import { GroupsListComponent } from './groups/groups-list/groups-list.component';
 import { AlumnesListComponent } from './alumnes-list/alumnes-list.component';
 
 import { ProfessorsListComponent } from './professors-list/professors-list.component';

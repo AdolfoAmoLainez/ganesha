@@ -65,12 +65,17 @@
             <a *ngIf="perfil == 'adm'" [routerLink]="['alumnes', group.id]" class="btn btn-link">{{
               assignatura.codi + '-g' + group.ordre
             }}</a>
+            <i
+            class="fas fa-edit"
+            style="cursor: pointer;"
+            (click)="onEditGrup(assignatura.codi + '-g' + group.ordre, group.quota)"
+            ></i>
             <i *ngIf="group.alumnes === 0"
-            class="fas fa-times text-danger "
+            class="fas fa-times text-danger ml-2"
             style="cursor: pointer;"
             (click)="onDeleteIconClick(group)"
-          ></i>
-          </h2>
+            ></i>
+         </h2>
         </div>
       </div>
       <div class="list-group-item">
