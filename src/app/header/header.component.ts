@@ -9,17 +9,14 @@ import { AuthService } from '../auth/auth.service';
 })
 export class HeaderComponent implements OnInit {
 
-  isNavbarCollapsed = true;
+
 
   /** TODO: Falta controlar visibilidad y admin/profe */
 
-  constructor(private authService: AuthService) { }
+  constructor() { }
 
   ngOnInit() {
   }
 
-  onSortir() {
-    this.authService.logout();
-  }
 
 }

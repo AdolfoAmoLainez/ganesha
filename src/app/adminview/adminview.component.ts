@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { AuthService } from '../auth/auth.service';
 
 @Component({
   selector: 'app-adminview',
@@ -8,14 +9,19 @@ import { Component, OnInit } from '@angular/core';
 export class AdminviewComponent implements OnInit {
 
   viewSideBar = false;
+  isNavbarCollapsed = true;
 
-  constructor() { }
+  constructor(private authService: AuthService) { }
 
   ngOnInit() {
   }
 
   onToggleSideBar() {
     this.viewSideBar = !this.viewSideBar;
+  }
+
+  onSortir() {
+    this.authService.logout();
   }
 
 }

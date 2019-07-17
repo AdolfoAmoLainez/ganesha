@@ -1,4 +1,57 @@
 <div class="row">
+  <div class="col-sm-12">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <a class="navbar-brand" href="#">Ganesha</a>
+      <button
+        class="navbar-toggler"
+        type="button"
+        data-toggle="collapse"
+        data-target="#navbarSupportedContent"
+        aria-controls="navbarSupportedContent"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+        (click) = "isNavbarCollapsed = !isNavbarCollapsed"
+      >
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div
+        [ngbCollapse]="isNavbarCollapsed"
+        class="collapse navbar-collapse"
+        id="navbarSupportedContent"
+      >
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item">
+            <a class="nav-link" [routerLink]="['addassignatura']" routerLinkActive="router-link-active"
+              ><i
+                class="fas fa-plus mr-2"
+                style="cursor: pointer;"
+              ></i
+              >Afegir Assignatura</a
+            >
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" [routerLink]="['usuaris']" routerLinkActive="router-link-active"><i
+              class="fas fa-edit mr-2"
+              style="cursor: pointer;"
+            ></i
+            >Gestionar Usuaris</a>
+          </li>
+        </ul>
+        <div class="my-2 my-lg-0">
+            <button class="btn btn-danger" type="button" (click)="onSortir()">
+              <i
+                class="fas fa-power-off text-white mr-2"
+                style="cursor: pointer;"
+              ></i
+              >Sortir
+            </button>
+          </div>
+      </div>
+    </nav>
+  </div>
+</div>
+<div class="row">
   <div class="col-sm-12 col-md-2" *ngIf="viewSideBar">
     <!-- <router-outlet name="leftbar"></router-outlet> -->
     <app-assignatures-list></app-assignatures-list>
