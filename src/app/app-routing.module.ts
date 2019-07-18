@@ -10,13 +10,16 @@ import { AssignaturaViewComponent } from './assignatures/assignatura-view/assign
 import { UsuarisListComponent } from './usuaris/usuaris-list/usuaris-list.component';
 import { LoginComponent } from './auth/login/login.component';
 import { AdminviewComponent } from './adminview/adminview.component';
+import { ProfeviewComponent } from './profeview/profeview.component';
 
 const routes: Routes = [
-  {path: '', redirectTo:'/login', pathMatch: 'full'},
+  {path: '', redirectTo: '/login', pathMatch: 'full'},
   {path: 'login', component: LoginComponent},
-  { path: 'professor', component: AssignaturesListComponent, data: {perfil: 'professor'}},
-    { path: 'professor/grups/:assignaturaid', component: GroupsListComponent},
-    { path: 'professor/alumnes/:grupid', component: AlumnesListComponent},
+  { path: 'professor', component: ProfeviewComponent, children: [
+    {path: 'assignatures', component: AssignaturesListComponent},
+    { path: 'grups/:assignaturaid', component: GroupsListComponent},
+    { path: 'alumnes/:grupid', component: AlumnesListComponent},
+  ]},
   { path: 'adm', component: AdminviewComponent, children: [
     { path: 'assignatura/:assignaturaid', component: AssignaturaViewComponent, data: {perfil: 'adm'}, children: [
       { path: 'grups', component: GroupsListComponent, data: {perfil: 'adm'}, children: [

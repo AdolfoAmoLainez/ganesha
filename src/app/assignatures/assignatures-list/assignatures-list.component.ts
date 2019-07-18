@@ -26,7 +26,7 @@ export class AssignaturesListComponent implements OnInit, OnDestroy {
       (data) => {
         this.perfil = data.perfils[0].perfil;
 
-        if (this.perfil === 'adm'){
+        if (this.perfil === 'adm') {
           this.dbService.getAssignatures();
         } else {
           this.dbService.getAssignaturesProfessor(this.authService.getUsername());

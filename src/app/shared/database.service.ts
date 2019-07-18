@@ -79,8 +79,6 @@ export class DataBaseService {
     return this.http.post<Assignatura[]>
       (environment.selfApiUrl + 'get_assignatures_profe', obj).subscribe(
       (data) => {
-        console.log(data);
-
         this.assignaturesUpdated.next(data);
       },
       (err) => {

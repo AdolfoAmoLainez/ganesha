@@ -40,7 +40,7 @@ export class AuthService {
 
   getPerfil() {
     this.username = JSON.parse(localStorage.getItem('currentUser'));
-    if (isUndefined(this.username)){
+    if (isUndefined(this.username)) {
       this.logout();
       return undefined;
     } else {

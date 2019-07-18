@@ -26,6 +26,7 @@ import {NgbAccordionModule} from '@ng-bootstrap/ng-bootstrap';
 import { ToastrModule } from 'ngx-toastr';
 import { MymodalwaitComponent } from './shared/mymodalwait/mymodalwait.component';
 import { GroupEditModalComponent } from './groups/group-edit-modal/group-edit-modal.component';
+import { ProfeviewComponent } from './profeview/profeview.component';
 
 @NgModule({
   declarations: [
@@ -42,7 +43,8 @@ import { GroupEditModalComponent } from './groups/group-edit-modal/group-edit-mo
     LoginComponent,
     AdminviewComponent,
     MymodalwaitComponent,
-    GroupEditModalComponent
+    GroupEditModalComponent,
+    ProfeviewComponent
   ],
   imports: [
     BrowserModule,

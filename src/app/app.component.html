@@ -2,11 +2,12 @@
   <app-header></app-header>
 </div>
 <div class="container-fluid">
-  <div class="row justify-content-center" *ngIf="perfil == 'professor'">
+    <router-outlet></router-outlet>
+<!--   <div class="row justify-content-center" *ngIf="perfil == 'professor'">
     <div class="col-sm-12">
         <router-outlet></router-outlet>
     </div>
-  </div>
+  </div> -->
 <!--   <div class="row" *ngIf="perfil == 'adm'">
     <div class="col-sm-12 col-md-2" *ngIf="viewSideBar">
       <app-assignatures-list></app-assignatures-list>
