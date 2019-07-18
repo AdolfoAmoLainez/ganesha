@@ -44,7 +44,8 @@ export class AssignaturaInfoComponent implements OnInit, OnDestroy {
       codi: new FormControl('', [Validators.required, , Validators.pattern(/^(a.+[^?¿*!|'\^\(\){}@\"$%&\/\\`´])$/)]),
       nom: new FormControl('', [Validators.required]),
       tamany: new FormControl('', [Validators.required, Validators.min(1)]),
-      tamanygb: new FormControl(0)
+      tamanygb: new FormControl(0),
+      validapgina: new FormControl(false)
     });
 
 
@@ -83,6 +84,7 @@ export class AssignaturaInfoComponent implements OnInit, OnDestroy {
                   codi: assignatura.codi,
                   nom: assignatura.nom,
                   tamany: assignatura.tamany,
+                  validapgina: assignatura.validapgina,
                   //unitat_id: assignatura.unitat_id,
                   //unitatstamany: assignatura.unitatstamany,
                   // quota: assignatura.quota,

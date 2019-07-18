@@ -142,6 +142,7 @@ export class DataBaseService {
     return this.http.put(environment.apiCrudUrl + 'assignatures/' + assignatura.id, assignatura).subscribe(
       (data: any) => {
         this.assignaturaChanged.next(assignatura);
+        this.toastr.success("Assignatura modificada correctament!");
       },
       (err) => {
         this.toastr.error(err.error.message);
