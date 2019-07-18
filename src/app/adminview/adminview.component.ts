@@ -8,7 +8,7 @@ import { AuthService } from '../auth/auth.service';
 })
 export class AdminviewComponent implements OnInit {
 
-  viewSideBar = false;
+  viewSideBar = true;
   isNavbarCollapsed = true;
 
   constructor(private authService: AuthService) { }
