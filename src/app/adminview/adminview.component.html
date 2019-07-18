@@ -56,7 +56,7 @@
     <!-- <router-outlet name="leftbar"></router-outlet> -->
     <app-assignatures-list></app-assignatures-list>
   </div>
-  <div class="col-sm-12 col-md-10">
+  <div class="col-sm-12 col-md-10" [class.offset-md-1]="!viewSideBar">
       <i
       class="fas fa-bars text-primary"
       style="cursor: pointer;"
