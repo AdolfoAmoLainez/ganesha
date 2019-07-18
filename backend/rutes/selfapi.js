@@ -19,4 +19,5 @@ router.get('/add_usuari', SelfApiController.addUsuari);
 router.post('/valida_usuari', SelfApiController.validaUsuari);
 router.post('/get_alumnes_names', SelfApiController.getAlumnesNames);
 router.post('/get_perfil_usuari', SelfApiController.getPerfilUsuari);
+router.post('/get_assignatures_profe', SelfApiController.getAssignaturesProfessor);
 module.exports = router;

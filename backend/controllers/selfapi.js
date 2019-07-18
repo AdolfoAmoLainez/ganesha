@@ -1080,3 +1080,28 @@ exports.getPerfilUsuari = (req, res) => {
       }
     });
 }
+
+/**
+ * Busquem les assignatures d'un NIU
+ *
+ * Request:
+ *  username
+ *
+ * Response:
+    assignatures
+ */
+
+exports.getAssignaturesProfessor = (req, res) => {
+  console.log("\nGet Assignatures Professor!");
+  console.log(req.body);
+  dbconfig.connection.query(
+    'SELECT assignatures.* FROM `assignatures` JOIN `professors` ON assignatures.id=professors.assignatura_id ' +
+    'WHERE professors.niu= ' + req.body.username +';',
+      (errorSel, consulta) => {
+      if (!errorSel){
+        res.status(200).json(consulta);
+      } else {
+        res.status(520).json({message: "No s'ha pogut consultar les assignatures del professor!"});
+      }
+    });
+}

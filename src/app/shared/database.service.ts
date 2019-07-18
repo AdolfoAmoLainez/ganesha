@@ -62,10 +62,29 @@ export class DataBaseService {
   }
 
   getAssignatures() {
-    return this.http.get<{assignatures: Assignatura[]}>(environment.apiCrudUrl + 'assignatures?' + '_order[codi]=ASC').subscribe(
-      (data: any) => {
+    return this.http.get<{result: string, json: any, length: number}>
+      (environment.apiCrudUrl + 'assignatures?' + '_order[codi]=ASC').subscribe(
+      (data) => {
 
         this.assignaturesUpdated.next(data.json);
+      }
+    );
+
+  }
+
+  getAssignaturesProfessor(username: string) {
+    const obj = {
+      username
+    };
+    return this.http.post<Assignatura[]>
+      (environment.selfApiUrl + 'get_assignatures_profe', obj).subscribe(
+      (data) => {
+        console.log(data);
+
+        this.assignaturesUpdated.next(data);
+      },
+      (err) => {
+        this.toastr.error(err.error.message);
       }
     );
 
@@ -142,7 +161,7 @@ export class DataBaseService {
     return this.http.put(environment.apiCrudUrl + 'assignatures/' + assignatura.id, assignatura).subscribe(
       (data: any) => {
         this.assignaturaChanged.next(assignatura);
-        this.toastr.success("Assignatura modificada correctament!");
+        this.toastr.success('Assignatura modificada correctament!');
       },
       (err) => {
         this.toastr.error(err.error.message);
@@ -171,7 +190,7 @@ export class DataBaseService {
       assigCodi
     };
 
-    const modalRef = this.modalService.open(MymodalwaitComponent,{backdrop: 'static', keyboard: false});
+    const modalRef = this.modalService.open(MymodalwaitComponent, {backdrop: 'static', keyboard: false});
     modalRef.componentInstance.titol = 'Operació en procés';
     modalRef.componentInstance.missatge = 'Esperi mentre esborrem els professors. Aquesta acció pot trigar uns minuts....';
 
@@ -265,7 +284,7 @@ export class DataBaseService {
       grups,
       assigCodi
     };
-    const modalRef = this.modalService.open(MymodalwaitComponent,{backdrop: 'static', keyboard: false});
+    const modalRef = this.modalService.open(MymodalwaitComponent, {backdrop: 'static', keyboard: false});
     modalRef.componentInstance.titol = 'Operació en procés';
     modalRef.componentInstance.missatge = 'Esperi mentre esborrem els grups. Aquesta acció pot trigar uns minuts....';
 
@@ -313,9 +332,9 @@ export class DataBaseService {
     );
   }
 
-  getGrupInfo(grup_id: string) {
+  getGrupInfo(grupId: string) {
     const obj = {
-      grup_id
+      grup_id: grupId
     };
 
     return this.http.post<[{id: number, ordre: number, quota: number, assignatura_id: number, codi: string}]>

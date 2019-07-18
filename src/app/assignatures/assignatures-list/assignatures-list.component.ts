@@ -21,18 +21,22 @@ export class AssignaturesListComponent implements OnInit, OnDestroy {
               private authService: AuthService) { }
 
 
-/**TODO: Falta hacer control de si es professor solo cargar sus assignatures!! */
-
   ngOnInit() {
     this.authService.getPerfil().subscribe(
       (data) => {
         this.perfil = data.perfils[0].perfil;
+
+        if (this.perfil === 'adm'){
+          this.dbService.getAssignatures();
+        } else {
+          this.dbService.getAssignaturesProfessor(this.authService.getUsername());
+        }
+
         this.assignaturesUpdatedSubs = this.dbService.assignaturesUpdated.subscribe(
           (assignatures: Assignatura[]) => {
             this.assignatures = assignatures;
           }
         );
-        this.dbService.getAssignatures();
       }
     );
   }
