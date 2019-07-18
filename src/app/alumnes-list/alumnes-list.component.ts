@@ -128,8 +128,8 @@ export class AlumnesListComponent implements OnInit, OnDestroy {
     modalRef.result.then(
       (resposta) => {
         this.dbService.deleteAlumnesGrup([alumne],
-                                         this.assignaturaCodi + '-g' + this.grup.ordre,
-                                        this.assignaturaCodi, esborrarDades );
+                                         this.grup.nom,
+                                         this.assignaturaCodi, esborrarDades );
         this.selectAllAlumnes = false;
       },
       () => {
@@ -163,7 +163,7 @@ export class AlumnesListComponent implements OnInit, OnDestroy {
             nom: 'Nom no trobat',
             grup_id: this.grupId
           };
-          this.dbService.addAlumneGrup(al, this.assignaturaCodi + '-g' + this.grup.ordre, this.assignaturaCodi);
+          this.dbService.addAlumneGrup(al, this.grup.nom, this.assignaturaCodi);
         }
       },
       () => {
@@ -200,7 +200,7 @@ export class AlumnesListComponent implements OnInit, OnDestroy {
       (resposta) => {
 
         this.dbService.deleteAlumnesGrup(this.selectedAlumnes,
-                                         this.assignaturaCodi + '-g' + this.grup.ordre,
+                                          this.grup.nom,
                                          this.assignaturaCodi, esborrarDades);
         this.selectAllAlumnes = false;
       },

@@ -200,7 +200,8 @@ export class GroupsListComponent implements  OnDestroy, OnInit {
 
     const modalRef = this.modalService.open(MymodalyesnoComponent);
     modalRef.componentInstance.titol = 'Esborrar Grup';
-    modalRef.componentInstance.missatge = 'Vols esborrar el grup ' + this.assignatura.codi + '-g' + grup.ordre + '?';
+    // modalRef.componentInstance.missatge = 'Vols esborrar el grup ' + this.assignatura.codi + '-g' + grup.ordre + '?';
+    modalRef.componentInstance.missatge = 'Vols esborrar el grup ' + grup.nom + '?';
     modalRef.result.then(
       (resposta) => {
         console.log('Vol esborrar el grup!' + resposta);

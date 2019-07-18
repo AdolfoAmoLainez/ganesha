@@ -335,13 +335,14 @@ export class DataBaseService {
       grup_id: grupId
     };
 
-    return this.http.post<[{id: number, ordre: number, quota: number, assignatura_id: number, codi: string}]>
+    return this.http.post<[{id: number, ordre: number, quota: number, assignatura_id: number, codi: string, nom: string}]>
       (environment.selfApiUrl + 'get_grup_info', obj).pipe(
       map(
         (data) => {
           const grup: Grup = {
             id: data[0].id,
             assignatura_id: data[0].assignatura_id,
+            nom: data[0].nom,
             quota: data[0].quota,
             ordre: data[0].ordre,
             alumnes:  0

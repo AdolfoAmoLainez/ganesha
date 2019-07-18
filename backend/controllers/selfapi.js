@@ -195,6 +195,7 @@ exports.addGrups = (req, res) => {
 
                     if(grupElement.codi == 200) {
                       valuesInsert.push("(" + req.body.assignatura.id + "," +
+                                            "'" + grupElement.json.nomgrup + "'," +
                                             req.body.quotaMin + "," +
                                             arrayGrups[grupElement.json.nomgrup].ordre + ")");
                     } else {
@@ -203,7 +204,7 @@ exports.addGrups = (req, res) => {
                   });
 
                   if (valuesInsert.length > 0) { // S'ha creat algun grup
-                    sqlInsert= "INSERT INTO `grups` (assignatura_id,quota,ordre) VALUES "+valuesInsert.join() +";";
+                    sqlInsert= "INSERT INTO `grups` (assignatura_id,nom,quota,ordre) VALUES "+valuesInsert.join() +";";
                     console.log(sqlInsert);
 
                     // Insercio a la BBDD

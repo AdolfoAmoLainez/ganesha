@@ -60,15 +60,15 @@
           </div>
           <h2 class="col-sm-6">
             <a *ngIf="perfil == 'professor'" [routerLink]="['/professor','alumnes', group.id]" class="btn btn-link">{{
-              assignatura.codi + '-g' + group.ordre
+              group.nom
             }}</a>
             <a *ngIf="perfil == 'adm'" [routerLink]="['alumnes', group.id]" class="btn btn-link">{{
-              assignatura.codi + '-g' + group.ordre
+              group.nom
             }}</a>
             <i
             class="fas fa-edit"
             style="cursor: pointer;"
-            (click)="onEditGrup(assignatura.codi + '-g' + group.ordre, group.quota)"
+            (click)="onEditGrup(group.nom, group.quota)"
             ></i>
             <i *ngIf="group.alumnes === 0"
             class="fas fa-times text-danger ml-2"
