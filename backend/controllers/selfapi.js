@@ -19,7 +19,7 @@ var ldap = new LDAP({
  * @param {logEntry: = {
     niu: Usuari que fa l'acció,
     accio: nom de la funció,
-    parametres: parametres de la funció,
+    parametres: parametres de la funció, generalment req.body,
     resposta: resposta de la funció,
     resultat: success | error
   };
@@ -276,6 +276,7 @@ exports.deleteGrups = (req, res) => {
   logEntry = {
     niu: 'Username',
     accio: 'deleteGrups',
+    parametres: JSON.stringify(req.body),
     resposta: '',
     resultat: ''
   };
@@ -398,6 +399,7 @@ exports.addAlumneGrup = (req, res) => {
   logEntry = {
     niu: 'Username',
     accio: 'addAlumneGrup',
+    parametres: JSON.stringify(req.body),
     resposta: '',
     resultat: ''
   };
@@ -486,6 +488,7 @@ exports.deleteAlumnesGrup = (req, res) => {
   logEntry = {
     niu: 'Username',
     accio: 'deleteAlumnesGrup',
+    parametres: JSON.stringify(req.body),
     resposta: '',
     resultat: ''
   };
@@ -601,6 +604,7 @@ exports.deleteProfesAssignatura = (req, res) => {
   logEntry = {
     niu: 'Username',
     accio: 'deleteProfesAssignatura',
+    parametres: JSON.stringify(req.body),
     resposta: '',
     resultat: ''
   };
@@ -734,6 +738,7 @@ exports.addProfeAssignatura = (req, res) => {
   logEntry = {
     niu: 'Username',
     accio: 'addProfeAssignatura',
+    parametres: JSON.stringify(req.body),
     resposta: '',
     resultat: ''
   };
@@ -988,6 +993,7 @@ exports.addUsuari = (req, res) => {
   logEntry = {
     niu: 'Username',
     accio: 'addUsuari',
+    parametres: JSON.stringify(req.body),
     resposta: '',
     resultat: ''
   };

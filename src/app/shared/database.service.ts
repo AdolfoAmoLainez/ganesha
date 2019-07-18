@@ -371,7 +371,7 @@ export class DataBaseService {
       (data) => {
         this.alumnesUpdated.next([...data.json]);
       }
-    )
+    );
   }
 
   addAlumneGrup(alumne: Alumne, grupName: string, assigCodi: string) {
@@ -403,7 +403,7 @@ export class DataBaseService {
       esborrarDades
     };
 
-    const modalRef = this.modalService.open(MymodalwaitComponent,{backdrop: 'static', keyboard: false});
+    const modalRef = this.modalService.open(MymodalwaitComponent, {backdrop: 'static', keyboard: false});
     modalRef.componentInstance.titol = 'Operació en procés';
     modalRef.componentInstance.missatge = 'Esperi mentre esborrem els alumnes. Aquesta acció pot trigar uns minuts....';
 
@@ -463,7 +463,7 @@ export class DataBaseService {
       (data) => {
         this.usuarisChanged.next();
       }
-    )
+    );
   }
 
   modificarUsuari(usuari: Usuari) {
