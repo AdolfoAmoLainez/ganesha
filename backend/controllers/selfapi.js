@@ -1112,3 +1112,42 @@ exports.getAssignaturesProfessor = (req, res) => {
       }
     });
 }
+
+/**
+ * Comprovem si un usuari pot validar amb pgina.
+ * Pensat per les màquines de la Redacció Integrada
+ *
+ * Request:
+ *  username: Niu de l'alumne
+ *
+ * Response:
+ *  200 => Validació OK. "\n"+req.body.username+"\nnom_complet\nemail_usuari\nadministradores\n"
+ *  410 => Validació KO.
+ */
+
+exports.testUserPginaValidation = (req, res) => {
+  if (req.body.username){
+
+    dbconfig.connection.query(
+      'SELECT alumnes.niu from ' +
+      '`alumnes` JOIN `grups` ON alumnes.grup_id = grups.id ' +
+      'JOIN `assignatures` ON assignatures.id = grups.assignatura_id ' +
+      'WHERE assignatures.validapgina=1 AND alumnes.niu=' + req.body.username +';',
+      function(error,result,fields){
+
+        if (error) throw error;
+
+        // console.log(result);
+
+        if (result.length > 0){ //S'ha trobat l'alumne, per tant té permís
+          res.status(200).send("\n"+req.body.username+"\nnom_complet\nemail_usuari\nadministradores\n");
+        }else{
+          res.status(401).send("\n");
+        }
+
+      });
+
+    }else{
+      res.status(401).send("\n");
+    }
+}

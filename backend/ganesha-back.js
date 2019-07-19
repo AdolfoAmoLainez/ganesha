@@ -2,7 +2,7 @@ const path = require('path');
 const express = require('express');
 const bodyParser = require('body-parser');
 const selfApiRoutes = require("./rutes/selfapi");
-const assignaturesRoutes = require('./rutes/assignatures');
+// const assignaturesRoutes = require('./rutes/assignatures');
 
 const app = express();
 
@@ -18,7 +18,7 @@ app.use((req, res, next) => {
 
 })
 
-app.use('/api/crud/assignatures', assignaturesRoutes)
+// app.use('/api/crud/assignatures', assignaturesRoutes)
 
 app.use("/selfapi", selfApiRoutes);
 
