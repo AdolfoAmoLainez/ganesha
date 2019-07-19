@@ -1,8 +1,11 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { DataBaseService } from '../shared/database.service';
 import { Subject } from 'rxjs';
 import { isUndefined } from 'util';
+import { HttpClient } from '@angular/common/http';
+
+import { DataBaseService } from '../shared/database.service';
+import {environment} from '../../environments/environment';
 
 
 @Injectable({
@@ -16,11 +19,12 @@ export class AuthService {
 
   loginError = new Subject<string>();
 
-  constructor(private router: Router, private dbService: DataBaseService) {}
+  constructor(private router: Router,
+              private http: HttpClient) {}
 
   login(username: string, passwd: string) {
 
-    this.dbService.validaUsuari(username, passwd).subscribe(
+    this.validaUsuari(username, passwd).subscribe(
       (data) => {
         console.log(data);
 
@@ -38,13 +42,18 @@ export class AuthService {
 
   }
 
+
   getPerfil() {
     this.username = JSON.parse(localStorage.getItem('currentUser'));
     if (isUndefined(this.username)) {
       this.logout();
       return undefined;
     } else {
-      return this.dbService.getPerfil(this.username);
+      const obj = {
+        username: this.username
+      };
+      return this.http.post<{status: string , message: string, perfils: [{perfil: string}]}>
+      (environment.selfApiUrl + 'get_perfil_usuari', obj);
     }
   }
 
@@ -64,5 +73,15 @@ export class AuthService {
     this.userId = 0;
     localStorage.removeItem('currentUser');
     this.router.navigate(['/' , 'login']);
+  }
+
+  validaUsuari(username: string, passwd: string) {
+    const obj = {
+      username,
+      passwd
+    };
+
+    return this.http.post<{status: string , message: string, perfils: [{perfil: string, id: number}]}>
+      (environment.selfApiUrl + 'valida_usuari', obj);
   }
 }

@@ -105,6 +105,7 @@ exports.getAlumnesNames = (req, res) => {
 
 /**
  * Request:
+ *  username: Usuari que fa la petició
  *  assignatura
  *  quantitat de grups
  *  quota en Gb
@@ -127,7 +128,7 @@ exports.addGrups = (req, res) => {
   console.log(req.body);
 
   var logEntry = {
-    niu: 'Username',
+    niu: req.body.username,
     accio: 'addGrups',
     parametres: JSON.stringify(req.body),
     resposta: '',
@@ -252,8 +253,9 @@ exports.addGrups = (req, res) => {
 
 /**
  * Request:
+ *  username: Usuari que fa la petició
  *  grups: llista en format array de grups
- * assigCodi: codi de l'assignatura
+ *  assigCodi: codi de l'assignatura
  *
  * Response:
  * {
@@ -275,7 +277,7 @@ exports.deleteGrups = (req, res) => {
   console.log(req.body);
 
   logEntry = {
-    niu: 'Username',
+    niu: req.body.username,
     accio: 'deleteGrups',
     parametres: JSON.stringify(req.body),
     resposta: '',
@@ -382,6 +384,7 @@ exports.getGrupInfo = (req, res) => {
 
 /**
  * Request:
+ *  username: Usuari que fa la petició
  *  alumne:
  *    id: number;
       niu: string;
@@ -398,7 +401,7 @@ exports.getGrupInfo = (req, res) => {
  */
 exports.addAlumneGrup = (req, res) => {
   logEntry = {
-    niu: 'Username',
+    niu: req.body.username,
     accio: 'addAlumneGrup',
     parametres: JSON.stringify(req.body),
     resposta: '',
@@ -461,6 +464,7 @@ exports.addAlumneGrup = (req, res) => {
 
 /**
  * Request:
+ *  username: Usuari que fa la petició
  *  alumnes: llista d'alumnes
  *  grupName: nom del grup (carpeta)
  *  assigCodi: codi assignatura
@@ -487,7 +491,7 @@ exports.deleteAlumnesGrup = (req, res) => {
   console.log(req.body);
 
   logEntry = {
-    niu: 'Username',
+    niu: req.body.username,
     accio: 'deleteAlumnesGrup',
     parametres: JSON.stringify(req.body),
     resposta: '',
@@ -580,6 +584,7 @@ exports.deleteAlumnesGrup = (req, res) => {
 
 /**
  * Request:
+ *  username: Usuari que fa la petició
  *  profes: llista de profes
  *
  *  assigCodi: codi assignatura
@@ -603,7 +608,7 @@ exports.deleteProfesAssignatura = (req, res) => {
   console.log(req.body);
 
   logEntry = {
-    niu: 'Username',
+    niu: req.body.username,
     accio: 'deleteProfesAssignatura',
     parametres: JSON.stringify(req.body),
     resposta: '',
@@ -717,6 +722,7 @@ exports.getLvmInfo = (req, res) => {
 /**
  * Request:
  * {
+ *  username: Usuari que fa la petició,
  *  assignaturaCodi,
  *  professor: { id: ,
             niu: ,
@@ -737,7 +743,7 @@ exports.addProfeAssignatura = (req, res) => {
   console.log(req.body);
 
   logEntry = {
-    niu: 'Username',
+    niu: req.body.username,
     accio: 'addProfeAssignatura',
     parametres: JSON.stringify(req.body),
     resposta: '',
@@ -796,6 +802,7 @@ exports.addProfeAssignatura = (req, res) => {
 
 /**
  * Request:
+ *  username: Usuari que fa la petició
  *  assignatura
  *
  * Resposta:
@@ -812,15 +819,16 @@ exports.addAssignatura = (req, res) => {
   console.log("\nadd Assignatura!");
 
   var logEntry = {
-    niu: 'Username',
+    niu: req.body.username,
     accio: 'addAssignatura',
     parametres: JSON.stringify(req.body),
     resposta: '',
     resultat: ''
   };
+  const assignatura = req.body.assignatura;
 
-  const { stdout, stderr, code } = shell.exec('ganesha-add-assignatura ' + req.body.codi + " " +
-             req.body.tamanygb + "G", {silent: true});
+  const { stdout, stderr, code } = shell.exec('ganesha-add-assignatura ' + assignatura.codi + " " +
+             assignatura.tamanygb + "G", {silent: true});
 
     if (stdout) {
         console.log("Stdout", stdout);
@@ -829,20 +837,20 @@ exports.addAssignatura = (req, res) => {
         if (stdjson.codi == 200) {
           dbconfig.connection.query( //Afegir assignatura
             "INSERT INTO `assignatures` (`id`, `codi`, `nom`, `unitat_id`, `tamany`, `unitatstamany`) " +
-            "VALUES (NULL, '"+req.body.codi+"', '"+req.body.nom+"','"+req.body.unitat_id+"', '"+req.body.tamany+"', '"+req.body.unitatstamany+"');",
+            "VALUES (NULL, '"+assignatura.codi+"', '"+assignatura.nom+"','"+assignatura.unitat_id+"', '"+assignatura.tamany+"', '"+assignatura.unitatstamany+"');",
             (errorinsert, result) =>{
 
               if (!errorinsert){
                 res.status(200).json({message: stdjson.message, assignaturaId: result.insertId});
                 logEntry.resultat = 'success';
-                logEntry.resposta = 'Assignatura ' + req.body.codi + ' creada correctament.';
-                console.log("Assignatura " + req.body.codi + " creada correctament.");
+                logEntry.resposta = 'Assignatura ' + assignatura.codi + ' creada correctament.';
+                console.log("Assignatura " + assignatura.codi + " creada correctament.");
                 insertaLog(logEntry);
               } else {
                 res.status(520).json({message: "No s'ha pogut insertar l'assignatura en la BBDD"});
                 logEntry.resultat = 'error';
-                logEntry.resposta = "No s'ha pogut insertar l'assignatura " + req.body.codi + " en la BBDD.";
-                console.log("ERROR: No s'ha pogut insertar l'assignatura " + req.body.codi + " en la BBDD.");
+                logEntry.resposta = "No s'ha pogut insertar l'assignatura " + assignatura.codi + " en la BBDD.";
+                console.log("ERROR: No s'ha pogut insertar l'assignatura " + assignatura.codi + " en la BBDD.");
                 insertaLog(logEntry);
               }
             });
@@ -865,6 +873,7 @@ exports.addAssignatura = (req, res) => {
 
 /**
  * Request:
+ *  username: Usuari que fa la petició
  *  assignatura
  *
  * Resposta:
@@ -876,15 +885,16 @@ exports.deleteAssignatura = (req, res) => {
   console.log("\ndelete Assignatura.");
 
   var logEntry = {
-    niu: 'Username',
+    niu: req.body.username,
     accio: 'deleteAssignatura',
     parametres: JSON.stringify(req.body),
     resposta: '',
     resultat: ''
   };
+  const assignatura = req.body.assignatura;
 
-  const { stdout, stderr, code } = shell.exec('ganesha-del-assignatura ' + req.body.codi + " " +
-  req.body.tamanygb + "G " + "TRUE", {silent: true});
+  const { stdout, stderr, code } = shell.exec('ganesha-del-assignatura ' + assignatura.codi + " " +
+  assignatura.tamanygb + "G " + "TRUE", {silent: true});
 
   if (stdout) {
     console.log("Stdout", stdout);
@@ -892,20 +902,20 @@ exports.deleteAssignatura = (req, res) => {
     const stdjson = JSON.parse(stdout);
     if (stdjson.codi == 200) {
       dbconfig.connection.query( //Afegir assignatura
-        "DELETE FROM `assignatures` WHERE id="+req.body.id+";",
+        "DELETE FROM `assignatures` WHERE id="+assignatura.id+";",
         (errorinsert, result) =>{
 
           if (!errorinsert){
             res.status(200).json({message: stdjson.message, assignaturaId: result.insertId});
             logEntry.resultat = 'success';
-            logEntry.resposta = 'Assignatura ' + req.body.codi + ' esborrada correctament.';
-            console.log("Assignatura " + req.body.codi + " esborrada correctament.");
+            logEntry.resposta = 'Assignatura ' + assignatura.codi + ' esborrada correctament.';
+            console.log("Assignatura " + assignatura.codi + " esborrada correctament.");
             insertaLog(logEntry);
           } else {
             res.status(520).json({message: "No s'ha pogut esborrar l'assignatura en la BBDD"});
             logEntry.resultat = 'error';
-            logEntry.resposta = "No s'ha pogut esborrar l'assignatura " + req.body.codi + " en la BBDD.";
-            console.log("ERROR: No s'ha pogut esborrar l'assignatura " + req.body.codi + " en la BBDD.");
+            logEntry.resposta = "No s'ha pogut esborrar l'assignatura " + assignatura.codi + " en la BBDD.";
+            console.log("ERROR: No s'ha pogut esborrar l'assignatura " + assignatura.codi + " en la BBDD.");
             insertaLog(logEntry);
           }
         });
@@ -978,6 +988,7 @@ exports.getMinutsConsumits = (req, res) => {
 
 /**
  * Request:
+ *  username: Usuari que fa la petició
  *
  * Resposta:
  *   200 => OK
@@ -992,7 +1003,7 @@ exports.addUsuari = (req, res) => {
   console.log(req.body);
 
   logEntry = {
-    niu: 'Username',
+    niu: req.body.username,
     accio: 'addUsuari',
     parametres: JSON.stringify(req.body),
     resposta: '',

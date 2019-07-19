@@ -10,12 +10,12 @@ import { Grup } from './grup.model';
 import { Alumne } from './alumne.model';
 import {environment} from '../../environments/environment';
 import { Router } from '@angular/router';
-import { stringify } from '@angular/core/src/render3/util';
 import { Usuari } from './usuari.model';
 import { Perfil } from './perfil.model';
 import { ToastrService } from 'ngx-toastr';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { MymodalwaitComponent } from './mymodalwait/mymodalwait.component';
+import { AuthService } from '../auth/auth.service';
 
 @Injectable()
 export class DataBaseService {
@@ -54,7 +54,8 @@ export class DataBaseService {
   constructor(private http: HttpClient,
               private router: Router,
               private toastr: ToastrService,
-              private modalService: NgbModal) {}
+              private modalService: NgbModal,
+              private authService: AuthService) {}
 
 
   getLvmInfo() {
@@ -109,8 +110,13 @@ export class DataBaseService {
   }
 
   addAssignatura(assignatura: Assignatura) {
+    const obj = {
+      username: this.authService.getUsername(),
+      assignatura
+    };
+
     return this.http.post<{message: string, assignaturaId: number}>
-      (environment.selfApiUrl + 'add_assignatura', assignatura).subscribe(
+      (environment.selfApiUrl + 'add_assignatura', obj).subscribe(
       (data) => {
         console.log(data);
         this.toastr.success(data.message);
@@ -184,6 +190,7 @@ export class DataBaseService {
 
   deleteProfessorsAssignatura(profes: Professor[], assigCodi: string) {
     const obj = {
+      username: this.authService.getUsername(),
       profes,
       assigCodi
     };
@@ -223,6 +230,7 @@ export class DataBaseService {
 
   addProfessorAssignatura(professor: Professor, assignaturaCodi: string) {
     const profObj = {
+      username: this.authService.getUsername(),
       assignaturaCodi,
       professor
     };
@@ -243,6 +251,7 @@ export class DataBaseService {
 
   addGrupsAssignatura(assignatura: Assignatura, quantitat: number, quotaMin: string, quotaGb: string) {
     const obj = {
+      username: this.authService.getUsername(),
       assignatura,
       quantitat,
       quotaMin,
@@ -279,6 +288,7 @@ export class DataBaseService {
   deleteGrupsAssignatura(grups: Grup[], assigCodi: string) {
 
     const obj = {
+      username: this.authService.getUsername(),
       grups,
       assigCodi
     };
@@ -377,6 +387,7 @@ export class DataBaseService {
 
   addAlumneGrup(alumne: Alumne, grupName: string, assigCodi: string) {
     const obj = {
+      username: this.authService.getUsername(),
       alumne,
       grupName,
       assigCodi
@@ -398,6 +409,7 @@ export class DataBaseService {
 
   deleteAlumnesGrup(alumnes: Alumne[], grupName: string, assigCodi: string, esborrarDades: boolean) {
     const obj = {
+      username: this.authService.getUsername(),
       alumnes,
       grupName,
       assigCodi,
@@ -481,25 +493,6 @@ export class DataBaseService {
         this.perfilsUpdated.next(data.json);
       }
     );
-  }
-
-  validaUsuari(username: string, passwd: string) {
-    const obj = {
-      username,
-      passwd
-    };
-
-    return this.http.post<{status: string , message: string, perfils: [{perfil: string, id: number}]}>
-      (environment.selfApiUrl + 'valida_usuari', obj);
-  }
-
-  getPerfil(username: string) {
-    const obj = {
-      username
-    };
-
-    return this.http.post<{status: string , message: string, perfils: [{perfil: string}]}>
-      (environment.selfApiUrl + 'get_perfil_usuari', obj);
   }
 
   getAlumnesNames(alumnes: Alumne[]) {
