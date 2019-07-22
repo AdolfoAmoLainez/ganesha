@@ -30,7 +30,7 @@
   <button
     type="button"
     class="btn btn-primary"
-    (click)="activeModal.close({nomGrup: nom.value, quota: quota.value})"
+    (click)="activeModal.close({nomAnterior: nomGrup, grupId: grupId, nomNou: nom.value, quotaNova: quota.value})"
     [disabled]="!editForm.valid || disponiblesInput.value<0"
   >
     Modificar

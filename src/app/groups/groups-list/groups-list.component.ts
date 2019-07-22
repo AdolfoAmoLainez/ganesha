@@ -267,18 +267,23 @@ export class GroupsListComponent implements  OnDestroy, OnInit {
 
   /** TODO: Falta implementar modificar grup al backend */
 
-  onEditGrup(nomGrup: string, quotaGrup: number) {
+  onEditGrup(grupId: number, nomGrup: string, quotaGrup: number) {
     const disponibles = this.assignatura.tamany - this.minutsConsumits;
 
     const modalRef = this.modalService.open(GroupEditModalComponent);
     modalRef.componentInstance.nomGrup = nomGrup;
     modalRef.componentInstance.quota = quotaGrup;
+    modalRef.componentInstance.grupId = grupId;
     modalRef.componentInstance.minutsDisponibles = disponibles;
 
     modalRef.result.then(
       (resposta) => {
-        console.log('Vol modificar el grup!');
-        console.log(resposta);
+
+        this.dbService.modificarGrupAssignatura(this.assignatura.codi,
+          resposta.grupId,
+          resposta.nomAnterior,
+          resposta.nomNou,
+          resposta.quotaNova);
 
       },
       () => {

@@ -68,7 +68,7 @@
             <i
             class="fas fa-edit"
             style="cursor: pointer;"
-            (click)="onEditGrup(group.nom, group.quota)"
+            (click)="onEditGrup(group.id, group.nom, group.quota)"
             ></i>
             <i *ngIf="group.alumnes === 0"
             class="fas fa-times text-danger ml-2"

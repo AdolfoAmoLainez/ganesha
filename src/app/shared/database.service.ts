@@ -285,6 +285,32 @@ export class DataBaseService {
     );
   }
 
+  modificarGrupAssignatura(nomAssignatura: string, grupId: number, nomAnterior: string, nomNou: string, novaQuota: number) {
+
+    const obj = {
+      username: this.authService.getUsername(),
+      nomAssignatura,
+      grupId,
+      nomAnterior,
+      nomNou,
+      novaQuota
+    };
+
+    return this.http.post<{message: string}>(environment.selfApiUrl + 'mod_grup', obj).subscribe(
+      (response) => {
+        console.log(response);
+        this.toastr.success(response.message);
+        this.grupsChanged.next();
+      },
+      (err) => {
+
+        this.toastr.error(err.error.message);
+        this.grupsChanged.next();
+      }
+    );
+
+  }
+
   deleteGrupsAssignatura(grups: Grup[], assigCodi: string) {
 
     const obj = {

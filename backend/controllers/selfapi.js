@@ -1162,3 +1162,83 @@ exports.testUserPginaValidation = (req, res) => {
       res.status(401).send("\n");
     }
 }
+
+/**
+ * Request:
+ *  username: Usuari que fa la petició
+ *    nomAssignatura,
+ *    grupId,
+ *    nomAnterior,
+      nomNou,
+      novaQuota
+ *
+ * Resposta:
+ *  message:
+ *      ok => codi 200 => assignaturaId: Id de l'assignatura insertada
+ *      error => 520 problema amb l'script / insertar en BBDD
+ *               501 problema al afegir el assignatura des de l'script
+ * TODO: Gestionar las unidades de quota desdel frontend K, M, G.... ?
+ */
+
+exports.modifyGrup = (req, res) => {
+  console.log("\nModify Grup!");
+  console.log(req.body);
+
+  var logEntry = {
+    niu: req.body.username,
+    accio: 'modifyGrup',
+    parametres: JSON.stringify(req.body),
+    resposta: '',
+    resultat: ''
+  };
+
+  const { stdout, stderr, code } = shell.exec('ganesha-mod-grup ' + req.body.nomAssignatura + " " +
+             req.body.nomAnterior + " " +
+             req.body.nomNou + " " +
+             req.body.novaQuota, {silent: true});
+
+    if (stdout) {
+        console.log("Stdout", stdout);
+
+        const stdjson = JSON.parse(stdout);
+        if (stdjson.codi == 200) {
+          dbconfig.connection.query( //Afegir assignatura
+            "UPDATE `grups` SET " +
+            "nom='"+req.body.nomNou+"', " +
+            "quota="+req.body.novaQuota +
+            " WHERE id=" + req.body.grupId + ";",
+            (errorinsert, result) =>{
+
+              if (!errorinsert){
+                res.status(200).json({message: stdjson.message});
+                logEntry.resultat = 'success';
+                logEntry.resposta = 'Grup '+req.body.nomAnterior+' modificat correctament.';
+                console.log('Grup '+req.body.nomAnterior+' modificat correctament.');
+                insertaLog(logEntry);
+              } else {
+                console.log(errorinsert);
+
+                res.status(520).json({message: "No s'ha pogut modificar el grup en la BBDD"});
+                logEntry.resultat = 'error';
+                logEntry.resposta = "No s'ha pogut modificar el grup " + req.body.nomAnterior + " en la BBDD.";
+                console.log("ERROR: No s'ha pogut modificar el grup " + req.body.nomAnterior + " en la BBDD.");
+                insertaLog(logEntry);
+              }
+            });
+        } else {
+          res.status(stdjson.codi).json({message: stdjson.message});
+          logEntry.resultat = 'error';
+          logEntry.resposta = stdjson.message;
+          console.log("ERROR: " + stdjson.message);
+          insertaLog(logEntry);
+        }
+
+    } else {
+      console.log("Error en la resposta de l'script ganesha-mod-grup!");
+      res.status(520).json({message: "Error en la resposta de l'script ganesha-mod-grup!"});
+      logEntry.resultat = 'error';
+      logEntry.resposta = "Error en la resposta de l'script ganesha-mod-grup!";
+      insertaLog(logEntry);
+    }
+
+}
