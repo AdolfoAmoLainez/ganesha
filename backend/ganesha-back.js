@@ -52,6 +52,16 @@ app.use((req, res, next) => {
 
 // app.use('/api/crud/assignatures', assignaturesRoutes)
 
+app.use('/api/crud/*', cas.serviceValidate(),(req, res, next) => {
+
+  if (req.session.cas && req.session.cas.user) {
+    next();
+  } else {
+      res.status(401).json({message: 'Usuari no valid!'})
+  }
+
+});
+
 var api = mysqlrestapi(app, dbconfig);
 
 app.use("/loginapi", loginApiRoutes);
