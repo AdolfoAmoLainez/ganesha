@@ -11,7 +11,7 @@ import { Assignatura } from 'src/app/shared/assignatura.model';
 })
 export class GroupEditModalComponent implements OnInit {
 
-  public groupId: string;
+  public grupId: string;
   public assignatura: Assignatura;
   public nomGrup: string;
   public minutsDisponibles: number;
