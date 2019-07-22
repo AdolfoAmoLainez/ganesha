@@ -1,19 +1,19 @@
 /* Create database connetion */
 var mysql = require('mysql');
 
-var mysqlOptions = {
+/* var mysqlOptions = {
   host:'localhost',
   user:'root',
   password:'',
   database:'ganesha'
 };
-
-/* var mysqlOptions = {
+ */
+var mysqlOptions = {
   host:'minerva.ccomunicacio',
   user:'desa_ganesha',
   password:'O9VS5OYU1TmB2gdz',
   database:'desa_ganesha'
-}; */
+};
 
 var connection=mysql.createPool(mysqlOptions);
 

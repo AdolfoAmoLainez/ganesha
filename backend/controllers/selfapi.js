@@ -1,6 +1,6 @@
 var dbconfig = require('../mysqlconn');
 const shell = require('shelljs');
-var LDAP = require('ldap-client');
+/*var LDAP = require('ldap-client');
 
 var ldap = new LDAP({
     uri:             'ldap://montblanc.uab.es',   // string
@@ -12,7 +12,7 @@ var ldap = new LDAP({
     scope:           LDAP.SUBTREE,      // default scope for all future searches
 }, function(err) {
     // connected and ready
-});
+});*/
 
 /**
  *
@@ -1241,4 +1241,26 @@ exports.modifyGrup = (req, res) => {
       insertaLog(logEntry);
     }
 
+}
+
+exports.getUserData = (username, callback) => {
+  dbconfig.connection.query(
+    "SELECT usuaris.id as id, perfils.perfil FROM `perfils` LEFT JOIN `usuaris` ON perfils.id = usuaris.perfil_id " +
+    "WHERE usuaris.niu='"+username+"';",
+    (errorSel, perfils) => {
+    if (!errorSel){
+      console.log(perfils);
+      if (perfils.length === 1) {
+       callback(200,perfils);
+
+      } else {
+        callback(401);
+      }
+
+    } else {
+      console.log(errorSel);
+
+      callback(500);
+    }
+  });
 }

@@ -22,8 +22,24 @@ export class AuthService {
   constructor(private router: Router,
               private http: HttpClient) {}
 
-  login(username: string, passwd: string) {
+  //login(username: string, passwd: string) {
+  login() {
+    this.http.get<{username: string , message: string, perfils: [{perfil: string, id: number}]}>
+    (environment.loginApiUrl + 'getUserData').subscribe(
+      (data) => {
+        this.isLogged = true;
+        this.username = data.username;
+        localStorage.setItem('currentUser', this.username);
+        this.userId = data.perfils[0].id;
+        this.router.navigate(['/' , data.perfils[0].perfil]);
+      },
+      (err) => {
 
+        this.loginError.next(err.error.message);
+        window.location.href = environment.loginApiUrl + 'login';
+      }
+    );
+/*
     this.validaUsuari(username, passwd).subscribe(
       (data) => {
         console.log(data);
@@ -38,7 +54,12 @@ export class AuthService {
           this.loginError.next(data.message);
         }
       }
-    );
+    ); */
+
+/*     const obj = {
+      username
+    }; */
+
 
   }
 
@@ -68,14 +89,15 @@ export class AuthService {
   }
 
   logout() {
+
     this.isLogged = false;
     this.username = '';
     this.userId = 0;
     localStorage.removeItem('currentUser');
-    this.router.navigate(['/' , 'login']);
+    window.location.href = environment.loginApiUrl + 'logout';
   }
 
-  validaUsuari(username: string, passwd: string) {
+/*   validaUsuari(username: string, passwd: string) {
     const obj = {
       username,
       passwd
@@ -83,5 +105,5 @@ export class AuthService {
 
     return this.http.post<{status: string , message: string, perfils: [{perfil: string, id: number}]}>
       (environment.selfApiUrl + 'valida_usuari', obj);
-  }
+  } */
 }
