@@ -57,12 +57,12 @@
               <label class="custom-control-label" [attr.for]="group.id"></label>
             </div>
           </div>
-          <h2 class="col-sm-6">
+          <h2 class="col-sm-7">
             <a *ngIf="perfil == 'professor'" [routerLink]="['/professor','alumnes', group.id]" class="btn btn-link">{{
               group.nom
             }}</a>
             <a *ngIf="perfil == 'adm'" [routerLink]="['alumnes', group.id]" class="btn btn-link">{{
-              group.nom
+              group.nom + " -> " + group.quota + "min."
             }}</a>
             <fa-icon icon="edit"
                      style="cursor: pointer;"
