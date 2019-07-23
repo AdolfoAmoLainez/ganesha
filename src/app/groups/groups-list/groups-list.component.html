@@ -59,7 +59,7 @@
           </div>
           <h2 class="col-sm-7">
             <a *ngIf="perfil == 'professor'" [routerLink]="['/professor','alumnes', group.id]" class="btn btn-link">{{
-              group.nom
+              group.nom + " -> " + group.quota + "min."
             }}</a>
             <a *ngIf="perfil == 'adm'" [routerLink]="['alumnes', group.id]" class="btn btn-link">{{
               group.nom + " -> " + group.quota + "min."
