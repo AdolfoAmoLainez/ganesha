@@ -108,7 +108,10 @@ export class GroupsListComponent implements  OnDestroy, OnInit {
   }
 
   ngOnDestroy() {
-    this.paramsSubs.unsubscribe();
+    if (this.paramsSubs) {
+      this.paramsSubs.unsubscribe();
+    }
+
     this.grupsUpdatedSubs.unsubscribe();
     this.grupsChangedSubs.unsubscribe();
   }

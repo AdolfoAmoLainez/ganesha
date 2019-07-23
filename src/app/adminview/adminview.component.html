@@ -23,28 +23,21 @@
         <ul class="navbar-nav mr-auto">
           <li class="nav-item">
             <a class="nav-link" [routerLink]="['addassignatura']" routerLinkActive="router-link-active"
-              ><i
-                class="fas fa-plus mr-2"
-                style="cursor: pointer;"
-              ></i
-              >Afegir Assignatura</a
+              >
+              <fa-icon icon="plus" class="mr-2" style="cursor: pointer;"></fa-icon>
+               Afegir Assignatura</a
             >
           </li>
           <li class="nav-item">
-            <a class="nav-link" [routerLink]="['usuaris']" routerLinkActive="router-link-active"><i
-              class="fas fa-edit mr-2"
-              style="cursor: pointer;"
-            ></i
-            >Gestionar Usuaris</a>
+            <a class="nav-link" [routerLink]="['usuaris']" routerLinkActive="router-link-active">
+              <fa-icon icon="edit" class="mr-2" style="cursor: pointer;"></fa-icon>
+              Gestionar Usuaris</a>
           </li>
         </ul>
         <div class="my-2 my-lg-0">
             <button class="btn btn-danger" type="button" (click)="onSortir()">
-              <i
-                class="fas fa-power-off text-white mr-2"
-                style="cursor: pointer;"
-              ></i
-              >Sortir
+              <fa-icon icon="power-off" class="text-white mr-2" style="cursor: pointer;"></fa-icon>
+              Sortir
             </button>
           </div>
       </div>
@@ -57,11 +50,10 @@
     <app-assignatures-list></app-assignatures-list>
   </div>
   <div class="col-sm-12 col-md-10" [class.offset-md-1]="!viewSideBar">
-      <i
-      class="fas fa-bars text-primary"
-      style="cursor: pointer;"
-      (click)="onToggleSideBar()"
-    ></i>
+      <fa-icon icon="bars"
+              class="text-primary"
+              style="cursor: pointer;"
+              (click)="onToggleSideBar()"></fa-icon>
     <router-outlet></router-outlet>
   </div>
 </div>

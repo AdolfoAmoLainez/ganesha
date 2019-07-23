@@ -28,6 +28,10 @@ import { MymodalwaitComponent } from './shared/mymodalwait/mymodalwait.component
 import { GroupEditModalComponent } from './groups/group-edit-modal/group-edit-modal.component';
 import { ProfeviewComponent } from './profeview/profeview.component';
 
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { faBackspace, faEdit, faTimes, faPlus, faPowerOff, faBars } from '@fortawesome/free-solid-svg-icons';
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -62,10 +66,17 @@ import { ProfeviewComponent } from './profeview/profeview.component';
       tapToDismiss: true,
       newestOnTop: true
     }),
-    NgbModule
+    NgbModule,
+    FontAwesomeModule
   ],
   providers: [DataBaseService, AuthService],
   bootstrap: [AppComponent],
   entryComponents: [MymodalyesnoComponent, MymodalwaitComponent, GroupEditModalComponent]
 })
-export class AppModule { }
+export class AppModule {
+
+  constructor() {
+    library.add(faBackspace, faEdit, faTimes, faPlus, faPowerOff, faBars);
+  }
+
+ }

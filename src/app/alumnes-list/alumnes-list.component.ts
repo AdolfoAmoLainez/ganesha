@@ -73,7 +73,6 @@ export class AlumnesListComponent implements OnInit, OnDestroy {
     );
     this.alumnesNamesUpdatedSubs = this.dbService.alumnesNamesUpdated.subscribe(
       (data: any) => {
-        console.log(data);
         if (data.length > 0) {
           data.forEach(element => {
             this.alumnes[this.alumnes.findIndex(alumne => {
@@ -144,7 +143,6 @@ export class AlumnesListComponent implements OnInit, OnDestroy {
     } else {
       this.selectedAlumnes.splice(this.selectedAlumnes.indexOf(alumne), 1);
     }
-    console.log(this.selectedAlumnes);
 
   }
 

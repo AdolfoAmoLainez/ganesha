@@ -10,11 +10,10 @@
       <div class="list-group-item list-group-item-primary mt-4" *ngIf="perfil == 'professor'">
         <div class="row align-items-center" >
           <div class="col-sm-1">
-            <i
-              class="fas fa-backspace fa-2x text-primary"
-              style="cursor: pointer;"
-              (click)="onBackClick()"
-            ></i>
+            <fa-icon icon="backspace"
+                    class="fa-2x text-primary"
+            style="cursor: pointer;"
+            (click)="onBackClick()"></fa-icon>
           </div>
           <div class="col-sm ml-2">
             <h5>
@@ -65,16 +64,14 @@
             <a *ngIf="perfil == 'adm'" [routerLink]="['alumnes', group.id]" class="btn btn-link">{{
               group.nom
             }}</a>
-            <i
-            class="fas fa-edit"
-            style="cursor: pointer;"
-            (click)="onEditGrup(group.id, group.nom, group.quota)"
-            ></i>
-            <i *ngIf="group.alumnes === 0"
-            class="fas fa-times text-danger ml-2"
-            style="cursor: pointer;"
-            (click)="onDeleteIconClick(group)"
-            ></i>
+            <fa-icon icon="edit"
+                     style="cursor: pointer;"
+                     (click)="onEditGrup(group.id, group.nom, group.quota)"></fa-icon>
+            <fa-icon *ngIf="group.alumnes === 0"
+                     icon="times"
+                     style="cursor: pointer;"
+                     class="text-danger ml-2"
+                     (click)="onDeleteIconClick(group)"></fa-icon>
          </h2>
         </div>
       </div>
