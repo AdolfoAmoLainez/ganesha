@@ -29,6 +29,7 @@ export class GroupsListComponent implements  OnDestroy, OnInit {
   isLoading = true;
   factorUnitats: number;
   minutsConsumits = 0;
+  minutsDisponibles = 0;
 
   addGroupsFrom: FormGroup;
 
@@ -124,6 +125,12 @@ export class GroupsListComponent implements  OnDestroy, OnInit {
         this.assignatura = assig;
 
         this.dbService.getGrupsAssignatura(this.assignaturaId);
+        this.dbService.getMinutsConsumits(this.assignaturaId).subscribe(
+          (respostaMinuts) => {
+
+            this.minutsConsumits = respostaMinuts.consulta[0].consumits;
+
+          });
 
       }
     );
