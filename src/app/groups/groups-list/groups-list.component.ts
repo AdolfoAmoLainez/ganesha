@@ -282,11 +282,13 @@ export class GroupsListComponent implements  OnDestroy, OnInit {
     modalRef.result.then(
       (resposta) => {
 
+        const quotaGb = (resposta.quotaNova * this.factorUnitats).toFixed(1);
+
         this.dbService.modificarGrupAssignatura(this.assignatura.codi,
           resposta.grupId,
           resposta.nomAnterior,
           resposta.nomNou,
-          resposta.quotaNova);
+          quotaGb);
 
       },
       () => {

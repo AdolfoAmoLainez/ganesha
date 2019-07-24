@@ -1195,7 +1195,7 @@ exports.modifyGrup = (req, res) => {
   const { stdout, stderr, code } = shell.exec('ganesha-mod-grup ' + req.body.nomAssignatura + " " +
              req.body.nomAnterior + " " +
              req.body.nomNou + " " +
-             req.body.novaQuota, {silent: true});
+             req.body.novaQuota + "G", {silent: true});
 
     if (stdout) {
         console.log("Stdout", stdout);

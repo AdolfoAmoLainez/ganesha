@@ -285,7 +285,7 @@ export class DataBaseService {
     );
   }
 
-  modificarGrupAssignatura(nomAssignatura: string, grupId: number, nomAnterior: string, nomNou: string, novaQuota: number) {
+  modificarGrupAssignatura(nomAssignatura: string, grupId: number, nomAnterior: string, nomNou: string, novaQuota: string) {
 
     const obj = {
       username: this.authService.getUsername(),
