@@ -46,6 +46,42 @@ function insertaLog (logEntry) {
 }
 
 /**
+ *
+ * @param {*} username: Nom d'usuari
+ * @param {*} callback: Funció per tornar true/false
+ */
+
+function checkUsernameExists(username, callback) {
+  ldap.bind({
+    binddn: 'cn=proxyCC,ou=CC,ou=users,o=sids',
+    password: 'proxy135'
+},
+(errBind) => {
+  if (!errBind) {
+     ldap.search({
+                      base: 'o=sids',
+                      scope: LDAP.SUBTREE,
+                      filter: '(uid='+username+')',
+                      attrs: 'cn, sn'
+                    },
+                    (err, data) => {
+                      if (err) {
+                        callback(false)
+                      } else {
+                        if (data.length === 0) {
+                          callback(false);
+                        } else {
+                          callback(true);
+                        }
+                      }
+
+                    });
+  }
+
+});
+}
+
+/**
  * Request:
  *  alumnes: Array d'alumnes
  *
@@ -396,7 +432,7 @@ exports.getGrupInfo = (req, res) => {
  *  * Resposta:
  *  message:
  *      ok => codi 200
- *      error => 520 problema amb l'script / insertar en BBDD
+ *      error => 520 problema amb l'script / insertar en BBDD / No existeix niu a LDAP
  *               501,502 problema al afegir l'alumne des de l'script
  */
 exports.addAlumneGrup = (req, res) => {
@@ -410,55 +446,64 @@ exports.addAlumneGrup = (req, res) => {
   console.log("\nAssignar usuari grup!");
   console.log(req.body);
 
+  checkUsernameExists(req.body.alumne.niu, (resposta) => {
+    if (resposta === true) { //Niu existeix
 
-  const { stdout, stderr, code } = shell.exec('ganesha-add-alumne-grup ' + req.body.alumne.niu + ' ' +
-  req.body.assigCodi + ' ' + req.body.grupName, {silent: true});
+      const { stdout, stderr, code } = shell.exec('ganesha-add-alumne-grup ' + req.body.alumne.niu + ' ' +
+      req.body.assigCodi + ' ' + req.body.grupName, {silent: true});
 
-  if (stdout) {
-    console.log("Stdout", stdout);
-    var resultjson = '';
+      if (stdout) {
+        console.log("Stdout", stdout);
+        var resultjson = '';
 
-    try {
-      resultjson = JSON.parse(stdout);
-    } catch ( err) {
-      console.log("Error en la resposta de l'script ganesha-add-usuari-grup!");
-      res.status(520).json({problemes: -1, grups:[{message: "Error en la resposta de l'script ganesha-add-usuari-grup!"}] });
-      logEntry.resultat = 'error';
-      logEntry.resposta = "Error en la resposta de l'script ganesha-add-usuari-grup!";
-      insertaLog(logEntry);
-      return;
-    }
-
-
-    switch (resultjson.codi){
-      case 200:
-          dbconfig.connection.query( //Afegir profe assignatura
-            "INSERT INTO `alumnes` (`id`, `niu`, `nom`, `grup_id`) " +
-            "VALUES (NULL, '"+req.body.alumne.niu+"', '"+req.body.alumne.nom+"','"+req.body.alumne.grup_id+"');",
-            (errorinsert) =>{
-              if (!errorinsert){
-                res.status(200).json({message: resultjson.message});
-                logEntry.resultat = 'success';
-                logEntry.resposta = resultjson.message;
-                insertaLog(logEntry);
-              } else {
-                res.status(520).json({message: "No s'ha pogut insertar l'alumne a la BBDD"});
-                logEntry.resultat = 'error';
-                logEntry.resposta = "No s'ha pogut insertar l'alumne a la BBDD";
-                insertaLog(logEntry);
-              }
-            });
-        break;
-      case 501: //Problema des de l'script
-      case 502:
-          res.status(501).json({message: resultjson.message});
+        try {
+          resultjson = JSON.parse(stdout);
+        } catch ( err) {
+          console.log("Error en la resposta de l'script ganesha-add-usuari-grup!");
+          res.status(520).json({message: "Error en la resposta de l'script ganesha-add-usuari-grup!"});
           logEntry.resultat = 'error';
-          logEntry.resposta = resultjson.message;
+          logEntry.resposta = "Error en la resposta de l'script ganesha-add-usuari-grup!";
           insertaLog(logEntry);
-        break;
-    }
+          return;
+        }
 
-  }
+
+        switch (resultjson.codi){
+          case 200:
+              dbconfig.connection.query( //Afegir profe assignatura
+                "INSERT INTO `alumnes` (`id`, `niu`, `nom`, `grup_id`) " +
+                "VALUES (NULL, '"+req.body.alumne.niu+"', '"+req.body.alumne.nom+"','"+req.body.alumne.grup_id+"');",
+                (errorinsert) =>{
+                  if (!errorinsert){
+                    res.status(200).json({message: resultjson.message});
+                    logEntry.resultat = 'success';
+                    logEntry.resposta = resultjson.message;
+                    insertaLog(logEntry);
+                  } else {
+                    res.status(520).json({message: "No s'ha pogut insertar l'alumne a la BBDD"});
+                    logEntry.resultat = 'error';
+                    logEntry.resposta = "No s'ha pogut insertar l'alumne a la BBDD";
+                    insertaLog(logEntry);
+                  }
+                });
+            break;
+          case 501: //Problema des de l'script
+          case 502:
+              res.status(501).json({message: resultjson.message});
+              logEntry.resultat = 'error';
+              logEntry.resposta = resultjson.message;
+              insertaLog(logEntry);
+            break;
+        }
+
+      }
+    } else { // Niu no existeix
+      res.status(520).json({message: "NIU Alumne no vàlid!"});
+      logEntry.resultat = 'error';
+      logEntry.resposta = "NIU Alumne no vàlid!";
+      insertaLog(logEntry);
+    }
+  });
 
 }
 
@@ -733,7 +778,7 @@ exports.getLvmInfo = (req, res) => {
  * Resposta:
  *  message:
  *      ok => codi 200
- *      error => 520 problema amb l'script / insertar en BBDD
+ *      error => 520 problema amb l'script / insertar en BBDD / NIU no trobat LDAP
  *               501 problema al afegir el profe des de l'script
  */
 
@@ -750,53 +795,63 @@ exports.addProfeAssignatura = (req, res) => {
     resultat: ''
   };
 
-  const { stdout, stderr, code } = shell.exec('ganesha-add-profe-assignatura ' + req.body.professor.niu + " " +
-  req.body.assignaturaCodi, {silent: true});
+  checkUsernameExists(req.body.alumne.niu, (resposta) => {
+    if (resposta === true) { //Niu existeix
+      const { stdout, stderr, code } = shell.exec('ganesha-add-profe-assignatura ' + req.body.professor.niu + " " +
+      req.body.assignaturaCodi, {silent: true});
 
-  if (stdout) {
-    console.log("Stdout", stdout);
-    var resultjson = '';
+      if (stdout) {
+        console.log("Stdout", stdout);
+        var resultjson = '';
 
-    try {
-      resultjson = JSON.parse(stdout);
-    } catch ( err) {
-      console.log("Error en la resposta de l'script ganesha-add-profe-assignatura!");
-      res.status(520).json({problemes: -1, grups:[{message: "Error en la resposta de l'script ganesha-add-profe-assignatura!"}] });
-      logEntry.resultat = 'error';
-      logEntry.resposta = "Error en la resposta de l'script ganesha-add-profe-assignatura!";
-      insertaLog(logEntry);
-      return;
-    }
-
-
-    switch (resultjson.codi){
-      case 200:
-          dbconfig.connection.query( //Afegir profe assignatura
-            "INSERT INTO `professors` (`id`, `niu`, `nom`, `assignatura_id`) " +
-            "VALUES (NULL, '"+req.body.professor.niu+"', '"+req.body.professor.nom+"','"+req.body.professor.assignatura_id+"');",
-            (errorinsert) =>{
-              if (!errorinsert){
-                res.status(200).json({message: resultjson.message});
-                logEntry.resultat = 'success';
-                logEntry.resposta = resultjson.message;
-                insertaLog(logEntry);
-              } else {
-                res.status(520).json({message: "No s'ha pogut insertar el professor a la BBDD"});
-                logEntry.resultat = 'error';
-                logEntry.resposta = "No s'ha pogut insertar el professor a la BBDD";
-                insertaLog(logEntry);
-              }
-            });
-        break;
-      case 501: //Problema des de l'script
-          res.status(501).json({message: resultjson.message});
+        try {
+          resultjson = JSON.parse(stdout);
+        } catch ( err) {
+          console.log("Error en la resposta de l'script ganesha-add-profe-assignatura!");
+          res.status(520).json({problemes: -1, grups:[{message: "Error en la resposta de l'script ganesha-add-profe-assignatura!"}] });
           logEntry.resultat = 'error';
-          logEntry.resposta = resultjson.message;
+          logEntry.resposta = "Error en la resposta de l'script ganesha-add-profe-assignatura!";
           insertaLog(logEntry);
-        break;
-    }
+          return;
+        }
 
-  }
+
+        switch (resultjson.codi){
+          case 200:
+              dbconfig.connection.query( //Afegir profe assignatura
+                "INSERT INTO `professors` (`id`, `niu`, `nom`, `assignatura_id`) " +
+                "VALUES (NULL, '"+req.body.professor.niu+"', '"+req.body.professor.nom+"','"+req.body.professor.assignatura_id+"');",
+                (errorinsert) =>{
+                  if (!errorinsert){
+                    res.status(200).json({message: resultjson.message});
+                    logEntry.resultat = 'success';
+                    logEntry.resposta = resultjson.message;
+                    insertaLog(logEntry);
+                  } else {
+                    res.status(520).json({message: "No s'ha pogut insertar el professor a la BBDD"});
+                    logEntry.resultat = 'error';
+                    logEntry.resposta = "No s'ha pogut insertar el professor a la BBDD";
+                    insertaLog(logEntry);
+                  }
+                });
+            break;
+          case 501: //Problema des de l'script
+              res.status(501).json({message: resultjson.message});
+              logEntry.resultat = 'error';
+              logEntry.resposta = resultjson.message;
+              insertaLog(logEntry);
+            break;
+        }
+
+      }
+    } else { // No existeix NIU
+      res.status(520).json({message: "NIU del professor no vàlid!"});
+      logEntry.resultat = 'error';
+      logEntry.resposta = "NIU del professor no vàlid!";
+      insertaLog(logEntry);
+    }
+  });
+
 
 }
 
@@ -1010,23 +1065,32 @@ exports.addUsuari = (req, res) => {
     resultat: ''
   };
 
-  dbconfig.connection.query( //Afegir usuari
-    "INSERT INTO `usuaris` (`id`, `niu`, `perfil_id`) " +
-    "VALUES (NULL, 'Escriu Niu', '2');",
-    (errorinsert) =>{
-      if (!errorinsert){
-        res.status(200).json({message: 'Fet!'});
-        logEntry.resultat = 'success';
-        logEntry.resposta = 'Usuari afegit correctament';
-        insertaLog(logEntry);
-      } else {
-        res.status(520).json({message: "No s'ha pogut insertar l'usuari a la BBDD"});
-        logEntry.resultat = 'error';
-        logEntry.resposta = "No s'ha pogut insertar l'usuari a la BBDD";
-        insertaLog(logEntry);
-      }
+  checkUsernameExists(req.body.alumne.niu, (resposta) => {
+    if (resposta === true) { //Niu existeix
+      dbconfig.connection.query( //Afegir usuari
+        "INSERT INTO `usuaris` (`id`, `niu`, `perfil_id`) " +
+        "VALUES (NULL, 'Escriu Niu', '2');",
+        (errorinsert) =>{
+          if (!errorinsert){
+            res.status(200).json({message: 'Fet!'});
+            logEntry.resultat = 'success';
+            logEntry.resposta = 'Usuari afegit correctament';
+            insertaLog(logEntry);
+          } else {
+            res.status(520).json({message: "No s'ha pogut insertar l'usuari a la BBDD"});
+            logEntry.resultat = 'error';
+            logEntry.resposta = "No s'ha pogut insertar l'usuari a la BBDD";
+            insertaLog(logEntry);
+          }
 
-    });
+        });
+    } else { // Niu no existeix
+      res.status(520).json({message: "No s'ha trobat l'usuari a l'LDAP"});
+      logEntry.resultat = 'error';
+      logEntry.resposta = "No s'ha trobat l'usuari a l'LDAP";
+      insertaLog(logEntry);
+    }
+  });
 }
 
 
