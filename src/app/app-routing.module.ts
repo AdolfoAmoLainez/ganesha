@@ -11,16 +11,17 @@ import { UsuarisListComponent } from './usuaris/usuaris-list/usuaris-list.compon
 import { LoginComponent } from './auth/login/login.component';
 import { AdminviewComponent } from './adminview/adminview.component';
 import { ProfeviewComponent } from './profeview/profeview.component';
+import { AuthGuard } from './auth/auth.guard';
 
 const routes: Routes = [
   {path: '', redirectTo: '/login', pathMatch: 'full'},
   {path: 'login', component: LoginComponent},
-  { path: 'professor', component: ProfeviewComponent, children: [
-    {path: 'assignatures', component: AssignaturesListComponent},
-    { path: 'grups/:assignaturaid', component: GroupsListComponent},
-    { path: 'alumnes/:grupid', component: AlumnesListComponent},
+  { path: 'professor', component: ProfeviewComponent, canActivate: [AuthGuard], data: {perfil: 'professor'}, children: [
+    {path: 'assignatures', component: AssignaturesListComponent, data: {perfil: 'professor'}},
+    { path: 'grups/:assignaturaid', component: GroupsListComponent, data: {perfil: 'professor'}},
+    { path: 'alumnes/:grupid', component: AlumnesListComponent, data: {perfil: 'professor'}},
   ]},
-  { path: 'adm', component: AdminviewComponent, children: [
+  { path: 'adm', component: AdminviewComponent, canActivate: [AuthGuard], data: {perfil: 'adm'}, children: [
     { path: 'assignatura/:assignaturaid', component: AssignaturaViewComponent, data: {perfil: 'adm'}, children: [
       { path: 'grups', component: GroupsListComponent, data: {perfil: 'adm'}, children: [
         { path: 'alumnes/:grupid', component: AlumnesListComponent}
