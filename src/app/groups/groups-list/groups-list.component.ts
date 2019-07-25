@@ -186,12 +186,14 @@ export class GroupsListComponent implements  OnDestroy, OnInit {
         this.modalService.open(content, {ariaLabelledBy: 'modal-basic-title'}).result.then(
           (resposta) => {
             if (this.addGroupsFrom.get('disponibles').value > 0) {
+            const quotaEnMg = (resposta.quota * this.factorUnitats).toFixed(0);
             console.log('Vol crear ' + resposta.quantitat + ' grups.');
-            console.log('Amb quota ' + resposta.quota + ' minuts. Que son ' + (resposta.quota * this.factorUnitats).toFixed(1) + 'Gb.');
+            console.log('Amb quota ' + resposta.quota + ' minuts. Que son ' + quotaEnMg + 'Mb.');
             this.dbService.addGrupsAssignatura(this.assignatura,
                                                resposta.quantitat,
                                                resposta.quota,
-                                               (resposta.quota * this.factorUnitats).toFixed(1) );
+                                               quotaEnMg,
+                                               'M' );
             } else {
               console.log('No es poden crear tants grups amb aquesta quota!!!!');
 
@@ -275,8 +277,6 @@ export class GroupsListComponent implements  OnDestroy, OnInit {
 
   }
 
-  /** TODO: Falta implementar modificar grup al backend */
-
   onEditGrup(grupId: number, nomGrup: string, quotaGrup: number) {
     const disponibles = this.assignatura.tamany - this.minutsConsumits;
 
@@ -289,13 +289,15 @@ export class GroupsListComponent implements  OnDestroy, OnInit {
     modalRef.result.then(
       (resposta) => {
 
-        const quotaGb = (resposta.quotaNova * this.factorUnitats).toFixed(1);
+        const quotaFisica = (resposta.quotaNova * this.factorUnitats).toFixed(0);
 
         this.dbService.modificarGrupAssignatura(this.assignatura.codi,
           resposta.grupId,
           resposta.nomAnterior,
           resposta.nomNou,
-          quotaGb);
+          resposta.quotaNova,
+          quotaFisica,
+          'M');
 
       },
       () => {

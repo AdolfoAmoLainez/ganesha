@@ -249,13 +249,14 @@ export class DataBaseService {
 
   /** GRUPS */
 
-  addGrupsAssignatura(assignatura: Assignatura, quantitat: number, quotaMin: string, quotaGb: string) {
+  addGrupsAssignatura(assignatura: Assignatura, quantitat: number, quotaMin: string, quotaFisica: string, unitatsQuota: string) {
     const obj = {
       username: this.authService.getUsername(),
       assignatura,
       quantitat,
       quotaMin,
-      quotaGb
+      quotaFisica,
+      unitatsQuota
     };
 
     return this.http.post<{problemes: number, grups: any}>(environment.selfApiUrl + 'add_grups', obj).subscribe(
@@ -285,7 +286,8 @@ export class DataBaseService {
     );
   }
 
-  modificarGrupAssignatura(nomAssignatura: string, grupId: number, nomAnterior: string, nomNou: string, novaQuota: string) {
+  modificarGrupAssignatura(nomAssignatura: string, grupId: number, nomAnterior: string,
+                           nomNou: string, quotaMinuts: string, quotaFisica: string, unitatsQuota: string) {
 
     const obj = {
       username: this.authService.getUsername(),
@@ -293,7 +295,9 @@ export class DataBaseService {
       grupId,
       nomAnterior,
       nomNou,
-      novaQuota
+      quotaMinuts,
+      quotaFisica,
+      unitatsQuota
     };
 
     return this.http.post<{message: string}>(environment.selfApiUrl + 'mod_grup', obj).subscribe(

@@ -144,7 +144,9 @@ exports.getAlumnesNames = (req, res) => {
  *  username: Usuari que fa la petició
  *  assignatura
  *  quantitat de grups
- *  quota en Gb
+ *  quotaMin
+ *  quotaFisica
+ *  unitatsQuota
  *
  * Response:
  * {
@@ -211,7 +213,8 @@ exports.addGrups = (req, res) => {
 
               shell.exec('ganesha-add-grups ' + req.body.assignatura.codi +
                          ' "' + nomGrups.join(' ') + '" ' +
-                         '"' + niusProfes.join(' ') + '"', {silent: true}, function(code, stdout, stderr){
+                         '"' + niusProfes.join(' ') + '" ' +
+                         req.body.quotaFisica + req.body.unitatsQuota, {silent: true}, function(code, stdout, stderr){
 
                 if (stdout) {
                   console.log("Stdout", stdout);
@@ -1234,7 +1237,9 @@ exports.testUserPginaValidation = (req, res) => {
  *    grupId,
  *    nomAnterior,
       nomNou,
-      novaQuota
+      quotaMinuts,
+      quotaFisica,
+      unitatsQuota
  *
  * Resposta:
  *  message:
@@ -1259,7 +1264,7 @@ exports.modifyGrup = (req, res) => {
   const { stdout, stderr, code } = shell.exec('ganesha-mod-grup ' + req.body.nomAssignatura + " " +
              req.body.nomAnterior + " " +
              req.body.nomNou + " " +
-             req.body.novaQuota + "G", {silent: true});
+             req.body.quotaFisica + req.body.unitatsQuota, {silent: true});
 
     if (stdout) {
         console.log("Stdout", stdout);
@@ -1269,7 +1274,7 @@ exports.modifyGrup = (req, res) => {
           dbconfig.connection.query( //Afegir assignatura
             "UPDATE `grups` SET " +
             "nom='"+req.body.nomNou+"', " +
-            "quota="+req.body.novaQuota +
+            "quota="+req.body.quotaMinuts +
             " WHERE id=" + req.body.grupId + ";",
             (errorinsert, result) =>{
 
