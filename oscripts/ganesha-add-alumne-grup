@@ -1,0 +1,88 @@
+#!/bin/bash
+#
+
+#  Nombre script: ganesha-add-alumne-grup
+# 
+#  Parámetros de entrada: 
+#    $1="usuario" 
+#    $2="asignatura"
+#    $3="grupo_asignatura" 
+#
+#  Salida en STDOUT (no STDERR): 
+#    {
+#    "codi":"<codi>", 
+#    "message":"<mensaje>", 
+#    "json": { "usuario":"<usuario>", "asignatura":"<asignatura>", "grupo_asignatura":"<grupo_asignatura>" }
+#
+#  Operaciones:
+#	1.- Asignar "usuario" al grupo "asignatura" local
+#	2.- Asignar "usuario" al grupo "grupo_asignatura" local  
+#	3.- Mostrar codigo de salida correcta o incorrecta según caso.
+#
+#  Codigos de error:
+#	505 - El directorio de la asignatura no existe
+#	506 - El directorio del grupo de la asignatura no existe
+#	507 - El grupo local de la asignatura no existe
+#	508 - El grupo local del grupo de la asignatura no existe
+#	509 - No se puede añadir el usuario al grupo local de la asignatura, motivo desconocido
+#	510 - No se puede añadir el usuario al grupo local del grupo de la asignatura, motivo desconocido
+#	599 - Faltan parametros
+
+source /usr/local/sbin/ganesha-config.sh
+usuario="$1"
+asignatura="$2"
+grupo_asignatura="$3"
+
+salida()
+{ 
+    echo "{" 
+    echo "\"codi\":$2," 
+    if [ "$2" -eq "200" ]; then
+       echo "\"message\":\"$1\","
+    else
+       codigo_error="codigo_$2"
+       echo "\"message\":\"${!codigo_error}\","
+    fi
+    echo "\"json\": {\"usuario\":\"$usuario\", \"asignatura\":\"$asignatura\", \"grupo_asignatura\":\"$grupo_asignatura\"} " ; 
+    echo "}"
+} 
+
+	error="0"
+
+	if [[ $usuario && $asignatura && $grupo_asignatura ]]; then
+
+# Control de errores fatales: Es para evitar acciones intermedias si las condiciones necesarias conocidas no són validas de antemano
+
+		if [ ! -d "$HOME_GANESHA/$asignatura" ]; then  salida "ERROR" "505"; exit ; fi
+		if [ ! -d "$HOME_GANESHA/$asignatura/$grupo_asignatura" ]; then  salida "ERROR" "506"; exit ; fi
+		if [ ! $(getent group "$asignatura") ]; then salida "ERROR" "507"; exit; fi
+		if [ ! $(getent group "$grupo_asignatura") ]; then salida "ERROR" "508"; exit; fi 
+
+# Fin control de errores fatales	
+
+		if [ -d "$HOME_GANESHA/$asignatura/" ]; then
+			if [ $(getent group "$asignatura") ]; then
+				  /usr/sbin/adduser $usuario $asignatura 2>/dev/null 1>/dev/null || error=509; 
+			else error=507;
+			fi
+
+	                if [ -d "$HOME_GANESHA/$asignatura/$grupo_asignatura" ] && [ "$error" -lt "500" ]; then
+                       	 if [ $(getent group "$grupo_asignatura") ]; then
+                                 /usr/sbin/adduser $usuario $grupo_asignatura 2>/dev/null 1>/dev/null || error=510;
+                         else error=508;
+                         fi
+                	else error=506;
+	                fi
+                else 
+			error=505;
+		fi 
+  	else
+		error=599
+	fi
+
+        if [ "$error" -gt "500" ]; then
+             salida "ERROR" "$error"
+          else
+             salida "Usuari afegit correctament!" "200"
+        fi
+

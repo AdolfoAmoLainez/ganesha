@@ -1,0 +1,83 @@
+#!/bin/bash
+#
+
+#  Nombre script: ganesha-del-grups
+# 
+#  Parámetros de entrada: 
+#    $1="Codi d’assignatura" 
+#    $2="Nom dels grups separats per espai" 
+#    $3="Forzar borrado(TRUE/Cualquier otro valor diferente de "TRUE" será falso)"
+#
+#  Salida en STDOUT (no STDERR): 
+#    [
+#    {
+#    "codi":<codi>, 
+#    "message":"<mensaje>", 
+#    "json": { "nomgrup":"<codi_assignatura_grup>" }
+#    },
+#    {
+#    "codi":<codi>,
+#    "message":"<mensaje>,
+#    "json": { "nomgrup":"<codi_assignatura_grup>" }, 
+#    },
+#    ...
+#    {
+#    "codi":<codi>,
+#    "message":"<mensaje>,
+#    "json": { "nomgrup":"<codi_assignatura_grup>" },
+#    }
+#    ]
+#
+#  Operaciones:
+#	1.- Borrar el directorio de grupo en la asignatura en la ruta definida por "ganesha-config.sh": "$HOME_GANESHA"/"$asignatura"
+#	2.- Borrar grupo local de asignatura_grupo
+#	3.- Mostrar codigo de salida correcta o incorrecta según caso.
+#
+#  Codigos de error:
+#       501 - El directorio no se puede borrar (1.- El directorio no existe. 2.- Permiso denegado. 3.- El directorio no está vacío).
+#       502 - El grupo no se borrar. (1.- El grupo no existe. 2.- Permiso denegado).
+#	510 - Faltan parámetros 
+
+source /usr/local/sbin/ganesha-config.sh
+asignatura="$1"
+grupos_asignatura="$2"
+forzar_borrado="$3"
+
+salida()
+{ 
+    echo "{" 
+    echo "\"codi\":$2," 
+    echo "\"message\":\"$1\"," 
+    echo "\"json\": {\"nomgrup\":\"$3\"}" ; 
+    echo "},"
+} 
+
+   echo "["
+
+   if [[ $asignatura && $grupos_asignatura ]]; then
+
+    for grupo in $grupos_asignatura
+      do
+	error="0" 
+	if [ "$forzar_borrado" = "TRUE" ]; then 
+		/bin/rm -rf $HOME_GANESHA"/$asignatura/$grupo" 2>/dev/null 1>/dev/null || error="501";
+	  else
+		/bin/rmdir $HOME_GANESHA"/$asignatura/$grupo" 2>/dev/null 1>/dev/null || error="501";	
+	 fi
+
+	if [ "$error" -lt "500" ]; then /usr/sbin/delgroup "$grupo" 2>/dev/null 1>/dev/null || error="502"; fi
+	
+	if [ "$error" -gt "500" ]; then
+	     txt_salida="$txt_salida$(salida "ERROR" "$error" "$grupo")"
+	  else 
+	     txt_salida="$txt_salida$(salida "OK" "200" "$grupo")"
+	  fi
+      done
+     else
+	error="510"
+	txt_salida=$(salida "ERROR" "$error")
+    fi
+
+    txt_salida=${txt_salida::-1}
+    echo "$txt_salida"
+    echo "]"

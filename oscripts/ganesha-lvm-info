@@ -1,0 +1,50 @@
+#!/bin/bash
+#
+
+#  Nombre script: ganesha-lvm-info
+# 
+#  Parámetros de entrada: 
+#    Ninguno 
+#
+#  Salida en STDOUT (no STDERR): 
+#    { 
+#    "codi":<codi>, 
+#    "message":"<mensaje>", 
+#    "json": [ { "volname":"<nombre montaje"}, { "espacio_total":"<espacio_total>"  }, { "espacio_usado":"<espacio_usado>"}, { "espacio_libre":"<espacio_libre>" } ] 
+#    }
+#
+#  Operaciones:
+#	1.- Comprobar el espacio en la ruta definida como $HOME_GANESHA en "ganesha-config.sh"
+#	2.- Mostrar los datos de espacio o el error
+#
+#  Codigos de error:
+#	501 - No se ha podido encontrar los datos de espacio (1.- El filesystem no existe. 2.- Permiso denegado). 
+#	510 - Faltan parámetros
+
+source /usr/local/sbin/ganesha-config.sh
+
+salida()
+{
+    echo "{"
+    echo "\"codi\":$2,"
+    echo "\"message\":\"$1\","
+    echo "\"json\": [ {\"volname\":\"$3\", \"espacio_total\":\"$4\", \"espacio_usado\":\"$5\", \"espacio_libre\":\"$6\"} ]" ;
+    echo "}"
+}
+
+export -f salida
+
+	error="0"
+
+	if [ $HOME_GANESHA ]; then
+		df -h "$HOME_GANESHA" 2>/dev/null 1>/dev/null || error="501"
+		df -h "$HOME_GANESHA" 2>/dev/null | grep "$HOME_GANESHA" | awk  ' { print $1" "$2" "$3" "$4 } ' |  xargs  bash -c 'salida "OK" "200" "$0" "$1" "$2" "$3"'  
+	else
+		error="510"
+	fi
+
+        if [ "$error" -gt "500" ]; then
+             salida "ERROR" "$error"
+        fi
+
+ 

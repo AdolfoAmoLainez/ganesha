@@ -1,0 +1,116 @@
+#!/bin/bash
+#
+
+#  Nombre script: ganesha-add-grups
+# 
+#  Parámetros de entrada: 
+#    $1="Codigo asignatura" 
+#    $2="Nom dels grups separats per espai" 
+#    $3="Nius dels professors separats per espai" 
+#
+#  Salida en STDOUT (no STDERR): 
+#    [
+#    {"codi":<codi>, 
+#    "message":"<mensaje>", 
+#    "json": { "nomgrup":"<codi_assignatura_grup>" }
+#     },
+#     {"codi":<codi>,
+#    "message":""<mensaje>",
+#    "json": { "nomgrup":"<codi_assignatura_grup>" }, 
+#     },
+#     ...
+#     {"codi":<codi>,
+#    "message":""<mensaje>",
+#    "json": { "nomgrup":"<codi_assignatura_grup>" },
+#     }
+#     ]
+#
+#  Operaciones:
+#	1.- Crear directorio de grupo en la asignatura en la ruta definida por "ganesha-config.sh": "$HOME_GANESHA"/"$asignatura"
+#	2.- Crear grupo local de asignatura_grupo
+#	3.- Asignar permisos directorio de asignatura_grupo
+#	4.- Asignar niu_profe a grupo local asignatura	
+#	5.- Asignar niu_profe a grupo local asignatura_grupo
+#	6.- Mostrar codigo de salida correcta o incorrecta según caso.
+#
+#  Codigos de error:
+#	505 - El directorio de la asignatura no existe
+#       507 - El grupo local de la asignatura no existe
+#	513 - El profesor no puede añadirse al grupo local de asignatura, motivo desconocido
+#	514 - El directorio del grupo de la asignatura no se puede crear, ya existe
+#	515 - El grupo local del grupo de la asignatura no se puede crear, ya existe
+#	516 - El profesor no puede añadirse al grupo local del grupo de la asignatura, motivo desconocido
+#	517 - El directorio del grupo de la asignatura no se puede crear, motivo desconocido
+#	518 - El grupo local del grupo de la asignatura no se puede crear, motivo desconocido
+#	519 - No se han podido cambiar los permisos del directorio del grupo de la asignatura, motivo desconocido
+#	599 - Faltan parámetros
+
+source /usr/local/sbin/ganesha-config.sh
+asignatura="$1"
+grupos_asignatura="$2"
+nius_profesores="$3"
+
+salida()
+{ 
+    echo "{" 
+    echo "\"codi\":$2," 
+    if [ "$2" -eq "200" ]; then
+       echo "\"message\":\"$1\","
+    else
+       codigo_error="codigo_$2"
+       echo "\"message\":\"${!codigo_error}\","
+    fi
+    echo "\"json\": { \"assignatura\":\"$asignatura\", \"nomgrup\":\"$3\" }" ; 
+    echo "},"
+} 
+
+    txt_salida=""
+
+#    if [[ $asignatura && $grupos_asignatura && $nius_profesores ]]; then
+    if [[ $asignatura && $grupos_asignatura ]]; then
+    
+	echo "["
+    
+        for grupo in $grupos_asignatura
+           do
+                error="0"
+
+# Control de errores fatales: Es para evitar acciones intermedias si las condiciones necesarias conocidas no són validas de antemano
+
+                if [ ! -d "$HOME_GANESHA/$asignatura" ]; then error=505; fi
+                if [ -d "$HOME_GANESHA/$asignatura/$grupo" ]; then error=514; fi
+                if [ ! $(getent group "$asignatura") ]; then error=507; fi
+                if [ $(getent group "$grupo") ]; then error=515; fi 
+
+# Fin control de errores fatales
+
+		if [ "$error" -lt "500" ]; then /bin/mkdir -m 2770  $HOME_GANESHA"/$asignatura/$grupo" 2>/dev/null 1>/dev/null || error=517; fi
+		if [ "$error" -lt "500" ]; then /usr/sbin/addgroup "$grupo" 2>/dev/null 1>/dev/null || error=518; fi
+		if [ "$error" -lt "500" ]; then /bin/chown root:"$grupo" $HOME_GANESHA"/$asignatura/$grupo"  2>/dev/null 1>/dev/null || error=519; fi
+
+		if  [ "$error" -lt "500" ]; then
+
+			for niu_profe in $nius_profesores
+			 do
+			   error=0
+			   /usr/sbin/adduser $niu_profe $asignatura 2>/dev/null 1>/dev/null || error=513
+			   if [ "$error" -lt "500" ]; then /usr/sbin/adduser $niu_profe $grupo 2>/dev/null 1>/dev/null || error=516; fi
+			 done
+		fi	
+
+     	  if [ "$error" -gt "500" ]; then
+	     txt_salida="$txt_salida$(salida "ERROR" "$error" "$grupo")" 
+	  else 
+	     txt_salida="$txt_salida$(salida "El grup de l'assignatura s'ha creat correctament." "200" "$grupo")"
+	  fi
+        done
+
+     else  
+                error="599"
+		txt_salida=$(salida "ERROR" "$error")
+     fi 
+
+        txt_salida=${txt_salida::-1}
+        echo "$txt_salida"
+        echo "]"
+

@@ -1,0 +1,61 @@
+#!/bin/bash
+#
+
+#  Nombre script: ganesha-add-profe-assignatura
+# 
+#  Parámetros de entrada: 
+#    $1="usuario" 
+#    $2="asignatura"
+#
+#  Salida en STDOUT (no STDERR): 
+#    {
+#    "codi":<codi>, 
+#    "message":"<mensaje>", 
+#    "json": [ "usuario":"<usuario>", "asignatura":"<asignatura>" ] 
+#    }
+#
+#  Operaciones:
+#	1.- Añadir "usuario" al grupo "asignatura" local
+#	2.- Mostrar codigo de salida correcta o incorrecta según caso.
+#
+#  Codigos de error:
+#	507 - El grupo local de la asignatura no existe 
+#       513 - El profesor no puede añadirse al grupo local de asignatura, motivo desconocido
+#	599 - Faltan parámetros
+
+source /usr/local/sbin/ganesha-config.sh
+usuario="$1"
+asignatura="$2"
+
+salida()
+{ 
+    echo "{" 
+    echo "\"codi\":$2,"
+    if [ "$2" -eq "200" ]; then 
+	    echo "\"message\":\"$1\","
+	else
+	    codigo_error="codigo_$2" 
+            echo "\"message\":\"${!codigo_error}\","
+    fi 
+    echo "\"json\": [ {\"usuario\":\"$usuario\"}, {\"asignatura\":\"$asignatura\"} ]" ; 
+    echo "}"
+} 
+
+	error=0
+	
+	if [[ $usuario && $asignatura ]]; then
+	    if [ $(getent group "$asignatura") ]; then
+		/usr/sbin/adduser $usuario $asignatura 2>/dev/null 1>/dev/null || error=513
+	    else
+	        error=507
+	    fi
+  	else
+		error=599
+	fi
+
+        if [ "$error" -gt "500" ]; then
+             salida "ERROR" "$error" 
+          else
+	      salida "Añadido el profesor a la asignatura" "200" 
+        fi
+

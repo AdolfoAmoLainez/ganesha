@@ -1,0 +1,91 @@
+#!/bin/bash
+#
+
+#  Nombre script: ganesha-del-assignatura
+# 
+#  Parámetros de entrada: 
+#   $1=asignatura 
+##   $2=quota
+#   $3=forzar_borrado
+#
+#  Salida en STDOUT (no STDERR): 
+#    { 
+#    "codi":<codi>, 
+#    "message":"<mensaje>", 
+#    "json": [ { "codi_assignatura":"<codi>" } ] 
+#    }
+#
+#  Operaciones:
+#	1.- Crear directorio de assignatura en la ruta definida en "ganesha-config.sh"
+#	2.- Crear grupo local de assignatura
+#	3.- Assignar permisos directorio de assignatura
+#	4.- Mostrar codigo de salida correcta o incorrecta según caso.
+#
+#  Codigos de error:
+#	501 - El directorio no se puede crear (1.- El directorio ya existe. 2.- Permiso denegado). 
+#	502 - El grupo no se puede crear. (1.- El grupo ya existe. 2.- Permiso denegado).
+#	503 - No se han podido cambiar los permisos. (1.- El directorio o grupo no existe. 2.- Permiso denegado)
+##	504 - No se ha podido asignar la quota
+#	505 - El directorio de la asignatura principal no existe
+#	510 - Faltan parámetros
+
+source /usr/local/sbin/ganesha-config.sh
+asignatura="$1"
+forzar_borrado="$2"
+
+salida()
+{ 
+    echo "{" 
+    echo "\"codi\":$2," 
+    echo "\"message\":\"$1\"," 
+    echo "\"json\": [ {\"codi_assignatura\":\"$asignatura\"} ]" ;
+    echo "}"
+} 
+
+	error="0"
+
+	if [ $asignatura ]; then
+
+          if [ -d "$HOME_GANESHA/$asignatura" ]; then      
+		 cd $HOME_GANESHA"/$asignatura"
+		      for directorio_grupo in $(find ./ -maxdepth 1 -mindepth 1 -type d -printf '%f\n') ; do
+
+		       error="0"
+
+		       if [ ! -d "$HOME_GANESHA/$asignatura/$grupo_asignatura" ]; then 
+				echo el directorio no exite
+				exit
+ 		       fi
+
+		       if [ "$forzar_borrado" = "TRUE" ]; then 
+				echo /bin/rm -rf $HOME_GANESHA"/$asignatura/$directorio_grupo" 2>/dev/null 1>/dev/null || error="501";
+		       else
+		                /bin/rmdir $HOME_GANESHA"/$asignatura/$directorio_grupo" 2>/dev/null 1>/dev/null || error="501";   
+		       fi
+	
+	               if [ "$error" -lt "500" ]; then setquota -g "$directorio_grupo" 0 0 0 0 $HOME_GANESHA"/" 2>/dev/null 1>/dev/null || error="504"; fi
+	
+		       if [ "$error" -lt "500" ]; then /usr/sbin/delgroup "$directorio_grupo" 2>/dev/null 1>/dev/null || error="502"; fi
+			
+		     done
+
+		if [ "$error" -lt "500" ]; then setquota -g "$asignatura" 0 0 0 0 $HOME_GANESHA"/" 2>/dev/null 1>/dev/null || error="504"; fi
+
+		if [ "$error" -lt "500" ]; then /bin/rmdir $HOME_GANESHA"/$asignatura" 2>/dev/null 1>/dev/null || error="501"; fi 
+		
+		if [ "$error" -lt "500" ]; then /usr/sbin/delgroup "$asignatura" 2>/dev/null 1>/dev/null || error="503"; fi
+ 
+	   else
+		error="505"
+
+	   fi
+	
+	else
+		error="510"
+        fi
+
+	 if [ "$error" -gt "500" ]; then
+             salida "ERROR" "$error" 
+          else
+ 	     salida "Assignatura esborrada correcta i completament." "200"
+	 fi
