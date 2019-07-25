@@ -174,10 +174,6 @@ export class AlumnesListComponent implements OnInit, OnDestroy {
     this.myLocation.back();
   }
 
-  /**
-   * TODO: Falta borrar ficheros del grupo si se borran todos los alumnos
-   */
-
   onDeleteAlumnes() {
     const modalRef = this.modalService.open(MymodalyesnoComponent);
     modalRef.componentInstance.titol = 'Esborrar Alumnes';
@@ -192,7 +188,6 @@ export class AlumnesListComponent implements OnInit, OnDestroy {
       modalRef.componentInstance.missatge = 'Vols esborrar els alumnes sel·leccionats?';
       esborrarDades = false;
     }
-    modalRef.componentInstance.missatge = 'Vols esborrar els alumnes sel·leccionats?';
 
     modalRef.result.then(
       (resposta) => {
