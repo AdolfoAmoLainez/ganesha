@@ -211,7 +211,7 @@ exports.addGrups = (req, res) => {
               console.log("Profes: " + niusProfes.join(' '));
               console.log("Creació de grups!");
 
-              shell.exec('ganesha-add-grups ' + req.body.assignatura.codi +
+              shell.exec('sudo /usr/local/sbin/ganesha-add-grups ' + req.body.assignatura.codi +
                          ' "' + nomGrups.join(' ') + '" ' +
                          '"' + niusProfes.join(' ') + '" ' +
                          req.body.quotaFisica + req.body.unitatsQuota, {silent: true}, function(code, stdout, stderr){
@@ -336,7 +336,7 @@ exports.deleteGrups = (req, res) => {
 
   });
 
-    const { stdout, stderr, code } = shell.exec('ganesha-del-grups ' + req.body.assigCodi + ' "' +
+    const { stdout, stderr, code } = shell.exec('sudo /usr/local/sbin/ganesha-del-grups ' + req.body.assigCodi + ' "' +
     nomGrups.join(' ') + '" TRUE', {silent: true});
 
       if (stdout) {
@@ -452,7 +452,7 @@ exports.addAlumneGrup = (req, res) => {
   checkUsernameExists(req.body.alumne.niu, (resposta) => {
     if (resposta === true) { //Niu existeix
 
-      const { stdout, stderr, code } = shell.exec('ganesha-add-alumne-grup ' + req.body.alumne.niu + ' ' +
+      const { stdout, stderr, code } = shell.exec('sudo /usr/local/sbin/ganesha-add-alumne-grup ' + req.body.alumne.niu + ' ' +
       req.body.assigCodi + ' ' + req.body.grupName, {silent: true});
 
       if (stdout) {
@@ -560,7 +560,7 @@ exports.deleteAlumnesGrup = (req, res) => {
 
   const esborrarDades = req.body.esborrarDades? 'TRUE':'FALSE';
 
-  const { stdout, stderr, code } = shell.exec('ganesha-del-alumnes-grup "' +
+  const { stdout, stderr, code } = shell.exec('sudo /usr/local/sbin/ganesha-del-alumnes-grup "' +
        alumnesNius.join(' ') + '" ' +
        req.body.assigCodi + ' ' +
        req.body.grupName + ' ' +
@@ -675,7 +675,7 @@ exports.deleteProfesAssignatura = (req, res) => {
     arrayProfes['n'+niu] = profe;
   });
 
-  const { stdout, stderr, code } = shell.exec('ganesha-del-profes-assignatura "' +
+  const { stdout, stderr, code } = shell.exec('sudo /usr/local/sbin/ganesha-del-profes-assignatura "' +
        profesNius.join(' ') + '" ' +
        req.body.assigCodi, {silent: true});
 
@@ -750,7 +750,7 @@ exports.getLvmInfo = (req, res) => {
 
   console.log("\nget LVM Info!");
 
-  shell.exec('ganesha-lvm-info ', {silent: true}, function(code, stdout, stderr){
+  shell.exec('sudo /usr/local/sbin/ganesha-lvm-info ', {silent: true}, function(code, stdout, stderr){
 
     if (stdout) {
 
@@ -798,9 +798,9 @@ exports.addProfeAssignatura = (req, res) => {
     resultat: ''
   };
 
-  checkUsernameExists(req.body.alumne.niu, (resposta) => {
+  checkUsernameExists(req.body.professor.niu, (resposta) => {
     if (resposta === true) { //Niu existeix
-      const { stdout, stderr, code } = shell.exec('ganesha-add-profe-assignatura ' + req.body.professor.niu + " " +
+      const { stdout, stderr, code } = shell.exec('sudo /usr/local/sbin/ganesha-add-profe-assignatura ' + req.body.professor.niu + " " +
       req.body.assignaturaCodi, {silent: true});
 
       if (stdout) {
@@ -868,7 +868,6 @@ exports.addProfeAssignatura = (req, res) => {
  *      ok => codi 200 => assignaturaId: Id de l'assignatura insertada
  *      error => 520 problema amb l'script / insertar en BBDD
  *               501 problema al afegir el assignatura des de l'script
- * TODO: Gestionar las unidades de quota desdel frontend K, M, G.... ?
  */
 
 exports.addAssignatura = (req, res) => {
@@ -885,8 +884,8 @@ exports.addAssignatura = (req, res) => {
   };
   const assignatura = req.body.assignatura;
 
-  const { stdout, stderr, code } = shell.exec('ganesha-add-assignatura ' + assignatura.codi + " " +
-             assignatura.tamanygb + "G", {silent: true});
+  const { stdout, stderr, code } = shell.exec('sudo /usr/local/sbin/ganesha-add-assignatura ' +
+            assignatura.codi, {silent: true});
 
     if (stdout) {
         console.log("Stdout", stdout);
@@ -951,7 +950,7 @@ exports.deleteAssignatura = (req, res) => {
   };
   const assignatura = req.body.assignatura;
 
-  const { stdout, stderr, code } = shell.exec('ganesha-del-assignatura ' + assignatura.codi + " " +
+  const { stdout, stderr, code } = shell.exec('sudo /usr/local/sbin/ganesha-del-assignatura ' + assignatura.codi + " " +
   assignatura.tamanygb + "G " + "TRUE", {silent: true});
 
   if (stdout) {
@@ -1261,7 +1260,7 @@ exports.modifyGrup = (req, res) => {
     resultat: ''
   };
 
-  const { stdout, stderr, code } = shell.exec('ganesha-mod-grup ' + req.body.nomAssignatura + " " +
+  const { stdout, stderr, code } = shell.exec('sudo /usr/local/sbin/ganesha-mod-grup ' + req.body.nomAssignatura + " " +
              req.body.nomAnterior + " " +
              req.body.nomNou + " " +
              req.body.quotaFisica + req.body.unitatsQuota, {silent: true});
