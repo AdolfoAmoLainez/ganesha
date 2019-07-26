@@ -19,23 +19,6 @@ import { AuthService } from '../auth/auth.service';
 
 @Injectable()
 export class DataBaseService {
-  assignatures = [
-    {
-      id: 1,
-      codi: '11223311',
-      nom: 'Assignatura 01'
-    },
-    {
-      id: 2,
-      codi: '11223322',
-      nom: 'Assignatura 02'
-    },
-    {
-      id: 3,
-      codi: '11223333',
-      nom: 'Assignatura 03'
-    }
-  ];
 
   assignaturaChanged = new Subject <Assignatura>();
   assignaturesUpdated = new Subject <Assignatura []>();
