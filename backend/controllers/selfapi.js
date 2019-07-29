@@ -957,31 +957,57 @@ exports.deleteAssignatura = (req, res) => {
     console.log("Stdout", stdout);
 
     const stdjson = JSON.parse(stdout);
-    if (stdjson.codi == 200) {
-      dbconfig.connection.query( //Afegir assignatura
-        "DELETE FROM `assignatures` WHERE id="+assignatura.id+";",
-        (errorinsert, result) =>{
 
-          if (!errorinsert){
-            res.status(200).json({message: stdjson.message, assignaturaId: result.insertId});
-            logEntry.resultat = 'success';
-            logEntry.resposta = 'Assignatura ' + assignatura.codi + ' esborrada correctament.';
-            console.log("Assignatura " + assignatura.codi + " esborrada correctament.");
-            insertaLog(logEntry);
-          } else {
-            res.status(520).json({message: "No s'ha pogut esborrar l'assignatura en la BBDD"});
-            logEntry.resultat = 'error';
-            logEntry.resposta = "No s'ha pogut esborrar l'assignatura " + assignatura.codi + " en la BBDD.";
-            console.log("ERROR: No s'ha pogut esborrar l'assignatura " + assignatura.codi + " en la BBDD.");
-            insertaLog(logEntry);
-          }
-        });
-    } else {
-      res.status(stdjson.codi).json({message: stdjson.message});
-      logEntry.resultat = 'error';
-      logEntry.resposta = stdjson.message;
-      console.log("ERROR: " + stdjson.message);
-      insertaLog(logEntry);
+    switch (stdjson.codi) {
+      case 200:
+          dbconfig.connection.query( //Esborrar assignatura BBDD
+            "DELETE FROM `assignatures` WHERE id="+assignatura.id+";",
+            (errorinsert, result) =>{
+
+              if (!errorinsert){
+                res.status(200).json({message: stdjson.message, assignaturaId: result.insertId});
+                logEntry.resultat = 'success';
+                logEntry.resposta = 'Assignatura ' + assignatura.codi + ' esborrada correctament.';
+                console.log("Assignatura " + assignatura.codi + " esborrada correctament.");
+                insertaLog(logEntry);
+              } else {
+                res.status(520).json({message: "No s'ha pogut esborrar l'assignatura en la BBDD"});
+                logEntry.resultat = 'error';
+                logEntry.resposta = "No s'ha pogut esborrar l'assignatura " + assignatura.codi + " en la BBDD.";
+                console.log("ERROR: No s'ha pogut esborrar l'assignatura " + assignatura.codi + " en la BBDD.");
+                insertaLog(logEntry);
+              }
+            });
+        break;
+      case 505:
+          dbconfig.connection.query( //Esborrar assignatura BBDD
+            "DELETE FROM `assignatures` WHERE id="+assignatura.id+";",
+            (errorinsert, result) =>{
+
+              if (!errorinsert){
+
+                logEntry.resultat = 'success';
+                logEntry.resposta = 'Assignatura ' + assignatura.codi + ' esborrada correctament '+
+                                    'tot i que la carpeta no existia!';
+                console.log("Assignatura " + assignatura.codi + " esborrada correctament.");
+                insertaLog(logEntry);
+                res.status(200).json({message: logEntry.resposta, assignaturaId: result.insertId});
+              } else {
+                res.status(520).json({message: "No s'ha pogut esborrar l'assignatura en la BBDD"});
+                logEntry.resultat = 'error';
+                logEntry.resposta = "No s'ha pogut esborrar l'assignatura " + assignatura.codi + " en la BBDD.";
+                console.log("ERROR: No s'ha pogut esborrar l'assignatura " + assignatura.codi + " en la BBDD.");
+                insertaLog(logEntry);
+              }
+            });
+        break;
+      default:
+          res.status(stdjson.codi).json({message: stdjson.message});
+          logEntry.resultat = 'error';
+          logEntry.resposta = stdjson.message;
+          console.log("ERROR: " + stdjson.message);
+          insertaLog(logEntry);
+          break;
     }
 
   } else {

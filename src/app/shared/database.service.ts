@@ -115,11 +115,16 @@ export class DataBaseService {
 
   deleteAssignatura(assignatura: Assignatura) {
 
+    const obj = {
+      username: this.authService.getUsername(),
+      assignatura
+    };
+
     const modalRef = this.modalService.open(MymodalwaitComponent, {backdrop: 'static', keyboard: false});
     modalRef.componentInstance.titol = 'Operació en procés';
     modalRef.componentInstance.missatge = 'Esperi mentre esborrem l\'assignatura. Aquesta acció pot trigar uns minuts....';
 
-    return this.http.post<{message: string}>(environment.selfApiUrl + 'delete_assignatura', assignatura).subscribe(
+    return this.http.post<{message: string}>(environment.selfApiUrl + 'delete_assignatura', obj).subscribe(
       (data) => {
         console.log(data);
         this.toastr.success(data.message);
