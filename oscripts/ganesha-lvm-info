@@ -18,8 +18,8 @@
 #	2.- Mostrar los datos de espacio o el error
 #
 #  Codigos de error:
-#	501 - No se ha podido encontrar los datos de espacio (1.- El filesystem no existe. 2.- Permiso denegado). 
-#	510 - Faltan parámetros
+#	528 - No se ha podido encontrar los datos de espacio del filesystem, motivo desconocido
+#	529 - No existe el directorio con el filesystem, o no está montado  
 
 source /usr/local/sbin/ganesha-config.sh
 
@@ -27,7 +27,12 @@ salida()
 {
     echo "{"
     echo "\"codi\":$2,"
-    echo "\"message\":\"$1\","
+    if [ "$2" -eq "200" ]; then
+       echo "\"message\":\"$1\","
+    else
+       codigo_error="codigo_$2"
+       echo "\"message\":\"${!codigo_error}\","
+    fi
     echo "\"json\": [ {\"volname\":\"$3\", \"espacio_total\":\"$4\", \"espacio_usado\":\"$5\", \"espacio_libre\":\"$6\"} ]" ;
     echo "}"
 }
@@ -36,11 +41,11 @@ export -f salida
 
 	error="0"
 
-	if [ $HOME_GANESHA ]; then
-		df -h "$HOME_GANESHA" 2>/dev/null 1>/dev/null || error="501"
-		df -h "$HOME_GANESHA" 2>/dev/null | grep "$HOME_GANESHA" | awk  ' { print $1" "$2" "$3" "$4 } ' |  xargs  bash -c 'salida "OK" "200" "$0" "$1" "$2" "$3"'  
+	if [ -d $HOME_GANESHA ]; then
+		df -h "$HOME_GANESHA" 2>/dev/null 1>/dev/null || error=528
+		if [ "$error" -lt "500" ]; then df -h "$HOME_GANESHA" 2>/dev/null | grep "$HOME_GANESHA" | awk  ' { print $1" "$2" "$3" "$4 } ' |  xargs  bash -c 'salida "OK" "200" "$0" "$1" "$2" "$3"'; fi
 	else
-		error="510"
+		error=529
 	fi
 
         if [ "$error" -gt "500" ]; then

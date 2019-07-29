@@ -7,6 +7,7 @@
 #    $1="Codigo asignatura" 
 #    $2="Nom dels grups separats per espai" 
 #    $3="Nius dels professors separats per espai" 
+#    $4="quota"
 #
 #  Salida en STDOUT (no STDERR): 
 #    [
@@ -43,12 +44,14 @@
 #	517 - El directorio del grupo de la asignatura no se puede crear, motivo desconocido
 #	518 - El grupo local del grupo de la asignatura no se puede crear, motivo desconocido
 #	519 - No se han podido cambiar los permisos del directorio del grupo de la asignatura, motivo desconocido
+#	526 - La quota del grupo de la asignatura no se puede cambiar, motivo desconocido
 #	599 - Faltan parámetros
 
 source /usr/local/sbin/ganesha-config.sh
 asignatura="$1"
 grupos_asignatura="$2"
 nius_profesores="$3"
+var_quota="$4"
 
 salida()
 { 
@@ -87,6 +90,7 @@ salida()
 		if [ "$error" -lt "500" ]; then /bin/mkdir -m 2770  $HOME_GANESHA"/$asignatura/$grupo" 2>/dev/null 1>/dev/null || error=517; fi
 		if [ "$error" -lt "500" ]; then /usr/sbin/addgroup "$grupo" 2>/dev/null 1>/dev/null || error=518; fi
 		if [ "$error" -lt "500" ]; then /bin/chown root:"$grupo" $HOME_GANESHA"/$asignatura/$grupo"  2>/dev/null 1>/dev/null || error=519; fi
+		if [ "$error" -lt "500" ]; then setquota -g "$grupo" "$var_quota" "$var_quota" 0 0 $HOME_GANESHA"/" || error=526; fi 
 
 		if  [ "$error" -lt "500" ]; then
 
