@@ -22,4 +22,5 @@ router.post('/get_perfil_usuari', SelfApiController.getPerfilUsuari);
 router.post('/get_assignatures_profe', SelfApiController.getAssignaturesProfessor);
 router.post('/test_user_pgina_validation', SelfApiController.testUserPginaValidation);
 router.post('/mod_grup', SelfApiController.modifyGrup);
+router.post('/get_logs', SelfApiController.getLogs);
 module.exports = router;

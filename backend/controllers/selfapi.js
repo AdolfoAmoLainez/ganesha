@@ -1336,3 +1336,97 @@ exports.modifyGrup = (req, res) => {
     }
 
 }
+
+/**
+ * Busquem logs
+ *
+ * Request:
+ *  {
+      data,
+      usuari,
+      accio,
+      resultat,
+      limit,
+      count
+    };
+ *
+ * Response:
+    Logs
+ */
+
+exports.getLogs = (req, res) => {
+  console.log("\nGet logs!");
+  console.log(req.body);
+
+  filterArray = [];
+
+  if (req.body.usuari != ''){
+    filterArray.push("usuari LIKE '" + req.body.usuari + "'");
+  }
+  if (req.body.accio != ''){
+    filterArray.push("accio LIKE '" + req.body.accio + "'");
+  }
+  if (req.body.resultat != ''){
+    filterArray.push("resultat LIKE '" + req.body.resultat + "'");
+  }
+
+  whereClause ='';
+
+  if (filterArray.length > 0) {
+    whereClause = ' AND '+ filterArray.join(' AND ');
+  }
+
+  dbconfig.connection.query( // Comptem el total de rows per la paginacio
+    "SELECT COUNT(id) as totalRows FROM `logs` WHERE DATE(timestamp) = '" + req.body.data + "'" + whereClause +";",
+      (errorSel, cuenta) => {
+      if (!errorSel){
+        dbconfig.connection.query(// Agafem els diferents usuaris
+          "SELECT distinct `usuari` FROM `logs` WHERE DATE(timestamp) = '" + req.body.data + "'" + whereClause + ";",
+            (errorSel, usuaris) => {
+            if (!errorSel){
+              console.log(usuaris);
+
+              dbconfig.connection.query(// Agafem els diferents accions
+                "SELECT distinct `accio` FROM `logs` WHERE DATE(timestamp) = '" + req.body.data + "'" + whereClause + ";",
+                  (errorSel, accions) => {
+                  if (!errorSel){
+                    dbconfig.connection.query(// Agafem els diferents resultats
+                      "SELECT distinct `resultat` FROM `logs` WHERE DATE(timestamp) = '" + req.body.data + "'" + whereClause + ";",
+                        (errorSel, resultats) => {
+                        if (!errorSel){
+                          dbconfig.connection.query(
+                            "SELECT * FROM `logs` WHERE DATE(timestamp) = '" + req.body.data + "'" + whereClause +
+                            " LIMIT " + req.body.count + "," + req.body.limit + ";",
+                              (errorSel, consulta) => {
+                              if (!errorSel){
+                                res.status(200).json({
+                                  totalRows: cuenta[0].totalRows,
+                                  logs: consulta,
+                                  usuaris,
+                                  accions,
+                                  resultats
+                                });
+                              } else {
+                                res.status(520).json({message: "No s'ha pogut consultar els Logs!"});
+                              }
+                            });
+                        } else {
+                          res.status(520).json({message: "No s'ha pogut consultar els Logs!"});
+                        }
+                      });
+                  } else {
+                    res.status(520).json({message: "No s'ha pogut consultar els Logs!"});
+                  }
+                });
+            } else {
+              res.status(520).json({message: "No s'ha pogut consultar els Logs!"});
+            }
+          });
+
+      } else {
+        res.status(520).json({message: "No s'ha pogut consultar els Logs!"});
+      }
+    });
+
+
+}

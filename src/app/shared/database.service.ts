@@ -16,6 +16,7 @@ import { ToastrService } from 'ngx-toastr';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { MymodalwaitComponent } from './mymodalwait/mymodalwait.component';
 import { AuthService } from '../auth/auth.service';
+import { Log } from './log.model';
 
 @Injectable()
 export class DataBaseService {
@@ -32,6 +33,12 @@ export class DataBaseService {
   usuarisUpdated = new Subject<Usuari[]>();
   usuarisChanged = new Subject();
   perfilsUpdated = new Subject<Perfil[]>();
+  logsUpdated = new Subject<{totalRows: number,
+                              logs: Log[],
+                              usuaris: [{usuari: string}],
+                              accions: [{accio: string}],
+                              resultats: [{resultat: string}]
+                            }>();
 
 
   constructor(private http: HttpClient,
@@ -522,6 +529,24 @@ export class DataBaseService {
     return this.http.post(environment.selfApiUrl + 'get_alumnes_names', obj).subscribe(
       (data: any[]) => {
         this.alumnesNamesUpdated.next(data);
+      }
+    );
+  }
+
+  getLogs(filterObj: any) {
+
+    return this.http.post<{totalRows: number,
+                           logs: Log[],
+                           usuaris: [{usuari: string}],
+                           accions: [{accio: string}],
+                           resultats: [{resultat: string}]
+                          }>
+    (environment.selfApiUrl + 'get_logs', filterObj).subscribe(
+      (respuesta) => {
+        this.logsUpdated.next(respuesta);
+      },
+      (err) => {
+        this.toastr.error(err.error.message);
       }
     );
   }

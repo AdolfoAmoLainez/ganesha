@@ -12,6 +12,7 @@ import { LoginComponent } from './auth/login/login.component';
 import { AdminviewComponent } from './adminview/adminview.component';
 import { ProfeviewComponent } from './profeview/profeview.component';
 import { AuthGuard } from './auth/auth.guard';
+import { LogsviewComponent } from './logs/logsview/logsview.component';
 
 const routes: Routes = [
   {path: '', redirectTo: '/login', pathMatch: 'full'},
@@ -32,6 +33,9 @@ const routes: Routes = [
     { path: 'addassignatura', component: AssignaturaInfoComponent, data: {perfil: 'adm'}},
     {
       path: 'usuaris', component: UsuarisListComponent
+    },
+    {
+      path: 'logs', component: LogsviewComponent
     }
   ]}
   // { path: 'path', component: FeatureComponent },

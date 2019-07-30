@@ -1,0 +1,198 @@
+<div class="row">
+  <form class="form-inline">
+    <div class="form-group">
+      <div class="input-group">
+        <input
+          class="form-control"
+          placeholder="yyyy-mm-dd"
+          name="dp"
+          [(ngModel)]="dataLog"
+          ngbDatepicker
+          #d="ngbDatepicker"
+          (dateSelect)="onDateSelected()"
+        />
+        <div class="input-group-append">
+          <button
+            class="btn btn-outline-secondary calendar"
+            (click)="d.toggle()"
+            type="button"
+          >
+            <fa-icon icon="calendar" style="cursor: pointer;"></fa-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="form-group ml-1">
+      <div class="input-group">
+        <select
+          class="custom-select form-control"
+          name="usuari"
+          id="usuari"
+          [(ngModel)]="usuari"
+          placeholder="usuari"
+          (change)="onFilterChange()"
+        >
+          <option selected>Usuari</option>
+          <option *ngFor="let usuario of usuarisArray" [value]="usuario">{{
+            usuario
+          }}</option>
+        </select>
+        <div class="input-group-append">
+          <button
+            class="btn btn-outline-secondary"
+            type="button"
+            (click)="onUsuariFilterClick()"
+          >
+            <fa-icon
+              [icon]="usuari == 'Usuari' ? 'search' : 'times'"
+              style="cursor: pointer;"
+            ></fa-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="form-group ml-1">
+      <div class="input-group">
+        <select
+          class="custom-select form-control"
+          name="accio"
+          id="accio"
+          [(ngModel)]="accio"
+          placeholder="accio"
+          (change)="onFilterChange()"
+        >
+          <option selected>Acció</option>
+          <option *ngFor="let accion of accionsArray" [value]="accion">{{
+            accion
+          }}</option>
+        </select>
+        <div class="input-group-append">
+          <button
+            class="btn btn-outline-secondary"
+            type="button"
+            (click)="onAccioFilterClick()"
+          >
+            <fa-icon
+              [icon]="accio == 'Acció' ? 'search' : 'times'"
+              style="cursor: pointer;"
+            ></fa-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="form-group ml-1">
+      <div class="input-group">
+        <select
+          class="custom-select form-control"
+          name="resultat"
+          id="resultat"
+          [(ngModel)]="resultat"
+          placeholder="resultat"
+          (change)="onFilterChange()"
+        >
+          <option selected>Resultat</option>
+          <option
+            *ngFor="let resultado of resultatsArray"
+            [value]="resultado"
+            >{{ resultado }}</option
+          >
+        </select>
+        <div class="input-group-append">
+          <button
+            class="btn btn-outline-secondary"
+            type="button"
+            (click)="onResultatFilterClick()"
+          >
+            <fa-icon
+              [icon]="resultat == 'Resultat' ? 'search' : 'times'"
+              style="cursor: pointer;"
+            ></fa-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
+<div class="row">
+  <div class="col-sm-12">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col" sortable="usuari">Usuari</th>
+          <th scope="col" sortable="accio">Acció</th>
+          <th scope="col" sortable="resultat">Resultat</th>
+          <th scope="col" sortable="timestamp">Timestamp</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr
+          *ngFor="let log of logs"
+          [class.table-success]="log.resultat === 'success'"
+          [class.table-danger]="log.resultat === 'error'"
+          (mouseenter)="onMouseEnter(log)"
+          (mouseout)="onMouseOut()"
+        >
+          <td>
+            <button
+              type="button"
+              class="btn btn-primary"
+              (click)="logModalView(viewLogModal, log.parametres, log.resposta)"
+            >
+              {{ log.id }}
+            </button>
+          </td>
+          <td>
+            {{ log.usuari }}
+          </td>
+          <td>{{ log.accio }}</td>
+          <td>{{ log.resultat }}</td>
+          <td>{{ log.timestamp | date: "short" }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+<div class="row">
+  <div class="col-sm-6">
+    <ngb-pagination
+      [collectionSize]="collectionSize"
+      [(page)]="page"
+      [pageSize]="pageSize"
+      [boundaryLinks]="true"
+      (pageChange)="pageChanged($event)"
+    >
+    </ngb-pagination>
+  </div>
+  <div class="col-sm-6">
+    <select class="custom-select" style="width: auto" [(ngModel)]="pageSize" (change)="onFilterChange()">
+      <option [ngValue]="5">5 items per page</option>
+      <option [ngValue]="10">10 items per page</option>
+      <option [ngValue]="15">15 items per page</option>
+      <option [ngValue]="20">20 items per page</option>
+    </select>
+  </div>
+</div>
+
+<ng-template #viewLogModal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Log View</h4>
+    <button
+      type="button"
+      class="close"
+      aria-label="Close"
+      (click)="modal.dismiss()"
+    >
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <pre>{{ selectedLogParams | json }}</pre>
+    <p>{{ selectedLogResposta }}</p>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-primary" (click)="modal.dismiss()">
+      Tancar
+    </button>
+  </div>
+</ng-template>
