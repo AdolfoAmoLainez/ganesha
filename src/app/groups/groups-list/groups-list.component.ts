@@ -129,6 +129,7 @@ export class GroupsListComponent implements  OnDestroy, OnInit {
           (respostaMinuts) => {
 
             this.minutsConsumits = respostaMinuts.consulta[0].consumits;
+            this.minutsDisponibles = this.assignatura.tamany - this.minutsConsumits;
 
           });
 
@@ -176,10 +177,10 @@ export class GroupsListComponent implements  OnDestroy, OnInit {
         this.minutsConsumits = respostaMinuts.consulta[0].consumits;
 
         this.addGroupsFrom = new FormGroup({
-            quantitat: new FormControl(1, [ Validators.required, Validators.pattern(/^-?([1-9]\d*)?$/)]),
-            quota: new FormControl(1, [ Validators.required, Validators.pattern(/^-?([1-9]\d*)?$/)]),
+            quantitat: new FormControl(1, [ Validators.required, Validators.pattern(/^([1-9]\d*)?$/)]),
+            quota: new FormControl(1, [ Validators.required, Validators.pattern(/^([1-9]\d*)?$/)]),
             disponibles: new FormControl(this.assignatura.tamany - this.minutsConsumits,
-                                         [ Validators.pattern(/^-?([0-9]\d*)?$/)])
+                                         [ Validators.pattern(/^([0-9]\d*)?$/)])
           }
         );
 
@@ -248,15 +249,38 @@ export class GroupsListComponent implements  OnDestroy, OnInit {
 
   onAddGroupFormChangeQuotaValues(valorInput: number) {
 
+    const totalMinuts = this.addGroupsFrom.get('quantitat').value * this.addGroupsFrom.get('quota').value;
     const minutsDisponibles = (this.assignatura.tamany - this.minutsConsumits) -
     (this.addGroupsFrom.get('quantitat').value * this.addGroupsFrom.get('quota').value);
-    if ( minutsDisponibles < 0) {
+
+    console.log("totalMinuts: " + totalMinuts);
+
+    if (totalMinuts < this.minutsDisponibles) {
+
+      if ( minutsDisponibles < 0) {
+        this.addGroupsFrom.patchValue({
+          quota: valorInput - 1
+        });
+      } else {
+        this.addGroupsFrom.patchValue({
+          disponibles: minutsDisponibles
+        });
+      }
+    }
+
+    if (totalMinuts === this.minutsDisponibles) {
       this.addGroupsFrom.patchValue({
-        quota: valorInput - 1
+        disponibles: 0
       });
-    } else {
+    }
+
+    if (totalMinuts > this.minutsDisponibles) {
+
+      const calQuota = Math.floor(this.minutsDisponibles / this.addGroupsFrom.get('quantitat').value);
+
       this.addGroupsFrom.patchValue({
-        disponibles: minutsDisponibles
+        quota: calQuota,
+        disponibles: 0
       });
     }
 
