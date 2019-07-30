@@ -58,7 +58,7 @@
               <label class="custom-control-label" [attr.for]="group.id"></label>
             </div>
           </div>
-          <h2 class="col-sm-7">
+          <h2 class="col-sm-8">
             <a *ngIf="perfil == 'professor'" [routerLink]="['/professor','alumnes', group.id]" class="btn btn-link">{{
               group.nom + " -> " + group.quota + "min."
             }}</a>
@@ -80,6 +80,7 @@
         <button
           class="btn btn-primary mt-2"
           (click)="onAfegirClick(afegirGrupsModal)"
+          [disabled]="assignatura.tamany - minutsConsumits <= 0"
         >
           Afegir Grups
         </button>

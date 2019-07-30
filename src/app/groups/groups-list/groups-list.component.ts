@@ -185,7 +185,7 @@ export class GroupsListComponent implements  OnDestroy, OnInit {
 
         this.modalService.open(content, {ariaLabelledBy: 'modal-basic-title'}).result.then(
           (resposta) => {
-            if (this.addGroupsFrom.get('disponibles').value > 0) {
+            if (this.addGroupsFrom.get('disponibles').value >= 0) {
             const quotaEnMg = (resposta.quota * this.factorUnitats).toFixed(0);
             console.log('Vol crear ' + resposta.quantitat + ' grups.');
             console.log('Amb quota ' + resposta.quota + ' minuts. Que son ' + quotaEnMg + 'Mb.');

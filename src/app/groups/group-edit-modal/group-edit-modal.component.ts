@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { FormControl, FormGroup } from '@angular/forms';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Grup } from 'src/app/shared/grup.model';
 import { Assignatura } from 'src/app/shared/assignatura.model';
 
@@ -24,17 +24,22 @@ export class GroupEditModalComponent implements OnInit {
   ngOnInit() {
     this.editForm = new FormGroup({
       nom: new FormControl(this.nomGrup),
-      quota: new FormControl(this.quota),
+      quota: new FormControl(this.quota, [Validators.required, Validators.pattern(/^-?([1-9]\d*)?$/)]),
       disponibles: new FormControl(this.minutsDisponibles)
     });
   }
 
   onEditGroupFormChangeQuotaValues(valorInput: number) {
 
+    console.log(valorInput);
+
     const minutsDisponibles = this.minutsDisponibles - this.editForm.get('quota').value;
+    console.log(minutsDisponibles);
+
+
     if ( minutsDisponibles < 0) {
       this.editForm.patchValue({
-        quota: valorInput - 1
+        quota: this.minutsDisponibles
       });
     } else {
       this.editForm.patchValue({
