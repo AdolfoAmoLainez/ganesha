@@ -34,14 +34,14 @@ export class UsuarisListComponent implements OnInit, OnDestroy {
             this.perfils = perfils;
             this.isLoading = false;
           }
-        )
+        );
       }
     );
 
     this.usuarisChangedSubs = this.dbService.usuarisChanged.subscribe(
       () => {
         this.dbService.getUsuaris();
-        this.isLoading = true;
+        this.isLoading = false;
       }
     );
 

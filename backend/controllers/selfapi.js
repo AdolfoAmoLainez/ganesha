@@ -1093,32 +1093,24 @@ exports.addUsuari = (req, res) => {
     resultat: ''
   };
 
-  checkUsernameExists(req.body.alumne.niu, (resposta) => {
-    if (resposta === true) { //Niu existeix
-      dbconfig.connection.query( //Afegir usuari
-        "INSERT INTO `usuaris` (`id`, `niu`, `perfil_id`) " +
-        "VALUES (NULL, 'Escriu Niu', '2');",
-        (errorinsert) =>{
-          if (!errorinsert){
-            res.status(200).json({message: 'Fet!'});
-            logEntry.resultat = 'success';
-            logEntry.resposta = 'Usuari afegit correctament';
-            insertaLog(logEntry);
-          } else {
-            res.status(520).json({message: "No s'ha pogut insertar l'usuari a la BBDD"});
-            logEntry.resultat = 'error';
-            logEntry.resposta = "No s'ha pogut insertar l'usuari a la BBDD";
-            insertaLog(logEntry);
-          }
+  dbconfig.connection.query( //Afegir usuari
+    "INSERT INTO `usuaris` (`id`, `niu`, `perfil_id`) " +
+    "VALUES (NULL, 'Escriu Niu', '2');",
+    (errorinsert) =>{
+      if (!errorinsert){
+        res.status(200).json({message: 'Fet!'});
+        logEntry.resultat = 'success';
+        logEntry.resposta = 'Usuari afegit correctament';
+        insertaLog(logEntry);
+      } else {
+        res.status(520).json({message: "No s'ha pogut insertar l'usuari a la BBDD"});
+        logEntry.resultat = 'error';
+        logEntry.resposta = "No s'ha pogut insertar l'usuari a la BBDD";
+        insertaLog(logEntry);
+      }
 
-        });
-    } else { // Niu no existeix
-      res.status(520).json({message: "No s'ha trobat l'usuari a l'LDAP"});
-      logEntry.resultat = 'error';
-      logEntry.resposta = "No s'ha trobat l'usuari a l'LDAP";
-      insertaLog(logEntry);
-    }
-  });
+    });
+
 }
 
 
