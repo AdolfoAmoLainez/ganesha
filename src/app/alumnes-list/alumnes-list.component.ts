@@ -205,6 +205,7 @@ export class AlumnesListComponent implements OnInit, OnDestroy {
 
   onSelectAllAlumnes(selectAllStatus: boolean) {
     if (selectAllStatus) {
+      this.selectedAlumnes = []; // Vaciamos para evitar duplicar entradas
       this.alumnes.forEach( element => {
           this.selectedAlumnes.push(element);
       });

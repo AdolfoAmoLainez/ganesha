@@ -174,6 +174,7 @@ export class ProfessorsListComponent implements OnInit, OnDestroy {
 
   onSelectAll(selectAllStatus: boolean) {
     if (selectAllStatus) {
+      this.selectedProfessors = []; // Vaciamos para evitar duplicar entradas
       this.professors.forEach( element => {
           this.selectedProfessors.push(element);
       });

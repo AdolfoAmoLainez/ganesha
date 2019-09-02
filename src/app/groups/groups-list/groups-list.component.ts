@@ -288,6 +288,7 @@ export class GroupsListComponent implements  OnDestroy, OnInit {
 
   onSelectAll(selectAllStatus: boolean) {
     if (selectAllStatus) {
+      this.selectedGroups = []; // Vaciamos para evitar duplicar entradas
       this.groups.forEach( element => {
         if (element.alumnes === 0) {
           this.selectedGroups.push(element);
