@@ -22,14 +22,13 @@
 #	3.- Mostrar codigo de salida correcta o incorrecta según caso.
 #
 #  Codigos de error:
-#	502 - El grupo "asignatura" no existe
-#	503 - No se ha podido vaciar el grupo
 #	505 - El directorio de la asignatura no existe
 #	506 - El directorio del grupo de la asignatura no existe
 #	507 - El grupo local de la asignatura no existe
 #	508 - El grupo local del grupo de la asignatura no existe
 #	520 - El alumno no puede borrarse del grupo local del grupo de la asignatura, motivo desconocido
 #	521 - El alumno no puede borrarse del grupo local de la asignatura, motivo desconocido
+#	537 - El directorio del grupo de la asingatura no puede vaciarse, motivo desconocido
 #	599 - Faltan parametros
 
 source /usr/local/sbin/ganesha-config.sh
@@ -87,7 +86,12 @@ salida()
 	  done
 	
 	 if [ "$vaciar_grupo" = "TRUE" ] && [ "$error" -lt "500" ]; then
-		if [ -d "$HOME_GANESHA/$asignatura/$grupo_asignatura" ]; then /bin/rm -rf "$HOME_GANESHA/$asignatura/$grupo_asignatura/"* || error="503"; fi
+		if [ -d "$HOME_GANESHA/$asignatura/$grupo_asignatura" ]; then
+		   /bin/rm -rf "$HOME_GANESHA/$asignatura/$grupo_asignatura/"* 2>/dev/null 1>/dev/null || error=537;
+		   if [ "$error" -gt "500" ]; then
+			 txt_salida="$txt_salida$(salida "ERROR" "$error" "$usuarios" "$asignatura" "$grupo_asignatura")"
+		   fi
+		fi
  	 fi
 
   	else

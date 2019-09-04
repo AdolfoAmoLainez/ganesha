@@ -5,8 +5,7 @@
 # 
 #  Parámetros de entrada: 
 #   $1=asignatura 
-##   $2=quota
-#   $3=forzar_borrado
+#   $2=forzar_borrado
 #
 #  Salida en STDOUT (no STDERR): 
 #    { 
@@ -22,12 +21,15 @@
 #	4.- Mostrar codigo de salida correcta o incorrecta según caso.
 #
 #  Codigos de error:
-#	501 - El directorio no se puede crear (1.- El directorio ya existe. 2.- Permiso denegado). 
-#	502 - El grupo no se puede crear. (1.- El grupo ya existe. 2.- Permiso denegado).
-#	503 - No se han podido cambiar los permisos. (1.- El directorio o grupo no existe. 2.- Permiso denegado)
-##	504 - No se ha podido asignar la quota
-#	505 - El directorio de la asignatura principal no existe
-#	510 - Faltan parámetros
+#	505 - El directorio de la asignatura no existe 
+#	507 - El grupo local de la asignatura no existe
+#	530 - Un directorio del grupo de la asignatura no puede borrarse, motivo desconocido
+#	531 - La quota de un grupo de la asignatura no puede borrarse, motivo desconocido
+#	532 - El grupo local de un grupo de la asignatura no puede borrarse, motivo desconocido
+#	533 - La quota de la asignatura no puede borrarse, motivo desconocido
+#	534 - El directorio de la asignatura no puede borrarse, motivo desconocido
+#	535 - El grupo local de la asignatura no puede borrarse, motivo desconocido
+#	599 - Faltan parámetros
 
 source /usr/local/sbin/ganesha-config.sh
 asignatura="$1"
@@ -37,7 +39,12 @@ salida()
 { 
     echo "{" 
     echo "\"codi\":$2," 
-    echo "\"message\":\"$1\"," 
+    if [ "$2" -eq "200" ]; then
+       echo "\"message\":\"$1\","
+    else
+       codigo_error="codigo_$2"
+       echo "\"message\":\"${!codigo_error}\","
+    fi
     echo "\"json\": [ {\"codi_assignatura\":\"$asignatura\"} ]" ;
     echo "}"
 } 
@@ -46,42 +53,45 @@ salida()
 
 	if [ $asignatura ]; then
 
+# Control de errores fatales: Es para evitar acciones intermedias si las condiciones necesarias conocidas no són válidas de antemano
+
+          if [ ! -d "$HOME_GANESHA/$asignatura" ]; then salida "ERROR" "505"; exit ; fi
+          if [ ! $(getent group "$asignatura") ]; then salida "ERROR" "507"; exit; fi
+
+# Fin control de errores fatales
+
+
           if [ -d "$HOME_GANESHA/$asignatura" ]; then      
 		 cd $HOME_GANESHA"/$asignatura"
 		      for directorio_grupo in $(find ./ -maxdepth 1 -mindepth 1 -type d -printf '%f\n') ; do
 
 		       error="0"
 
-		       if [ ! -d "$HOME_GANESHA/$asignatura/$grupo_asignatura" ]; then 
-				echo el directorio no exite
-				exit
- 		       fi
-
 		       if [ "$forzar_borrado" = "TRUE" ]; then 
-				echo /bin/rm -rf $HOME_GANESHA"/$asignatura/$directorio_grupo" 2>/dev/null 1>/dev/null || error="501";
+				echo /bin/rm -rf $HOME_GANESHA"/$asignatura/$directorio_grupo" 2>/dev/null 1>/dev/null || error=530;
 		       else
-		                /bin/rmdir $HOME_GANESHA"/$asignatura/$directorio_grupo" 2>/dev/null 1>/dev/null || error="501";   
+		                /bin/rmdir $HOME_GANESHA"/$asignatura/$directorio_grupo" 2>/dev/null 1>/dev/null || error=530;   
 		       fi
 	
-	               if [ "$error" -lt "500" ]; then setquota -g "$directorio_grupo" 0 0 0 0 $HOME_GANESHA"/" 2>/dev/null 1>/dev/null || error="504"; fi
+	               if [ "$error" -lt "500" ]; then setquota -g "$directorio_grupo" 0 0 0 0 $HOME_GANESHA"/" 2>/dev/null 1>/dev/null || error=531; fi
 	
-		       if [ "$error" -lt "500" ]; then /usr/sbin/delgroup "$directorio_grupo" 2>/dev/null 1>/dev/null || error="502"; fi
+		       if [ "$error" -lt "500" ]; then /usr/sbin/delgroup "$directorio_grupo" 2>/dev/null 1>/dev/null || error=532; fi
 			
 		     done
 
-		if [ "$error" -lt "500" ]; then setquota -g "$asignatura" 0 0 0 0 $HOME_GANESHA"/" 2>/dev/null 1>/dev/null || error="504"; fi
+		if [ "$error" -lt "500" ]; then setquota -g "$asignatura" 0 0 0 0 $HOME_GANESHA"/" 2>/dev/null 1>/dev/null || error=533; fi
 
-		if [ "$error" -lt "500" ]; then /bin/rmdir $HOME_GANESHA"/$asignatura" 2>/dev/null 1>/dev/null || error="501"; fi 
+		if [ "$error" -lt "500" ]; then /bin/rmdir $HOME_GANESHA"/$asignatura" 2>/dev/null 1>/dev/null || error=534; fi 
 		
-		if [ "$error" -lt "500" ]; then /usr/sbin/delgroup "$asignatura" 2>/dev/null 1>/dev/null || error="503"; fi
+		if [ "$error" -lt "500" ]; then /usr/sbin/delgroup "$asignatura" 2>/dev/null 1>/dev/null || error=535; fi
  
 	   else
-		error="505"
+		error=505
 
 	   fi
 	
 	else
-		error="510"
+		error=599
         fi
 
 	 if [ "$error" -gt "500" ]; then

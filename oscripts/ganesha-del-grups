@@ -34,9 +34,14 @@
 #	3.- Mostrar codigo de salida correcta o incorrecta según caso.
 #
 #  Codigos de error:
-#       501 - El directorio no se puede borrar (1.- El directorio no existe. 2.- Permiso denegado. 3.- El directorio no está vacío).
-#       502 - El grupo no se borrar. (1.- El grupo no existe. 2.- Permiso denegado).
-#	510 - Faltan parámetros 
+#       505 - El directorio de la asignatura no existe
+#       506 - El directorio del grupo de la asignatura no existe
+#       507 - El grupo local de la asignatura no existe
+#       508 - El grupo local del grupo de la asignatura no existe
+#       531 - La quota de un grupo de la asignatura no puede borrarse, motivo desconocido
+#       532 - El grupo local de un grupo de la asignatura no puede borrarse, motivo desconocido
+#	536 - El directorio del grupo de la asignatura no puede borrarse, motivo desconocido
+#       599 - Faltan parámetros
 
 source /usr/local/sbin/ganesha-config.sh
 asignatura="$1"
@@ -47,8 +52,13 @@ salida()
 { 
     echo "{" 
     echo "\"codi\":$2," 
-    echo "\"message\":\"$1\"," 
-    echo "\"json\": {\"nomgrup\":\"$3\"}" ; 
+    if [ "$2" -eq "200" ]; then
+       echo "\"message\":\"$1\","
+    else
+       codigo_error="codigo_$2"
+       echo "\"message\":\"${!codigo_error}\","
+    fi
+    echo "\"json\": {\"asignatura:\":\"$asignatura\",\"nomgrup\":\"$3\"}" ; 
     echo "},"
 } 
 
@@ -58,23 +68,37 @@ salida()
 
     for grupo in $grupos_asignatura
       do
-	error="0" 
-	if [ "$forzar_borrado" = "TRUE" ]; then 
-		/bin/rm -rf $HOME_GANESHA"/$asignatura/$grupo" 2>/dev/null 1>/dev/null || error="501";
-	  else
-		/bin/rmdir $HOME_GANESHA"/$asignatura/$grupo" 2>/dev/null 1>/dev/null || error="501";	
-	 fi
 
-	if [ "$error" -lt "500" ]; then /usr/sbin/delgroup "$grupo" 2>/dev/null 1>/dev/null || error="502"; fi
+       error=0
+
+# Control de errores fatales: Es para evitar acciones intermedias si las condiciones necesarias conocidas no són validas de antemano
+
+       if [ ! -d "$HOME_GANESHA/$asignatura" ]; then error=505; fi
+       if [ ! -d "$HOME_GANESHA/$asignatura/$grupo_asignatura" ]; then error=506; fi
+       if [ ! $(getent group "$asignatura") ]; then error=507; fi
+       if [ ! $(getent group "$grupo") ]; then error=508; fi
+
+# Fin control de errores fatales
+       
+       if [ "$error" -lt "500" ]; then
+	if [ "$forzar_borrado" = "TRUE" ]; then 
+		/bin/rm -rf $HOME_GANESHA"/$asignatura/$grupo" 2>/dev/null 1>/dev/null || error=536;
+	  else
+		/bin/rmdir $HOME_GANESHA"/$asignatura/$grupo" 2>/dev/null 1>/dev/null || error=536;	
+	fi
+	
+	if [ "$error" -lt "500" ]; then setquota -g "$grupo" 0 0 0 0 $HOME_GANESHA"/" 2>/dev/null 1>/dev/null || error=531; fi
+	if [ "$error" -lt "500" ]; then /usr/sbin/delgroup "$grupo" 2>/dev/null 1>/dev/null || error=532; fi
+       fi
 	
 	if [ "$error" -gt "500" ]; then
 	     txt_salida="$txt_salida$(salida "ERROR" "$error" "$grupo")"
 	  else 
 	     txt_salida="$txt_salida$(salida "OK" "200" "$grupo")"
-	  fi
+	fi
       done
      else
-	error="510"
+	error=599
 	txt_salida=$(salida "ERROR" "$error")
     fi
 
