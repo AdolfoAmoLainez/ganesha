@@ -5,3 +5,7 @@
     margin-right: auto;
   }
 }
+
+input.ng-invalid {
+  border: 2px solid red;
+}

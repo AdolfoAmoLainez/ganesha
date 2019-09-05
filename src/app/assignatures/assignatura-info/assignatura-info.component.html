@@ -13,14 +13,22 @@
         <div class="form-group row">
           <label for="codi" class="col-sm-3 col-form-label">Codi:</label>
           <div class="col-sm-9">
-            <input
-              type="text"
-              [readonly]="editMode"
-              [class.form-control-plaintext]="editMode"
-              id="codi"
-              name="codi"
-              formControlName="codi"
-            />
+            <div class="row">
+              <input
+                type="text"
+                class="form-control"
+                [readonly]="editMode"
+                [class.form-control-plaintext]="editMode"
+                id="codi"
+                name="codi"
+                formControlName="codi"
+              />
+            </div>
+            <div class="row">
+              <small id="passwordHelp" class="text-danger" *ngIf="assignaturaForm.get('codi').touched && !assignaturaForm.get('codi').valid">
+                Ha de començar per "a"
+              </small>
+            </div>
           </div>
         </div>
         <div class="form-group row">
