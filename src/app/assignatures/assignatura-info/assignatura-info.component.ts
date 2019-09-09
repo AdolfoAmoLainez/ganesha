@@ -17,7 +17,6 @@ export class AssignaturaInfoComponent implements OnInit, OnDestroy {
 
   perfil = 'adm';
   assignatura: Assignatura;
-  //unitatsDisponibles: Unitat[];
   assignaturaForm: FormGroup;
   assignaturaId;
   assignaturesUpdatedSubs: Subscription;
@@ -76,8 +75,7 @@ export class AssignaturaInfoComponent implements OnInit, OnDestroy {
             this.assignaturaId = paramMap.get('assignaturaid');
             this.dbService.getAssignatura(this.assignaturaId).subscribe(
               (assignatura: Assignatura) => {
-                //const assignatura = result.json[0];
-                // console.log(assignatura);
+
                 this.assignatura = assignatura;
                 this.assignaturaForm.patchValue({
                   id: assignatura.id,
@@ -85,10 +83,7 @@ export class AssignaturaInfoComponent implements OnInit, OnDestroy {
                   nom: assignatura.nom,
                   tamany: assignatura.tamany,
                   validapgina: assignatura.validapgina,
-                  //unitat_id: assignatura.unitat_id,
-                  //unitatstamany: assignatura.unitatstamany,
-                  // quota: assignatura.quota,
-                  // unitatsquota: assignatura.unitatsquota
+
                 });
               }
             );
@@ -125,14 +120,12 @@ export class AssignaturaInfoComponent implements OnInit, OnDestroy {
     this.assignaturaForm.patchValue({
       tamanygb: parseInt((this.assignaturaForm.get('tamany').value * this.factorUnitats).toFixed(0))
     });
-    //console.log(this.assignaturaForm.value);
+
     this.dbService.addAssignatura(this.assignaturaForm.value);
 
     this.assignaturaForm.reset();
   }
 
-  // TODO: Controlar si ha cambiado el tamaño porque hay que
-  // hacer cambios en el SO. Con el pristine y el touched
   onUpdateAssignatura() {
     this.dbService.updateAssignatura(this.assignaturaForm.value);
   }
