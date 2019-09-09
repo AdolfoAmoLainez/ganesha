@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormControl } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { AuthService } from '../auth.service';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-login',
@@ -14,7 +15,9 @@ export class LoginComponent implements OnInit {
   loginErrorSubscription: Subscription;
   errorMsg: string;
 
-  constructor(private authService: AuthService) { }
+  constructor(private authService: AuthService,
+              private activatedRoute: ActivatedRoute,
+              private router: Router) { }
 
   ngOnInit() {
     this.loginForm = new FormGroup({
@@ -26,10 +29,22 @@ export class LoginComponent implements OnInit {
         this.errorMsg = error;
       }
     );
+
+    this.activatedRoute.data.subscribe(
+      (data) => {
+        if (!data.ticket) {
+          this.authService.login();
+        } else {
+          this.router.navigate(['/', this.authService.getPerfil()]);
+        }
+      }
+    );
+
+    // this.authService.loginUser();
   }
 
-  onLogin() {
+/*   onLogin() {
     this.authService.login(this.loginForm.get('niu').value, this.loginForm.get('passwd').value);
   }
-
+ */
 }

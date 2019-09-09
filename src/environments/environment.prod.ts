@@ -1,8 +1,9 @@
 /* export const environment = {
   production: true,
-  selfApiUrl: 'http://localhost:3000/selfapi/',
-  apiCrudUrl: 'http://localhost:3000/api/crud/',
-  apiCustomUrl: 'http://localhost:3000/api/custom/'
+  selfApiUrl: 'http://chaman.uab.cat:3000/selfapi/',
+  loginApiUrl: 'http://chaman.uab.cat:3000/loginapi/',
+  apiCrudUrl: 'http://chaman.uab.cat:3000/api/crud/',
+  apiCustomUrl: 'http://chaman.uab.cat:3000/api/custom/'
 };
  */
 /* export const environment = {
