@@ -893,8 +893,9 @@ exports.addAssignatura = (req, res) => {
         const stdjson = JSON.parse(stdout);
         if (stdjson.codi == 200) {
           dbconfig.connection.query( //Afegir assignatura
-            "INSERT INTO `assignatures` (`id`, `codi`, `nom`, `unitat_id`, `tamany`, `unitatstamany`) " +
-            "VALUES (NULL, '"+assignatura.codi+"', '"+assignatura.nom+"','"+assignatura.unitat_id+"', '"+assignatura.tamany+"', '"+assignatura.unitatstamany+"');",
+            "INSERT INTO `assignatures` (`id`, `codi`, `nom`, `unitat_id`, `tamany`, `unitatstamany`, `validapgina`) " +
+            "VALUES (NULL, '"+assignatura.codi+"', '"+assignatura.nom+"','"+assignatura.unitat_id+
+             "', '"+assignatura.tamany+"', '"+assignatura.unitatstamany+"', '"+assignatura.validapgina+"');",
             (errorinsert, result) =>{
 
               if (!errorinsert){

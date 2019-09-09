@@ -156,6 +156,12 @@ export class DataBaseService {
     return this.http.post<{message: string, consulta: any}>(environment.selfApiUrl + 'get_minuts_consumits', peticio);
   }
 
+
+  /**
+   * TODO: Falta verificar què fem si canvia la quota!
+   * @param assignatura
+   */
+
   updateAssignatura(assignatura: Assignatura) {
     return this.http.put(environment.apiCrudUrl + 'assignatures/' + assignatura.id, assignatura).subscribe(
       (data: any) => {
