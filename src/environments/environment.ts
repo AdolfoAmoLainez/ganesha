@@ -15,6 +15,13 @@ export const environment = {
   apiCrudUrl: 'http://minisiva.ccomunicacio:3000/api/crud/',
   apiCustomUrl: 'http://minisiva.ccomunicacio:3000/api/custom/'
 };
+/* export const environment = {
+  production: false,
+  selfApiUrl: 'http://ganesha.uab.cat:3000/selfapi/',
+  loginApiUrl: 'http://ganesha.uab.cat:3000/loginapi/',
+  apiCrudUrl: 'http://ganesha.uab.cat:3000/api/crud/',
+  apiCustomUrl: 'http://ganesha.uab.cat:3000/api/custom/'
+}; */
 
 /*
  * For easier debugging in development mode, you can import the following file
