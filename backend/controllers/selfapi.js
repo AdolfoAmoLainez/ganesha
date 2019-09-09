@@ -1420,7 +1420,7 @@ exports.getLogs = (req, res) => {
         res.status(520).json({message: "No s'ha pogut consultar els Logs!"});
       }
     });
-
+}
 
 exports.getUserData = (username, callback) => {
   dbconfig.connection.query(
