@@ -884,6 +884,12 @@ exports.addAssignatura = (req, res) => {
   };
   const assignatura = req.body.assignatura;
 
+  if (assignatura.validapgina === true){
+    assignatura.validapgina = 1;
+  } else {
+    assignatura.validapgina = 0;
+  }
+
   const { stdout, stderr, code } = shell.exec('sudo /usr/local/sbin/ganesha-add-assignatura ' +
             assignatura.codi, {silent: true});
 
