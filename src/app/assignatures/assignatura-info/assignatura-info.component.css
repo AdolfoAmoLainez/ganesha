@@ -5,7 +5,6 @@
     margin-right: auto;
   }
 }
-
-input.ng-invalid {
+input.ng-invalid.ng-touched {
   border: 2px solid red;
 }

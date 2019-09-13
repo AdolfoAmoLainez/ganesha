@@ -1,0 +1,20 @@
+[Unit]
+Description=GaneshaServer
+After=syslog.target network.target
+
+[Service]
+WorkingDirectory=/home/ganesha/GaneshaServer
+Type=simple
+User=ganesha
+Group=ganesha
+ExecStart=/usr/bin/sudo /usr/local/bin/node /home/ganesha/GaneshaServer/server.js
+Restart=always
+# Restart service after 10 seconds if node service crashes
+RestartSec=10
+# Output to syslog
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=GaneshaServer
+
+[Install]
+WantedBy=multi-user.target

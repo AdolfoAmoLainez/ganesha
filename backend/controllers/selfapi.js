@@ -1,6 +1,6 @@
 var dbconfig = require('../mysqlconn');
 const shell = require('shelljs');
-/*var LDAP = require('ldap-client');
+var LDAP = require('ldap-client');
 
 var ldap = new LDAP({
     uri:             'ldap://montblanc.uab.es',   // string
@@ -12,7 +12,7 @@ var ldap = new LDAP({
     scope:           LDAP.SUBTREE,      // default scope for all future searches
 }, function(err) {
     // connected and ready
-});*/
+});
 
 /**
  *

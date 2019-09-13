@@ -15,15 +15,15 @@
 }; */
 export const environment = {
   production: true,
-  selfApiUrl: 'http://ganesha.uab.cat:3000/selfapi/',
-  loginApiUrl: 'http://ganesha.uab.cat:3000/loginapi/',
-  apiCrudUrl: 'http://ganesha.uab.cat:3000/api/crud/',
-  apiCustomUrl: 'http://ganesha.uab.cat:3000/api/custom/'
+  selfApiUrl: 'https://ganesha.uab.cat/selfapi/',
+  loginApiUrl: 'https://ganesha.uab.cat/loginapi/',
+  apiCrudUrl: 'https://ganesha.uab.cat/api/crud/',
+  apiCustomUrl: 'https://ganesha.uab.cat/api/custom/'
 };
 /* export const environment = {
   production: true,
-  selfApiUrl: 'https://minisiva.ccomunicacio/selfapi/',
-  loginApiUrl: 'https://minisiva.ccomunicacio/loginapi/',
-  apiCrudUrl: 'https://minisiva.ccomunicacio/api/crud/',
-  apiCustomUrl: 'https://minisiva.ccomunicacio/api/custom/'
+  selfApiUrl: 'http://chaman.uab.cat:3000/selfapi/',
+  loginApiUrl: 'http://chaman.uab.cat:3000/loginapi/',
+  apiCrudUrl: 'http://chaman.uab.cat:3000/api/crud/',
+  apiCustomUrl: 'http://chaman.uab.cat:3000/api/custom/'
 }; */

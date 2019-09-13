@@ -8,21 +8,20 @@
   apiCrudUrl: 'http://localhost:3000/api/crud/',
   apiCustomUrl: 'http://localhost:3000/api/custom/'
 }; */
-export const environment = {
+/* export const environment = {
   production: false,
   selfApiUrl: 'http://minisiva.ccomunicacio:3000/selfapi/',
   loginApiUrl: 'http://minisiva.ccomunicacio:3000/loginapi/',
   apiCrudUrl: 'http://minisiva.ccomunicacio:3000/api/crud/',
   apiCustomUrl: 'http://minisiva.ccomunicacio:3000/api/custom/'
-};
-/* export const environment = {
-  production: false,
-  selfApiUrl: 'http://ganesha.uab.cat:3000/selfapi/',
-  loginApiUrl: 'http://ganesha.uab.cat:3000/loginapi/',
-  apiCrudUrl: 'http://ganesha.uab.cat:3000/api/crud/',
-  apiCustomUrl: 'http://ganesha.uab.cat:3000/api/custom/'
 }; */
-
+export const environment = {
+  production: true,
+  selfApiUrl: 'https://ganesha.uab.cat/selfapi/',
+  loginApiUrl: 'https://ganesha.uab.cat/loginapi/',
+  apiCrudUrl: 'https://ganesha.uab.cat/api/crud/',
+  apiCustomUrl: 'https://ganesha.uab.cat/api/custom/'
+};
 /*
  * For easier debugging in development mode, you can import the following file
  * to ignore zone related error stack frames such as `zone.run`, `zoneDelegate.invokeTask`.

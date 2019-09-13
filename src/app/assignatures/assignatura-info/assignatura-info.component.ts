@@ -40,7 +40,7 @@ export class AssignaturaInfoComponent implements OnInit, OnDestroy {
     // El codi d'assignatura ha de començar per a i no pot tenir caracters especials
     this.assignaturaForm = new FormGroup({
       id: new FormControl(''),
-      codi: new FormControl('', [Validators.required, , Validators.pattern(/^(a.+[^?¿*!|'\^\(\){}@\"$%&\/\\`´])$/)]),
+      codi: new FormControl('', [Validators.required, , Validators.pattern(/^[a,m][^A-Z?¿*!|'\^\(\){}@\"$%&\/\\`´\[\]\+\:]+$/)]),
       nom: new FormControl('', [Validators.required]),
       tamany: new FormControl('', [Validators.required, Validators.min(1)]),
       tamanygb: new FormControl(0),
