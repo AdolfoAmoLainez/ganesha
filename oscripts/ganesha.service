@@ -7,7 +7,7 @@ WorkingDirectory=/home/ganesha/GaneshaServer
 Type=simple
 User=ganesha
 Group=ganesha
-ExecStart=/usr/bin/sudo /usr/local/bin/node /home/ganesha/GaneshaServer/server.js
+ExecStart=/usr/local/bin/node /home/ganesha/GaneshaServer/server.js
 Restart=always
 # Restart service after 10 seconds if node service crashes
 RestartSec=10

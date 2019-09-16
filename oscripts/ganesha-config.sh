@@ -6,7 +6,7 @@ HOME_GANESHA="/home/samba/assignatures"
 codigo_200="Todo correcto"
 
 codigo_501="El usuario no existe o no puede añadirse al grupo local"
-codigo_502="El grupo local no existe"
+codigo_502="El grupo local asignatura no se puede crear, motivo desconocido"
 codigo_503="El directorio de la asignatura no se puede crear, ya existe"
 codigo_504="No se han podido cambiar los permisos del directorio de la asignatura, motivo desconocido"
 codigo_505="El directorio de la asignatura no existe"
@@ -42,5 +42,7 @@ codigo_534="El directorio de la asignatura no puede borrarse, motivo desconocido
 codigo_535="El grupo local de la asignatura no puede borrarse, motivo desconocido"
 codigo_536="El directorio del grupo de la asignatura no puede borrarse, motivo desconocido"
 codigo_537="El directorio del grupo de la asingatura no puede vaciarse, motivo desconocido"
+codigo_538="El nombre de asignatura es demasiado largo, máximo 15 carácteres"
+codigo_539="El nombre de la asignatura contiene carácteres no válidos, solo se permiten letras en minúscula, números y -"
 
 codigo_599="Faltan parámetros"
