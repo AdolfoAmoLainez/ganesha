@@ -1,7 +1,7 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
-import { HttpClientModule} from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS} from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { AppComponent } from './app.component';
@@ -32,6 +32,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faBackspace, faEdit, faTimes, faPlus, faPowerOff, faBars, faCalendar, faSearch } from '@fortawesome/free-solid-svg-icons';
 import { LogsviewComponent } from './logs/logsview/logsview.component';
+import { ErrorInterceptor } from './shared/httperror.interceptor';
 
 @NgModule({
   declarations: [
@@ -71,7 +72,9 @@ import { LogsviewComponent } from './logs/logsview/logsview.component';
     NgbModule,
     FontAwesomeModule
   ],
-  providers: [DataBaseService, AuthService],
+  providers: [{ provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
+              DataBaseService,
+              AuthService],
   bootstrap: [AppComponent],
   entryComponents: [MymodalyesnoComponent, MymodalwaitComponent, GroupEditModalComponent]
 })
