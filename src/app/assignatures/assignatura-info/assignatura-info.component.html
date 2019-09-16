@@ -22,11 +22,18 @@
                 id="codi"
                 name="codi"
                 formControlName="codi"
+                maxlength="20"
               />
+              <!-- <button type="button" class="btn btn-primary" (click)="testform()">Test</button> -->
             </div>
             <div class="row">
-              <small id="passwordHelp" class="text-danger" *ngIf="assignaturaForm.get('codi').touched && !assignaturaForm.get('codi').valid">
+              <small id="passwordHelp" class="text-danger"
+              *ngIf="assignaturaForm.get('codi').touched && !assignaturaForm.get('codi').valid && assignaturaForm.get('codi').errors['pattern']">
                 Ha de començar per "a", "m". Sense caràcters especials ni majúscules.
+              </small>
+              <small id="passwordHelp" class="text-danger"
+              *ngIf="assignaturaForm.get('codi').touched && !assignaturaForm.get('codi').valid && assignaturaForm.get('codi').errors['maxlength']">
+                El codi no pot ser més gran de 20 caràcters
               </small>
             </div>
           </div>
