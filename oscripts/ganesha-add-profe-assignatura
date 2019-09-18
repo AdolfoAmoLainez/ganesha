@@ -21,6 +21,7 @@
 #  Codigos de error:
 #	507 - El grupo local de la asignatura no existe 
 #       513 - El profesor no puede añadirse al grupo local de asignatura, motivo desconocido
+#	516 - El profesor no puede añadirse al grupo local del grupo de la asignatura, motivo desconocido
 #	599 - Faltan parámetros
 
 source /usr/local/sbin/ganesha-config.sh
@@ -46,6 +47,14 @@ salida()
 	if [[ $usuario && $asignatura ]]; then
 	    if [ $(getent group "$asignatura") ]; then
 		/usr/sbin/adduser $usuario $asignatura 2>/dev/null 1>/dev/null || error=513
+
+                if [ "$error" -lt "500" ] && [ -d "$HOME_GANESHA/$asignatura" ]; then
+                   cd $HOME_GANESHA"/$asignatura"
+			for directorio_grupo in  $(find ./ -maxdepth 1 -mindepth 1 -type d -printf '%f\n') ; do
+			  /usr/sbin/adduser $usuario $directorio_grupo 2>/dev/null 1>/dev/null || error=516; 
+			done
+                fi
+
 	    else
 	        error=507
 	    fi

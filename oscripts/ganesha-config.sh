@@ -44,5 +44,6 @@ codigo_536="El directorio del grupo de la asignatura no puede borrarse, motivo d
 codigo_537="El directorio del grupo de la asingatura no puede vaciarse, motivo desconocido"
 codigo_538="El nombre de asignatura es demasiado largo, máximo 15 carácteres"
 codigo_539="El nombre de la asignatura contiene carácteres no válidos, solo se permiten letras en minúscula, números y -"
+codigo_540="El usuario se ha borrado del grupo de assignatura principal, pero no de todos los grupos de la asignatura"
 
 codigo_599="Faltan parámetros"
