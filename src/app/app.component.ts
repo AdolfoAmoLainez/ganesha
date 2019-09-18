@@ -7,32 +7,9 @@ import { AuthService } from './auth/auth.service';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent implements AfterViewInit {
+export class AppComponent {
   title = 'ganesha';
-  perfil = 'professor';
 
+  constructor() {}
 
-  constructor(private router: Router,
-              private authService: AuthService) {}
-
-  ngAfterViewInit(): void {
-
-/*     this.authService.getPerfil().subscribe(
-      (data) => {
-        this.perfil = data.perfils[0].perfil;
-      }
-    ) */
-    if (this.perfil === 'adm') {
-      //console.log('por aqui');
-
-      //this.router.navigate([{outlets: {primary: ['assignatura', 1], leftbar: ['adm']}}]);
-      //this.router.navigate( ['assignatura', 1]);
-    } else {
-
-      //this.router.navigate(['professor']);
-    }
   }
-
-
-
-}

@@ -22,7 +22,6 @@ export class AuthService {
   constructor(private router: Router,
               private http: HttpClient) {}
 
-  //login(username: string, passwd: string) {
   login() {
     this.http.get<{username: string , message: string, perfils: [{perfil: string, id: number}]}>
     (environment.loginApiUrl + 'getUserData').subscribe(
@@ -39,26 +38,6 @@ export class AuthService {
         window.location.href = environment.loginApiUrl + 'login';
       }
     );
-/*
-    this.validaUsuari(username, passwd).subscribe(
-      (data) => {
-        console.log(data);
-
-        if (data.status === 'success') {
-          this.isLogged = true;
-          this.username = username;
-          localStorage.setItem('currentUser', username);
-          this.userId = data.perfils[0].id;
-          this.router.navigate(['/' , data.perfils[0].perfil]);
-        } else {
-          this.loginError.next(data.message);
-        }
-      }
-    ); */
-
-/*     const obj = {
-      username
-    }; */
 
 
   }
@@ -97,13 +76,4 @@ export class AuthService {
     window.location.href = environment.loginApiUrl + 'logout';
   }
 
-/*   validaUsuari(username: string, passwd: string) {
-    const obj = {
-      username,
-      passwd
-    };
-
-    return this.http.post<{status: string , message: string, perfils: [{perfil: string, id: number}]}>
-      (environment.selfApiUrl + 'valida_usuari', obj);
-  } */
 }

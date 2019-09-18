@@ -108,13 +108,13 @@ export class DataBaseService {
     return this.http.post<{message: string, assignaturaId: number}>
       (environment.selfApiUrl + 'add_assignatura', obj).subscribe(
       (data) => {
-        console.log(data);
+
         this.toastr.success(data.message);
         this.getAssignatures();
         this.router.navigate(['/', 'adm', 'assignatura', data.assignaturaId, 'professors']);
       },
       (err) => {
-        console.log(err);
+
         this.toastr.error(err.error.message);
       }
     );
@@ -133,14 +133,14 @@ export class DataBaseService {
 
     return this.http.post<{message: string}>(environment.selfApiUrl + 'delete_assignatura', obj).subscribe(
       (data) => {
-        console.log(data);
+
         this.toastr.success(data.message);
         this.getAssignatures();
         this.router.navigate(['/', 'adm']);
         modalRef.dismiss();
       },
       (err) => {
-        console.log(err);
+
         this.toastr.error(err.error.message);
         this.getAssignatures();
         this.router.navigate(['/', 'adm']);
@@ -261,7 +261,7 @@ export class DataBaseService {
 
     return this.http.post<{problemes: number, grups: any}>(environment.selfApiUrl + 'add_grups', obj).subscribe(
       (response) => {
-        console.log(response);
+
         if (response.problemes === 0) {
           this.toastr.success(response.grups[0].message);
         } else {
@@ -277,7 +277,6 @@ export class DataBaseService {
           this.toastr.error(err.error.grups[0].message);
         } else {
           err.error.grups.forEach(grup => {
-            console.log(grup);
             this.toastr.error(grup.message + ' ' + grup.json.nomgrup);
           });
         }
@@ -302,7 +301,6 @@ export class DataBaseService {
 
     return this.http.post<{message: string}>(environment.selfApiUrl + 'mod_grup', obj).subscribe(
       (response) => {
-        console.log(response);
         this.toastr.success(response.message);
         this.grupsChanged.next();
       },
@@ -422,7 +420,6 @@ export class DataBaseService {
       grupName,
       assigCodi
     };
-    console.log(obj);
 
     return this.http.post<{message: string}>
       (environment.selfApiUrl + 'add_alumne_grup', obj).subscribe(

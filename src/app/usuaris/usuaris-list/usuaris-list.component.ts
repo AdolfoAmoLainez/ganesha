@@ -56,18 +56,15 @@ export class UsuarisListComponent implements OnInit, OnDestroy {
   }
 
   onGuardar(usuari: Usuari) {
-    console.log(usuari);
     this.dbService.modificarUsuari(usuari);
   }
 
   onEsborrar(usuari: Usuari) {
-    console.log(usuari);
     const modalRef = this.modalService.open(MymodalyesnoComponent);
     modalRef.componentInstance.titol = 'Esborrar Usuari';
     modalRef.componentInstance.missatge = 'Vols esborrar l\'usuari \'' + usuari.niu + '\'?';
     modalRef.result.then(
       (resposta) => {
-        console.log('Vol esborrar l\'usuari.');
         this.dbService.deleteUsuari(usuari.id);
         this.isLoading = true;
       },

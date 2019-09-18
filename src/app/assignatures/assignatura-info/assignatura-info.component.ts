@@ -136,7 +136,6 @@ export class AssignaturaInfoComponent implements OnInit, OnDestroy {
     modalRef.componentInstance.missatge = 'Vols esborrar l\'assignatura ' + this.assignatura.nom + '?';
     modalRef.result.then(
       (resposta) => {
-        console.log('Vol esborrar l\'assignatura');
         this.dbService.deleteAssignatura(this.assignatura);
       },
       () => {
@@ -155,9 +154,9 @@ export class AssignaturaInfoComponent implements OnInit, OnDestroy {
 
   }
 
-  testform() {
+/*   testform() {
     console.log(this.assignaturaForm);
 
-  }
+  } */
 
 }

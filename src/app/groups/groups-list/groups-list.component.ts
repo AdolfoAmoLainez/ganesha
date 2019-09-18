@@ -188,8 +188,7 @@ export class GroupsListComponent implements  OnDestroy, OnInit {
           (resposta) => {
             if (this.addGroupsFrom.get('disponibles').value >= 0) {
             const quotaEnMg = (resposta.quota * this.factorUnitats).toFixed(0);
-            console.log('Vol crear ' + resposta.quantitat + ' grups.');
-            console.log('Amb quota ' + resposta.quota + ' minuts. Que son ' + quotaEnMg + 'Mb.');
+
             this.dbService.addGrupsAssignatura(this.assignatura,
                                                resposta.quantitat,
                                                resposta.quota,
@@ -217,11 +216,10 @@ export class GroupsListComponent implements  OnDestroy, OnInit {
     modalRef.componentInstance.missatge = 'Vols esborrar el grup ' + grup.nom + '?';
     modalRef.result.then(
       (resposta) => {
-        console.log('Vol esborrar el grup!' + resposta);
         this.dbService.deleteGrupsAssignatura([grup], this.assignatura.codi);
       },
       () => {
-        // console.log('Cancelado');
+         console.log('Cancelado');
       }
     );
 
@@ -252,8 +250,6 @@ export class GroupsListComponent implements  OnDestroy, OnInit {
     const totalMinuts = this.addGroupsFrom.get('quantitat').value * this.addGroupsFrom.get('quota').value;
     const minutsDisponibles = (this.assignatura.tamany - this.minutsConsumits) -
     (this.addGroupsFrom.get('quantitat').value * this.addGroupsFrom.get('quota').value);
-
-    console.log("totalMinuts: " + totalMinuts);
 
     if (totalMinuts < this.minutsDisponibles) {
 
@@ -297,8 +293,6 @@ export class GroupsListComponent implements  OnDestroy, OnInit {
     } else {
       this.selectedGroups = [];
     }
-
-    // console.log(this.selectedGroups);
 
   }
 

@@ -97,9 +97,6 @@ export class LogsviewComponent implements OnInit, OnDestroy {
       count
     };
 
-    console.log(filterObj);
-
-
     return filterObj;
   }
 
@@ -109,23 +106,7 @@ export class LogsviewComponent implements OnInit, OnDestroy {
 
   }
 
-/*   onSort(event) {
-    console.log("Sort");
-
-  } */
-
-  onMouseEnter(log: Log) {
-    // console.log(log);
-
-  }
-
-  onMouseOut() {
-    // console.log('Dismiss!');
-
-  }
-
   onFilterChange() {
-    console.log("Filter Change!");
     this.dbService.getLogs(this.constructFilterObj());
   }
 

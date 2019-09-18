@@ -35,14 +35,10 @@ export class GroupEditModalComponent implements OnInit {
 
   onEditGroupFormChangeQuotaValues(valorInput: number) {
 
-    console.log(valorInput);
-
-
     if (this.editForm.get('quota').value < this.topeQuota) {
 
 
       let resta = this.editForm.get('quota').value - this.quota;
-      console.log("resta: " + resta);
 
       if (resta > 0) { // Augmenta quota
         const minutsDisponibles = this.minutsDisponibles - resta;

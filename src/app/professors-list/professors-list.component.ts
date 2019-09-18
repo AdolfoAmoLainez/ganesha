@@ -129,7 +129,7 @@ export class ProfessorsListComponent implements OnInit, OnDestroy {
   onAfegirClick(content) {
     this.modalService.open(content, {ariaLabelledBy: 'modal-basic-title'}).result.then(
       (niu) => {
-        console.log('Vol afegir el niu ' + niu + '.');
+
         let duplicat = null;
 
         duplicat = this.professors.find( profe => profe.niu === niu);
