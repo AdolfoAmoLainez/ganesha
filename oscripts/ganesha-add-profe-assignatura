@@ -2,16 +2,16 @@
 #
 
 #  Nombre script: ganesha-add-profe-assignatura
-# 
-#  Parámetros de entrada: 
-#    $1="usuario" 
+#
+#  Parámetros de entrada:
+#    $1="usuario"
 #    $2="asignatura"
 #
-#  Salida en STDOUT (no STDERR): 
+#  Salida en STDOUT (no STDERR):
 #    {
-#    "codi":<codi>, 
-#    "message":"<mensaje>", 
-#    "json": [ "usuario":"<usuario>", "asignatura":"<asignatura>" ] 
+#    "codi":<codi>,
+#    "message":"<mensaje>",
+#    "json": [ "usuario":"<usuario>", "asignatura":"<asignatura>" ]
 #    }
 #
 #  Operaciones:
@@ -19,8 +19,9 @@
 #	2.- Mostrar codigo de salida correcta o incorrecta según caso.
 #
 #  Codigos de error:
-#	507 - El grupo local de la asignatura no existe 
+#	507 - El grupo local de la asignatura no existe
 #       513 - El profesor no puede añadirse al grupo local de asignatura, motivo desconocido
+#	516 - El profesor no puede añadirse al grupo local del grupo de la asignatura, motivo desconocido
 #	599 - Faltan parámetros
 
 source /usr/local/sbin/ganesha-config.sh
@@ -28,24 +29,32 @@ usuario="$1"
 asignatura="$2"
 
 salida()
-{ 
-    echo "{" 
+{
+    echo "{"
     echo "\"codi\":$2,"
-    if [ "$2" -eq "200" ]; then 
+    if [ "$2" -eq "200" ]; then
 	    echo "\"message\":\"$1\","
 	else
-	    codigo_error="codigo_$2" 
+	    codigo_error="codigo_$2"
             echo "\"message\":\"${!codigo_error}\","
-    fi 
-    echo "\"json\": [ {\"usuario\":\"$usuario\"}, {\"asignatura\":\"$asignatura\"} ]" ; 
+    fi
+    echo "\"json\": [ {\"usuario\":\"$usuario\"}, {\"asignatura\":\"$asignatura\"} ]" ;
     echo "}"
-} 
+}
 
 	error=0
-	
+
 	if [[ $usuario && $asignatura ]]; then
 	    if [ $(getent group "$asignatura") ]; then
 		/usr/sbin/adduser $usuario $asignatura 2>/dev/null 1>/dev/null || error=513
+
+                if [ "$error" -lt "500" ] && [ -d "$HOME_GANESHA/$asignatura" ]; then
+                   cd $HOME_GANESHA"/$asignatura"
+			for directorio_grupo in  $(find ./ -maxdepth 1 -mindepth 1 -type d -printf '%f\n') ; do
+			  /usr/sbin/adduser $usuario $directorio_grupo 2>/dev/null 1>/dev/null || error=516;
+			done
+                fi
+
 	    else
 	        error=507
 	    fi
@@ -54,8 +63,8 @@ salida()
 	fi
 
         if [ "$error" -gt "500" ]; then
-             salida "ERROR" "$error" 
+             salida "ERROR" "$error"
           else
-	      salida "Añadido el profesor a la asignatura" "200" 
+	      salida "Añadido el profesor a la asignatura" "200"
         fi
 

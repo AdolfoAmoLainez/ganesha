@@ -2,15 +2,15 @@
 #
 
 #  Nombre script: ganesha-add-assignatura
-# 
-#  Parámetros de entrada: 
-#   $1=asignatura 
 #
-#  Salida en STDOUT (no STDERR): 
-#    { 
-#    "codi":<codi>, 
-#    "message":"<mensaje>", 
-#    "json": [ { "codi_assignatura":"<codi>" } ] 
+#  Parámetros de entrada:
+#   $1=asignatura
+#
+#  Salida en STDOUT (no STDERR):
+#    {
+#    "codi":<codi>,
+#    "message":"<mensaje>",
+#    "json": [ { "codi_assignatura":"<codi>" } ]
 #    }
 #
 #  Operaciones:
@@ -26,15 +26,17 @@
 #	504 - No se han podido cambiar los permisos del directorio de la asignatura, motivo desconocido
 #	511 - El directorio de la asignatura no se puede crear, motivo desconocido
 #	512 - El grupo local asignatura no se puede crear, ya existe
+#	538 - El nombre de asignatura es demasiado largo, máximo 15 carácteres
+#       539 - El nombre de la asignatura contiene carácteres no válidos, solo se permiten letras en minúscula, números y -
 #	599 - Faltan parámetros
 
 source /usr/local/sbin/ganesha-config.sh
 asignatura="$1"
 
 salida()
-{ 
-    echo "{" 
-    echo "\"codi\":$2," 
+{
+    echo "{"
+    echo "\"codi\":$2,"
     if [ "$2" -eq "200" ]; then
             echo "\"message\":\"$1\","
         else
@@ -43,7 +45,7 @@ salida()
     fi
     echo "\"json\": [ {\"codi_assignatura\":\"$asignatura\"} ]" ;
     echo "}"
-} 
+}
 
 	error="0"
 
@@ -51,7 +53,11 @@ salida()
 
 # Control de errores fatales: Es para evitar acciones intermedias si las condiciones necesarias conocidas no són válidas de antemano
 
-                if [ -d "$HOME_GANESHA/$asignatura" ]; then salida "ERROR" "503"; exit ; fi
+		if [ ${#asignatura} -ge 15 ]; then salida "ERROR" "538"; exit; fi
+		case "$asignatura" in
+			(*[![abcdefghijklmnopqstuvwxyz0123456789-]*) salida "ERROR" "539"; exit ;;
+		esac
+                if [ -d "$HOME_GANESHA/$asignatura" ]; then salida "ERROR" "503"; exit; fi
                 if [ $(getent group "$asignatura") ]; then salida "ERROR" "512"; exit; fi
 
 # Fin control de errores fatales
@@ -64,7 +70,7 @@ salida()
         fi
 
 	 if [ "$error" -gt "500" ]; then
-             salida "ERROR" "$error" 
+             salida "ERROR" "$error"
           else
  	     salida "Assignatura creada correctament." "200"
 	 fi
