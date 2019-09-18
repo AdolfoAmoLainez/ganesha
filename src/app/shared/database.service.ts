@@ -182,9 +182,8 @@ export class DataBaseService {
     return this.http.get<{result: string, json: Professor[], length: number}>
       (environment.apiCrudUrl + 'professors?assignatura_id[LIKE]=' + assignaturaId + '&_order[niu]=ASC').subscribe(
         (data) => {
-          console.log(data);
 
-          this.profesUpdated.next([...data.json]);
+          this.profesUpdated.next(data.json);
         }
       );
   }
@@ -363,7 +362,7 @@ export class DataBaseService {
     return this.http.post<{message: string, consulta: Grup[]}>
       (environment.selfApiUrl + 'get_grups_assignatura', obj).subscribe(
       (response) => {
-        this.grupsUpdated.next(...[response.consulta]);
+        this.grupsUpdated.next(response.consulta);
       },
       (err) => {
         this.toastr.error('No s\'ha pogut consultar els grups de l\'assignatura!');
@@ -411,7 +410,7 @@ export class DataBaseService {
     return this.http.get<{result: string, json: any, length: number}>
       (environment.apiCrudUrl + 'alumnes?grup_id[LIKE]=' + grupId + '&_order[niu]=ASC').subscribe(
       (data) => {
-        this.alumnesUpdated.next([...data.json]);
+        this.alumnesUpdated.next(data.json);
       }
     );
   }
@@ -514,6 +513,10 @@ export class DataBaseService {
     return this.http.put(environment.apiCrudUrl + 'usuaris/' + usuari.id, usuari).subscribe(
       (data: any) => {
         this.usuarisChanged.next();
+        this.toastr.success('Usuari guardat correctament');
+      },
+      (err) => {
+        this.toastr.error('Ha hagut un error al guardar l\'usuari');
       }
     );
   }
