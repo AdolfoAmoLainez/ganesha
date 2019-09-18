@@ -2,6 +2,9 @@ const path = require('path');
 const express = require('express');
 const bodyParser = require('body-parser');
 const selfApiRoutes = require("./rutes/selfapi");
+
+var mysqlrestapi  = require('./mysql-restapi');
+var dbconfig = require('./mysqlconn');
 // const assignaturesRoutes = require('./rutes/assignatures');
 
 const app = express();
@@ -20,6 +23,14 @@ app.use((req, res, next) => {
 
 // app.use('/api/crud/assignatures', assignaturesRoutes)
 
+
+var api = mysqlrestapi(app, dbconfig);
 app.use("/selfapi", selfApiRoutes);
+
+app.get('*',(req,res)=>{
+
+  res.sendFile(__dirname+'/public/index.html');
+
+});
 
 module.exports = app;

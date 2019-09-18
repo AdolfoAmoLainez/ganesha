@@ -1,7 +1,7 @@
 const app = require("./ganesha-back");
 const http = require("http");
-var mysqlrestapi  = require('./mysql-restapi');
-var dbconfig = require('./mysqlconn');
+/* var mysqlrestapi  = require('./mysql-restapi');
+var dbconfig = require('./mysqlconn'); */
 
 const normalizePort = val => {
   var port = parseInt(val, 10);
@@ -47,7 +47,7 @@ const onListening = () => {
 const port = normalizePort(process.env.PORT || "3000");
 app.set("port", port);
 
-var api = mysqlrestapi(app, dbconfig);
+/* var api = mysqlrestapi(app, dbconfig); */
 
 const server = http.createServer(app);
 server.on("error", onError);

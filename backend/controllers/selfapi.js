@@ -884,6 +884,12 @@ exports.addAssignatura = (req, res) => {
   };
   const assignatura = req.body.assignatura;
 
+  if (assignatura.validapgina === true){
+    assignatura.validapgina = 1;
+  } else {
+    assignatura.validapgina = 0;
+  }
+
   const { stdout, stderr, code } = shell.exec('sudo /usr/local/sbin/ganesha-add-assignatura ' +
             assignatura.codi, {silent: true});
 
@@ -1420,6 +1426,26 @@ exports.getLogs = (req, res) => {
         res.status(520).json({message: "No s'ha pogut consultar els Logs!"});
       }
     });
+}
 
+exports.getUserData = (username, callback) => {
+  dbconfig.connection.query(
+    "SELECT usuaris.id as id, perfils.perfil FROM `perfils` LEFT JOIN `usuaris` ON perfils.id = usuaris.perfil_id " +
+    "WHERE usuaris.niu='"+username+"';",
+    (errorSel, perfils) => {
+    if (!errorSel){
+      console.log(perfils);
+      if (perfils.length === 1) {
+       callback(200,perfils);
 
+      } else {
+        callback(401);
+      }
+
+    } else {
+      console.log(errorSel);
+
+      callback(500);
+    }
+  });
 }
