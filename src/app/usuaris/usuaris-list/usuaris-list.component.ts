@@ -5,6 +5,7 @@ import { MymodalyesnoComponent } from 'src/app/shared/mymodalyesno/mymodalyesno.
 import { DataBaseService } from 'src/app/shared/database.service';
 import { Subscription } from 'rxjs';
 import { Perfil } from 'src/app/shared/perfil.model';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-usuaris-list',
@@ -22,7 +23,8 @@ export class UsuarisListComponent implements OnInit, OnDestroy {
   perfilsUpdatedSubs: Subscription;
 
   constructor(private modalService: NgbModal,
-              private dbService: DataBaseService) { }
+              private dbService: DataBaseService,
+              private toastr: ToastrService) { }
 
   ngOnInit() {
     this.usuarisUpdatedSubs = this.dbService.usuarisUpdated.subscribe(
@@ -56,7 +58,14 @@ export class UsuarisListComponent implements OnInit, OnDestroy {
   }
 
   onGuardar(usuari: Usuari) {
-    this.dbService.modificarUsuari(usuari);
+    let duplicat = null;
+    duplicat = this.usuaris.find( user => user.niu === usuari.niu);
+
+    if (duplicat) {
+      this.toastr.error('Aquest niu ja està afegit!!');
+    } else {
+      this.dbService.modificarUsuari(usuari);
+    }
   }
 
   onEsborrar(usuari: Usuari) {
