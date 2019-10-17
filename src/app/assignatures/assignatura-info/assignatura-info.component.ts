@@ -3,7 +3,6 @@ import { ActivatedRoute, ParamMap } from '@angular/router';
 import { Assignatura } from 'src/app/shared/assignatura.model';
 import { DataBaseService } from 'src/app/shared/database.service';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
-import { Unitat } from 'src/app/shared/unitat.model';
 import { Subscription } from 'rxjs';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { MymodalyesnoComponent } from 'src/app/shared/mymodalyesno/mymodalyesno.component';
