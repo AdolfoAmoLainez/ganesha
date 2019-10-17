@@ -59,7 +59,13 @@ export class UsuarisListComponent implements OnInit, OnDestroy {
 
   onGuardar(usuari: Usuari) {
     let duplicat = null;
-    duplicat = this.usuaris.find( user => user.niu === usuari.niu);
+    duplicat = this.usuaris.find( user => {
+      if (user.id !== usuari.id && user.niu === usuari.niu) {
+        return true;
+      } else {
+        return false;
+      }
+    });
 
     if (duplicat) {
       this.toastr.error('Aquest niu ja està afegit!!');
