@@ -1,8 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { Grup } from 'src/app/shared/grup.model';
+import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { FormControl, FormGroup, Validators, AbstractControl, AsyncValidatorFn } from '@angular/forms';
 import { Assignatura } from 'src/app/shared/assignatura.model';
+import { MymodalyesnoComponent } from 'src/app/shared/mymodalyesno/mymodalyesno.component';
+import { DataBaseService } from 'src/app/shared/database.service';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-group-edit',
@@ -19,12 +22,17 @@ export class GroupEditModalComponent implements OnInit {
 
   editForm: FormGroup;
   topeQuota: number;
+  canEditName = false;
+  nomEditGrup = '';
 
-  constructor(public activeModal: NgbActiveModal) { }
+  constructor(public activeModal: NgbActiveModal,
+              private modalService: NgbModal,
+              private db: DataBaseService) { }
 
   ngOnInit() {
     this.editForm = new FormGroup({
-      nom: new FormControl(this.nomGrup),
+      nom: new FormControl(this.nomGrup, [Validators.required, Validators.pattern(/^[a-z][a-z0-9-]+$/), Validators.maxLength(15)],
+                                        [this.validateGrupName()]),
       quota: new FormControl(this.quota, [Validators.required, Validators.pattern(/^([1-9]\d*)?$/)]),
       disponibles: new FormControl(this.minutsDisponibles)
     });
@@ -42,7 +50,7 @@ export class GroupEditModalComponent implements OnInit {
 
 
       let resta = this.editForm.get('quota').value - this.quota;
-      console.log("resta: " + resta);
+      console.log('resta: ' + resta);
 
       if (resta > 0) { // Augmenta quota
         const minutsDisponibles = this.minutsDisponibles - resta;
@@ -81,4 +89,51 @@ export class GroupEditModalComponent implements OnInit {
     }
 
   }
+
+  lockName() {
+    this.canEditName = !this.canEditName;
+
+    if (this.canEditName) { // Mostramos mensaje
+      this.nomEditGrup = this.editForm.get('nom').value;
+      const modalRef = this.modalService.open(MymodalyesnoComponent);
+      modalRef.componentInstance.titol = 'Editar nom';
+      modalRef.componentInstance.missatge = 'Has d\'introduïr un nom que no existeixi al sistema a cap assignatura. ' +
+                                            'Vols continuar?';
+      modalRef.result.then(
+      (afirmatiu) => {
+        // No fem res perquè s'ha de quedar a true
+      },
+      () => {
+        this.canEditName = false;
+      }
+    );
+
+    } else {
+      this.editForm.get('nom').setValue(this.nomEditGrup);
+    }
+  }
+
+
+  validateGrupName(): AsyncValidatorFn {
+    return (control: AbstractControl): Observable<{ [key: string]: any } | null> => {
+      console.log(control);
+
+      return this.db.validarGroupNameNotTaken(control.value)
+        .pipe(
+          map(res => {
+            console.log(res);
+
+            // Comprovem si existeix i si és diferent de l'actual nom.
+            if (res.nomgrupexisteix && this.nomEditGrup !== this.editForm.get('nom').value) {
+              return {
+                groupNameExists: true
+              };
+            }
+
+          })
+        );
+    };
+
+  }
+
 }

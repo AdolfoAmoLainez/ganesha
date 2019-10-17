@@ -23,4 +23,5 @@ router.post('/get_assignatures_profe', SelfApiController.getAssignaturesProfesso
 router.post('/test_user_pgina_validation', SelfApiController.testUserPginaValidation);
 router.post('/mod_grup', SelfApiController.modifyGrup);
 router.post('/get_logs', SelfApiController.getLogs);
+router.post('/testnamenottaken', SelfApiController.testNomGrum);
 module.exports = router;

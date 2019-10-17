@@ -30,7 +30,7 @@ import { ProfeviewComponent } from './profeview/profeview.component';
 
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faBackspace, faEdit, faTimes, faPlus, faPowerOff, faBars, faCalendar, faSearch } from '@fortawesome/free-solid-svg-icons';
+import { faBackspace, faEdit, faTimes, faPlus, faPowerOff, faBars, faCalendar, faSearch, faLockOpen, faLock } from '@fortawesome/free-solid-svg-icons';
 import { LogsviewComponent } from './logs/logsview/logsview.component';
 
 @NgModule({
@@ -78,7 +78,7 @@ import { LogsviewComponent } from './logs/logsview/logsview.component';
 export class AppModule {
 
   constructor() {
-    library.add(faBackspace, faEdit, faTimes, faPlus, faPowerOff, faBars, faCalendar, faSearch);
+    library.add(faBackspace, faEdit, faTimes, faPlus, faPowerOff, faBars, faCalendar, faSearch, faLock, faLockOpen);
   }
 
  }

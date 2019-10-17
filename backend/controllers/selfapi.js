@@ -1449,3 +1449,29 @@ exports.getUserData = (username, callback) => {
     }
   });
 }
+
+/**
+ * Verifica si el nom del gru ja s'ha fet servir
+ *
+ * Request:
+ *  nomgrup
+ *
+ * Response:
+    nomgrupexisteix: true / false
+ */
+
+exports.testNomGrum = (req, res) => {
+  console.log("\ntestNomGrup!");
+  console.log(req.body);
+
+  nomgrup = req.body.nomgrup;
+
+  const { stdout, stderr, code } = shell.exec('getent group ' + nomgrup, {silent: true});
+
+  if (stdout){
+    res.status(200).json({nomgrupexisteix: true});
+  } else {
+    res.status(200).json({nomgrupexisteix: false});
+  }
+
+}

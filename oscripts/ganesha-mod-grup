@@ -2,23 +2,23 @@
 #
 
 #  Nombre script: ganesha-mod-grup
-# 
-#  Parámetros de entrada: 
+#
+#  Parámetros de entrada:
 #    $1="asignatura"
-#    $2="nombre_grupo_actual" 
-#    $3="nombre_grupo_nuevo" 
+#    $2="nombre_grupo_actual"
+#    $3="nombre_grupo_nuevo"
 #    $4="quota_nueva"
 #
-#  Salida en STDOUT (no STDERR): 
+#  Salida en STDOUT (no STDERR):
 #    {
-#    "codi":<codi>, 
-#    "message":"<mensaje>", 
+#    "codi":<codi>,
+#    "message":"<mensaje>",
 #    "json": { "assignatura":"<asignatura>", "nomgrup":"<nombre_grupo_actual>", "nou_nomgrup":"<nombre_grupo_nuevo>", nova_quota":"<quota_nueva>" }
 #    }
 #
 #  Operaciones:
 #	1.- Cambiar el nombre del directorio de grupo en la asignatura en la ruta definida por "ganesha-config.sh": "$HOME_GANESHA"/"$asignatura"
-#	2.- Cambiar el nombre de grupo en el fichero de grupos /etc/groups 
+#	2.- Cambiar el nombre de grupo en el fichero de grupos /etc/groups
 #	3.- Modificar quota
 #	4.- Mostrar codigo de salida correcta o incorrecta según caso.
 #
@@ -41,55 +41,54 @@ nombre_grupo_nuevo="$3"
 quota_nueva="$4"
 
 salida()
-{ 
-    echo "{" 
-    echo "\"codi\":$2," 
+{
+    echo "{"
+    echo "\"codi\":$2,"
    if [ "$2" -eq "200" ]; then
        echo "\"message\":\"$1\","
     else
        codigo_error="codigo_$2"
        echo "\"message\":\"${!codigo_error}\","
     fi
-    echo "\"json\": { \"assignatura\":\"$asignatura\", \"nomactual\":\"$nombre_grupo_actual\", \"nomnou\":\"$nombre_grupo_nuevo\", \"quota\":\"$quota_nueva\"} " ; 
+    echo "\"json\": { \"assignatura\":\"$asignatura\", \"nomactual\":\"$nombre_grupo_actual\", \"nomnou\":\"$nombre_grupo_nuevo\", \"quota\":\"$quota_nueva\"} " ;
     echo "}"
-} 
+}
 
 
-   if [[ $asignatura && $nombre_grupo_actual && $nombre_grupo_nuevo && $quota_nueva  ]]; then
+if [[ $asignatura && $nombre_grupo_actual && $nombre_grupo_nuevo && $quota_nueva  ]]; then
 
-	error="0" 
+	error="0"
 
 # Control de errores fatales: Es para evitar acciones intermedias si las condiciones necesarias conocidas no són validas de antemano
 
         if [ ! -d "$HOME_GANESHA/$asignatura" ]; then  salida "ERROR" "505"; exit ; fi
         if [ ! -d "$HOME_GANESHA/$asignatura/$nombre_grupo_actual" ]; then  salida "ERROR" "506"; exit ; fi
-	if [ "$nombre_grupo_actual" != "$nombre_grupo_nuevo" ] && [ -d "$HOME_GANESHA/$asignatura/$nombre_grupo_nuevo" ]; then  salida "ERROR" "522"; exit ; fi
+	      if [ "$nombre_grupo_actual" != "$nombre_grupo_nuevo" ] && [ -d "$HOME_GANESHA/$asignatura/$nombre_grupo_nuevo" ]; then  salida "ERROR" "522"; exit ; fi
         if [ ! $(getent group "$asignatura") ]; then salida "ERROR" "507"; exit; fi
         if [ ! $(getent group "$nombre_grupo_actual") ]; then salida "ERROR" "508"; exit; fi
-	if [ "$nombre_grupo_actual" != "$nombre_grupo_nuevo" ] && [ $(getent group "$nombre_grupo_nuevo") ]; then salida "ERROR" "523"; exit; fi
+	      if [ "$nombre_grupo_actual" != "$nombre_grupo_nuevo" ] && [ $(getent group "$nombre_grupo_nuevo") ]; then salida "ERROR" "523"; exit; fi
 
 # Fin control de errores fatales
 
-	
-	if [ "$nombre_grupo_actual" = "$nombre_grupo_nuevo" ]; then 
+	if [ "$nombre_grupo_actual" = "$nombre_grupo_nuevo" ]; then
 		 setquota -g "$nombre_grupo_actual" "$quota_nueva" "$quota_nueva" 0 0 $HOME_GANESHA"/" || error=526
 	else
-	      if [ -d "$HOME_GANESHA/$asignatura/$nombre_grupo_actual" ] && [ $(getent group "$nombre_grupo_actual") ] &&  [ ! -d "$HOME_GANESHA/$asignatura/$nombre_grupo_nuevo" ] && [ $(getent group "$nombre_grupo_nuevo") ]; then
-		 groupmod "$nombre_grupo_actual" -n "$nombre_grupo_nuevo" || error=524
-		 if [ "$error" -lt "500" ]; then mv "$HOME_GANESHA/$asignatura/$nombre_grupo_actual" "$HOME_GANESHA/$asignatura/$nombre_grupo_nuevo" || error=525; fi 
-		 if [ "$error" -lt "500" ]; then setquota -g "$nombre_grupo_nuevo" "$quota_nueva" "$quota_nueva" 0 0 $HOME_GANESHA"/" || error=526; fi	
-	      else
+	  if [ -d "$HOME_GANESHA/$asignatura/$nombre_grupo_actual" ] && [ $(getent group "$nombre_grupo_actual") ] &&  [ ! -d "$HOME_GANESHA/$asignatura/$nombre_grupo_nuevo" ] && [ $(getent group "$nombre_grupo_nuevo") ]; then
+		  groupmod "$nombre_grupo_actual" -n "$nombre_grupo_nuevo" || error=524
+		  if [ "$error" -lt "500" ]; then mv "$HOME_GANESHA/$asignatura/$nombre_grupo_actual" "$HOME_GANESHA/$asignatura/$nombre_grupo_nuevo" || error=525; fi
+		  if [ "$error" -lt "500" ]; then setquota -g "$nombre_grupo_nuevo" "$quota_nueva" "$quota_nueva" 0 0 $HOME_GANESHA"/" || error=526; fi
+	  else
 		 error=527
-	      fi
+	  fi
 	fi
 
 	if [ "$error" -gt "500" ]; then
-	     salida "ERROR" "$error" 
-	else 
-	     salida "OK" "200" 
+	     salida "ERROR" "$error"
+	else
+	     salida "OK" "200"
 	fi
-    else
+else
 	error="599"
-	salida "Faltan parámetros" "$error"  
-    fi
-    
+	salida "Faltan parámetros" "$error"
+fi
+
