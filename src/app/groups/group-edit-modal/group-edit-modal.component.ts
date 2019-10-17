@@ -31,7 +31,7 @@ export class GroupEditModalComponent implements OnInit {
 
   ngOnInit() {
     this.editForm = new FormGroup({
-      nom: new FormControl(this.nomGrup, [Validators.required, Validators.pattern(/^[a-z][a-z0-9-]+$/), Validators.maxLength(15)],
+      nom: new FormControl(this.nomGrup, [Validators.required, Validators.pattern(/^[a-z][a-z0-9-]+$/), Validators.maxLength(25)],
                                         [this.validateGrupName()]),
       quota: new FormControl(this.quota, [Validators.required, Validators.pattern(/^([1-9]\d*)?$/)]),
       disponibles: new FormControl(this.minutsDisponibles)
