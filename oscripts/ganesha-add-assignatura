@@ -55,7 +55,7 @@ salida()
 
 		if [ ${#asignatura} -ge 15 ]; then salida "ERROR" "538"; exit; fi
 		case "$asignatura" in
-			(*[![abcdefghijklmnopqstuvwxyz0123456789-]*) salida "ERROR" "539"; exit ;;
+			(*[![abcdefghijklmnopqrstuvwxyz0123456789-]*) salida "ERROR" "539"; exit ;;
 		esac
                 if [ -d "$HOME_GANESHA/$asignatura" ]; then salida "ERROR" "503"; exit; fi
                 if [ $(getent group "$asignatura") ]; then salida "ERROR" "512"; exit; fi
