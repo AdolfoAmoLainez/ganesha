@@ -556,4 +556,16 @@ export class DataBaseService {
       }
     );
   }
+
+
+  validarGroupNameNotTaken(nomgrup: string) {
+
+    const obj = {
+      nomgrup
+    };
+
+    return this.http.post<{nomgrupexisteix: boolean}>(environment.selfApiUrl + 'testnamenottaken', obj);
+
+  }
+
 }
