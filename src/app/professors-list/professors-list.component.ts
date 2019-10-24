@@ -9,6 +9,7 @@ import { Professor } from '../shared/professor.model';
 import { Subscription } from 'rxjs';
 import { Assignatura } from '../shared/assignatura.model';
 import { ToastrService } from 'ngx-toastr';
+import { FormGroup, FormControl, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-professors-list',
@@ -26,6 +27,8 @@ export class ProfessorsListComponent implements OnInit, OnDestroy {
 
   assignaturaId: string;
   assignatura: Assignatura;
+
+  newProfeForm: FormGroup;
 
   perfil = 'adm';
   paramsSubs: Subscription;
@@ -83,6 +86,10 @@ export class ProfessorsListComponent implements OnInit, OnDestroy {
       }
     );
 
+    this.newProfeForm = new FormGroup({
+      niu: new FormControl(null, [Validators.pattern(/^\S*$/)])
+    });
+
   }
   ngOnDestroy() {
     this.paramsSubs.unsubscribe();
@@ -127,6 +134,8 @@ export class ProfessorsListComponent implements OnInit, OnDestroy {
   }
 
   onAfegirClick(content) {
+    this.newProfeForm.reset();
+
     this.modalService.open(content, {ariaLabelledBy: 'modal-basic-title'}).result.then(
       (niu) => {
 
