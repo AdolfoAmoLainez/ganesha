@@ -26,8 +26,8 @@ export class GroupEditModalComponent implements OnInit {
   nomEditGrup = '';
 
   constructor(public activeModal: NgbActiveModal,
-    private modalService: NgbModal,
-    private db: DataBaseService) { }
+              private modalService: NgbModal,
+              private db: DataBaseService) { }
 
   ngOnInit() {
     this.editForm = new FormGroup({
@@ -38,6 +38,7 @@ export class GroupEditModalComponent implements OnInit {
     });
 
     this.topeQuota = this.quota + this.minutsDisponibles;
+    this.nomEditGrup = this.nomGrup;
 
   }
 
@@ -47,6 +48,7 @@ export class GroupEditModalComponent implements OnInit {
 
 
       let resta = this.editForm.get('quota').value - this.quota;
+      console.log('resta: ' + resta);
 
       if (resta > 0) { // Augmenta quota
         const minutsDisponibles = this.minutsDisponibles - resta;
@@ -108,7 +110,6 @@ export class GroupEditModalComponent implements OnInit {
       this.editForm.get('nom').setValue(this.nomEditGrup);
     }
   }
-
 
 
   validateGrupName(): AsyncValidatorFn {
