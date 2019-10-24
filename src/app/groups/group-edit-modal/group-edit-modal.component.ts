@@ -39,6 +39,8 @@ export class GroupEditModalComponent implements OnInit {
 
     this.topeQuota = this.quota + this.minutsDisponibles;
 
+    this.nomEditGrup = this.nomGrup;
+
   }
 
   onEditGroupFormChangeQuotaValues(valorInput: number) {
