@@ -9,6 +9,7 @@ import { DataBaseService } from '../shared/database.service';
 import { Alumne } from '../shared/alumne.model';
 import { Grup } from '../shared/grup.model';
 import { ToastrService } from 'ngx-toastr';
+import { FormGroup, FormControl, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-alumnes-list',
@@ -22,6 +23,8 @@ export class AlumnesListComponent implements OnInit, OnDestroy {
 
   selectedAlumnes = [];
   selectAllAlumnes = false;
+
+  newAlumneForm: FormGroup;
 
   isLoading = true;
 
@@ -92,6 +95,10 @@ export class AlumnesListComponent implements OnInit, OnDestroy {
           }
         });
     }
+
+    this.newAlumneForm = new FormGroup({
+      niu: new FormControl(null, [Validators.pattern(/^\S*$/)])
+    });
   }
 
   loadAlumnes() {
@@ -147,6 +154,9 @@ export class AlumnesListComponent implements OnInit, OnDestroy {
   }
 
   onAfegirClick(content) {
+
+    this.newAlumneForm.reset();
+
     this.modalService.open(content, {ariaLabelledBy: 'modal-basic-title'}).result.then(
       (niu) => {
         let duplicat = null;

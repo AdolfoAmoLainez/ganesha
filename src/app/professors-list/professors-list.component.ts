@@ -134,6 +134,8 @@ export class ProfessorsListComponent implements OnInit, OnDestroy {
   }
 
   onAfegirClick(content) {
+    this.newProfeForm.reset();
+
     this.modalService.open(content, {ariaLabelledBy: 'modal-basic-title'}).result.then(
       (niu) => {
         console.log('Vol afegir el niu ' + niu + '.');

@@ -73,13 +73,13 @@
     </button>
   </div>
   <div class="modal-body">
-    <form>
+    <form [formGroup]="newProfeForm">
       <div class="form-group">
         <label for="niu">Introduiu el NIU del professor:</label>
-        <input type="text" class="form-control" name="niu" id="niu" #niu />
+        <input type="text" class="form-control" name="niu" id="niu" #niu formControlName="niu" />
         <div *ngIf="newProfeForm.get('niu').errors">
           <small id="nomHelp" class="text-danger"
-          *ngIf="newProfeForm.get('niu').touched && !newProfeForm.get('niu').valid && newProfeForm.get('niu').errors['pattern']">
+          *ngIf="!newProfeForm.get('niu').valid && newProfeForm.get('niu').errors['pattern']">
             El NIU no pot tenir espais!
           </small>
         </div>
