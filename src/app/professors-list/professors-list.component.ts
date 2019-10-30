@@ -62,7 +62,7 @@ export class ProfessorsListComponent implements OnInit, OnDestroy {
       (profes: Professor[]) => {
         this.professors = profes;
         this.isLoading = false;
-        this.selectedProfessors = []
+        this.selectedProfessors = [];
 
         this.dbService.getAlumnesNames(this.professors);
       }
@@ -148,7 +148,7 @@ export class ProfessorsListComponent implements OnInit, OnDestroy {
         } else {
           const professor: Professor = {
             id: null,
-            niu: niu,
+            niu,
             nom: 'Nom no trobat',
             assignatura_id: this.assignaturaId
           };
