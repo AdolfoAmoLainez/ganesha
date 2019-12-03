@@ -42,7 +42,7 @@
     *ngFor="let alumne of alumnes; index as i"
   >
     <div class="row">
-      <div class="col-sm-1">
+      <div class="col-1">
         <div class="custom-control custom-checkbox">
           <input
             type="checkbox"
@@ -55,7 +55,7 @@
           <label class="custom-control-label" [attr.for]="alumne.niu"></label>
         </div>
       </div>
-      <div class="col-sm-11">
+      <div class="col-auto">
         {{ alumne.niu + " - " + alumne.nom }}
         <fa-icon icon="times"
                  class="text-danger"
