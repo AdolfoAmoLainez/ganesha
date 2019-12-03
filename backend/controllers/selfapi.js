@@ -1,6 +1,6 @@
 var dbconfig = require('../mysqlconn');
 const shell = require('shelljs');
-var LDAP = require('ldap-client');
+/* var LDAP = require('ldap-client');
 
 var ldap = new LDAP({
     uri:             'ldap://montblanc.uab.es',   // string
@@ -12,7 +12,7 @@ var ldap = new LDAP({
     scope:           LDAP.SUBTREE,      // default scope for all future searches
 }, function(err) {
     // connected and ready
-});
+}); */
 
 /**
  *
@@ -50,36 +50,22 @@ function insertaLog (logEntry) {
  * @param {*} username: Nom d'usuari
  * @param {*} callback: Funció per tornar true/false
  */
-
 function checkUsernameExists(username, callback) {
-  ldap.bind({
-    binddn: 'cn=proxyCC,ou=CC,ou=users,o=sids',
-    password: 'proxy135'
-},
-(errBind) => {
-  if (!errBind) {
-     ldap.search({
-                      base: 'o=sids',
-                      scope: LDAP.SUBTREE,
-                      filter: '(uid='+username+')',
-                      attrs: 'cn, sn'
-                    },
-                    (err, data) => {
-                      if (err) {
-                        callback(false)
-                      } else {
-                        if (data.length === 0) {
-                          callback(false);
-                        } else {
-                          callback(true);
-                        }
-                      }
+  const { stdout, stderr, code } = shell.exec('ldapsearch -x -b "o=sids" -D "cn=proxycc,ou=cc,ou=users,o=sids" -w proxy135 -H ldaps://carbol.uab.es -L "(uid='+username+')"', {silent: true});
 
-                    });
-  }
-
-});
+      if (stdout) {
+        if (stdout.includes('numEntries:')) {
+          callback(true);
+          return;
+        }
+        else {
+          callback(false);
+          return;
+        }
+      }
+      callback(false);
 }
+
 
 /**
  * Request:
@@ -106,37 +92,39 @@ exports.getAlumnesNames = (req, res) => {
   console.log("\nBusca Noms Alumnes!");
   console.log(req.body);
 
-  filtro = '(|';
+  arrayAlu = [];
 
   req.body.alumnes.forEach(alumne => {
-    filtro += '(uid=' + alumne.niu + ')';
+    const { stdout, stderr, code } = shell.exec('ldapsearch -x -b "o=sids" -D "cn=proxycc,ou=cc,ou=users,o=sids" -w proxy135 -H ldaps://carbol.uab.es -L "(uid='+alumne.niu+')" sn cn | grep "dn:\\|sn:\\|cn:"', {silent: true});
+
+      if (stdout) {
+        lines = stdout.split('\n');
+
+        var userObj = {
+                dn:'',
+                sn:[],
+                cn:[]
+        };
+        for(var line = 0; line<lines.length;line++){
+
+          if(lines[line].includes("dn:")){
+                  const dn = lines[line].split(':')[1].trim();
+                  userObj.dn=dn;
+          }
+          if(lines[line].includes("sn:")){
+                  const sn = lines[line].split(':')[1].trim();
+                  userObj.sn[0]=sn;
+          }
+          if(lines[line].includes("cn:")){
+                  const cn = lines[line].split(':')[1].trim();
+                  userObj.cn[0]=cn;
+          }
+
+        }
+        arrayAlu.push(userObj);
+      }
   });
-  filtro += ')';
-
-  ldap.bind({
-    binddn: 'cn=proxyCC,ou=CC,ou=users,o=sids',
-    password: 'proxy135'
-},
-(errBind) => {
-  if (!errBind) {
-     ldap.search({
-                      base: 'o=sids',
-                      scope: LDAP.SUBTREE,
-                      filter: filtro,
-                      attrs: 'cn, sn'
-                    },
-                    (err, data) => {
-                      if (err) {
-                        res.status(200).json([]);
-                      } else {
-                        res.status(200).json(data);
-                      }
-
-                    });
-  }
-
-});
-
+  res.status(200).json(arrayAlu);
 }
 
 /**
