@@ -107,17 +107,36 @@ exports.getAlumnesNames = (req, res) => {
         };
         for(var line = 0; line<lines.length;line++){
 
+          const partes = lines[line].split(':');
           if(lines[line].includes("dn:")){
                   const dn = lines[line].split(':')[1].trim();
                   userObj.dn=dn;
           }
           if(lines[line].includes("sn:")){
-                  const sn = lines[line].split(':')[1].trim();
-                  userObj.sn[0]=sn;
+            sn ='';
+            if (partes.length === 3 ){
+              //Assumim que llavors está codificat en Base64 per accents
+              sn = ':' + lines[line].split(':')[2];
+              sn = Buffer.from(sn, 'base64').toString();
+            } else {
+              sn = lines[line].split(':')[1].trim();
+            }
+
+            userObj.sn[0]=sn;
+
           }
           if(lines[line].includes("cn:")){
-                  const cn = lines[line].split(':')[1].trim();
-                  userObj.cn[0]=cn;
+            cn ='';
+            if (partes.length === 3 ){
+              //Assumim que llavors está codificat en Base64 per accents
+              cn = ':' + lines[line].split(':')[2];
+              cn = Buffer.from(cn, 'base64').toString();
+            } else {
+              cn = lines[line].split(':')[1].trim();
+            }
+
+            userObj.cn[0]=cn
+
           }
 
         }
