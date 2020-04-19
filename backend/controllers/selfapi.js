@@ -497,11 +497,11 @@ exports.addAlumneGrup = (req, res) => {
                   }
                 });
             break;
-          case 501: //Problema des de l'script
-          case 502:
-              res.status(501).json({message: resultjson.message});
+          default:
+              res.status(stdjson.codi).json({message: stdjson.message});
               logEntry.resultat = 'error';
-              logEntry.resposta = resultjson.message;
+              logEntry.resposta = stdjson.message;
+              console.log("ERROR: " + stdjson.message);
               insertaLog(logEntry);
             break;
         }
@@ -845,10 +845,11 @@ exports.addProfeAssignatura = (req, res) => {
                   }
                 });
             break;
-          case 501: //Problema des de l'script
-              res.status(501).json({message: resultjson.message});
+          default:
+              res.status(stdjson.codi).json({message: stdjson.message});
               logEntry.resultat = 'error';
-              logEntry.resposta = resultjson.message;
+              logEntry.resposta = stdjson.message;
+              console.log("ERROR: " + stdjson.message);
               insertaLog(logEntry);
             break;
         }
