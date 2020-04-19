@@ -14,12 +14,12 @@
     <div class="form-group">
         <label for="nom">Nom:
           <fa-icon *ngIf="!canEditName"
-          icon="lock"
+          [icon]="faLock"
           style="cursor: pointer;"
           class="text-danger ml-2"
           (click)="lockName()"></fa-icon>
           <fa-icon *ngIf="canEditName"
-          icon="lock-open"
+          [icon]="faLockOpen"
           style="cursor: pointer;"
           class="text-danger ml-2"
           (click)="lockName()"></fa-icon>

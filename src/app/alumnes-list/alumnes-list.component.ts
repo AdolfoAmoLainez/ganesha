@@ -10,6 +10,7 @@ import { Alumne } from '../shared/alumne.model';
 import { Grup } from '../shared/grup.model';
 import { ToastrService } from 'ngx-toastr';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
+import { faBackspace, faTimes } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'app-alumnes-list',
@@ -17,6 +18,11 @@ import { FormGroup, FormControl, Validators } from '@angular/forms';
   styleUrls: ['./alumnes-list.component.css']
 })
 export class AlumnesListComponent implements OnInit, OnDestroy {
+
+  // Iconos
+  faBackspace = faBackspace;
+  faTimes = faTimes;
+
   perfil = 'professor';
 
   alumnes: Alumne[] = [];

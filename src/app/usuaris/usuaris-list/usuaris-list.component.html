@@ -53,7 +53,7 @@
           <button type="button" class="btn btn-primary" (click)="onGuardar(usuari)">Guardar</button>
         </div>
         <div class="col-sm-1 ml-2">
-            <fa-icon icon="times"
+            <fa-icon [icon]="faTimes"
             class="fa-2x text-danger "
             style="cursor: pointer;"
             (click)="onEsborrar(usuari)"></fa-icon>

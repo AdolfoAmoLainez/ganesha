@@ -6,6 +6,7 @@ import { DataBaseService } from 'src/app/shared/database.service';
 import { Subscription } from 'rxjs';
 import { Perfil } from 'src/app/shared/perfil.model';
 import { ToastrService } from 'ngx-toastr';
+import { faTimes } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'app-usuaris-list',
@@ -13,6 +14,9 @@ import { ToastrService } from 'ngx-toastr';
   styleUrls: ['./usuaris-list.component.css']
 })
 export class UsuarisListComponent implements OnInit, OnDestroy {
+
+  // Iconos
+  faTimes = faTimes;
 
   perfils: Perfil[];
   usuaris: Usuari[];

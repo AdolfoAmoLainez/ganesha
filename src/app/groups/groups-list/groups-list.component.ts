@@ -11,6 +11,7 @@ import { Assignatura } from '../../shared/assignatura.model';
 import { Grup } from '../../shared/grup.model';
 import { AuthService } from '../../auth/auth.service';
 import { GroupEditModalComponent } from '../group-edit-modal/group-edit-modal.component';
+import { faBackspace, faEdit, faTimes } from '@fortawesome/free-solid-svg-icons';
 
 
 @Component({
@@ -19,6 +20,11 @@ import { GroupEditModalComponent } from '../group-edit-modal/group-edit-modal.co
   styleUrls: ['./groups-list.component.css']
 })
 export class GroupsListComponent implements  OnDestroy, OnInit {
+
+  // Iconos
+  faBackspace = faBackspace;
+  faEdit = faEdit;
+  faTimes = faTimes;
 
   perfil = 'professor';
   groups = [];

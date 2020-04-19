@@ -6,6 +6,7 @@ import { MymodalyesnoComponent } from 'src/app/shared/mymodalyesno/mymodalyesno.
 import { DataBaseService } from 'src/app/shared/database.service';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { faLock, faLockOpen } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'app-group-edit',
@@ -13,6 +14,10 @@ import { map } from 'rxjs/operators';
   styleUrls: ['./group-edit-modal.component.css']
 })
 export class GroupEditModalComponent implements OnInit {
+
+  // Iconos
+  faLock = faLock;
+  faLockOpen = faLockOpen;
 
   public grupId: string;
   public assignatura: Assignatura;

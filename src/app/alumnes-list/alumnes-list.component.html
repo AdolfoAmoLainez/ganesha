@@ -7,7 +7,7 @@
   <li class="list-group-item list-group-item-primary">
     <div class="row align-items-center">
       <div class="col-sm-1" *ngIf="perfil == 'professor'">
-          <fa-icon icon="backspace"
+          <fa-icon [icon]="faBackspace"
           class="fa-2x text-primary"
           style="cursor: pointer;"
           (click)="onBackClick()"></fa-icon>
@@ -57,7 +57,7 @@
       </div>
       <div class="col-auto">
         {{ alumne.niu + " - " + alumne.nom }}
-        <fa-icon icon="times"
+        <fa-icon [icon]="faTimes"
                  class="text-danger"
                  style="cursor: pointer;"
                  (click)="onDeleteIconClick(alumne)"></fa-icon>
