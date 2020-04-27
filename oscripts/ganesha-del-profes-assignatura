@@ -34,11 +34,11 @@ asignatura="$2"
 
 salida()
 {
-    echo "{"
-    echo "\"codi\":$2,"
-    echo "\"message\":\"$1\","
-    echo "\"json\": {\"usuario\":\"$3\", \"asignatura\":\"$4\"}" ;
-    echo "},"
+  echo "{"
+  echo "\"codi\":$2,"
+  echo "\"message\":\"$1\","
+  echo "\"json\": {\"usuario\":\"$3\", \"asignatura\":\"$4\"}" ;
+  echo "},"
 }
 
  echo "["
@@ -50,38 +50,35 @@ salida()
 
 # Control de errores fatales: Es para evitar acciones intermedias si las condiciones necesarias conocidas no són validas de antemano
 
-               if [ ! -d "$HOME_GANESHA/$asignatura" ]; then error=505; fi
-               if [ ! $(getent group "$asignatura") ]; then error=507; fi
+          if [ ! -d "$HOME_GANESHA/$asignatura" ]; then error=505; fi
+          if [ ! $(getent group "$asignatura") ]; then error=507; fi
 
 # Fin control de errores fatales
 
+          if [ -d "$HOME_GANESHA/$asignatura" ]; then /usr/sbin/deluser $usuario $asignatura 2>/dev/null 1>/dev/null || error=521; else error=505; fi
 
-		if [ -d "$HOME_GANESHA/$asignatura" ]; then /usr/sbin/deluser $usuario $asignatura 2>/dev/null 1>/dev/null || error=521; else error=505; fi
-
-		if [ "$error" -lt "500" ] && [ -d "$HOME_GANESHA/$asignatura" ]; then
-		 	cd $HOME_GANESHA"/$asignatura"
-			     for directorio_grupo in  $(find ./ -maxdepth 1 -mindepth 1 -type d -printf '%f\n') ; do
-				if [ "$(grep $directorio_grupo /etc/group | grep $usuario | wc -l)" -eq "1" ] ; then
-					/usr/sbin/deluser $usuario $directorio_grupo 2>/dev/null 1>/dev/null || error=540;
-				fi
-		     	     done
-		fi
+          if [ "$error" -lt "500" ] && [ -d "$HOME_GANESHA/$asignatura" ]; then
+		 	      cd $HOME_GANESHA"/$asignatura"
+			      for directorio_grupo in  $(find ./ -maxdepth 1 -mindepth 1 -type d -printf '%f\n') ; do
+              if [ "$(grep $directorio_grupo /etc/group | grep $usuario | wc -l)" -eq "1" ] ; then
+                /usr/sbin/deluser $usuario $directorio_grupo 2>/dev/null 1>/dev/null || error=540;
+              fi
+		     	  done
+		      fi
 
 	        if [ "$error" -gt "500" ]; then
-        	     txt_salida="$txt_salida$(salida "ERROR" "$error" "$usuario" "$asignatura")"
-
+        	  txt_salida="$txt_salida$(salida "ERROR" "$error" "$usuario" "$asignatura")"
 	        else
-	             txt_salida="$txt_salida$(salida "Borrado el profesor \\\"$usuario\\\" de la asignatura \\\"$asignatura\\\"" "200" "$usuario" "$asignatura")"
+	          txt_salida="$txt_salida$(salida "Borrado el profesor \\\"$usuario\\\" de la asignatura \\\"$asignatura\\\"" "200" "$usuario" "$asignatura")"
 	        fi
 
 	      done
-  	else
+  else
 		error=599
 		txt_salida=$(salida "ERROR" "$error")
 	fi
 
-
-    txt_salida=${txt_salida::-1}
-    echo "$txt_salida"
-    echo "]"
+  txt_salida=${txt_salida::-1}
+  echo "$txt_salida"
+  echo "]"
 

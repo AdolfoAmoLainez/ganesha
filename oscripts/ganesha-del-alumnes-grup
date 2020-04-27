@@ -2,23 +2,23 @@
 #
 
 #  Nombre script: ganesha-del-alumnes-grup
-# 
-#  Parámetros de entrada: 
-#    $1="usuario" 
+#
+#  Parámetros de entrada:
+#    $1="usuario"
 #    $2="asignatura"
-#    $3="grupo_asignatura" 
+#    $3="grupo_asignatura"
 #    $4="vaciar_grupo" (TRUE/Cualquier otro valor diferente de "TRUE" será falso)
 #
-#  Salida en STDOUT (no STDERR): 
+#  Salida en STDOUT (no STDERR):
 #    {
-#    "codi":"<codi>", 
-#    "message":"<mensaje>", 
+#    "codi":"<codi>",
+#    "message":"<mensaje>",
 #    "json": { "usuario":"<usuario>", "asignatura":"<asignatura>", "grupo_asignatura":"<grupo_asignatura>" }
 #     }
 #
 #  Operaciones:
 #	1.- Borrar "usuario" del grupo "grupo_asignatura" local
-#	2.- Borrar "usuario" al grupo "asignatura" local  
+#	2.- Borrar "usuario" al grupo "asignatura" local
 #	3.- Mostrar codigo de salida correcta o incorrecta según caso.
 #
 #  Codigos de error:
@@ -38,69 +38,67 @@ grupo_asignatura="$3"
 vaciar_grupo="$4"
 
 salida()
-{ 
-    echo "{" 
-    echo "\"codi\":\"$2\"," 
+{
+    echo "{"
+    echo "\"codi\":\"$2\","
     if [ "$2" -eq "200" ]; then
        echo "\"message\":\"$1\","
     else
        codigo_error="codigo_$2"
        echo "\"message\":\"${!codigo_error}\","
     fi
-    echo "\"json\": {\"usuario\":\"$3\", \"asignatura\":\"$4\", \"grupo_asignatura\":\"$5\"}" ; 
+    echo "\"json\": {\"usuario\":\"$3\", \"asignatura\":\"$4\", \"grupo_asignatura\":\"$5\"}" ;
     echo "},"
-} 
+}
 
 
  echo "["
 
 	error="0"
-	
+
 	if [[ $usuarios && $asignatura && $grupo_asignatura ]]; then
 
 	  for usuario in $usuarios
-              do
-                error="0"
+      do
+        error="0"
 
 # Control de errores fatales: Es para evitar acciones intermedias si las condiciones necesarias conocidas no són validas de antemano
 
-               if [ ! -d "$HOME_GANESHA/$asignatura" ]; then error=505; fi
-               if [ ! -d "$HOME_GANESHA/$asignatura/$grupo_asignatura" ]; then error=506; fi
-               if [ ! $(getent group "$asignatura") ]; then error=507; fi
-               if [ ! $(getent group "$grupo_asignatura") ]; then error=508; fi
+        if [ ! -d "$HOME_GANESHA/$asignatura" ]; then error=505; fi
+        if [ ! -d "$HOME_GANESHA/$asignatura/$grupo_asignatura" ]; then error=506; fi
+        if [ ! $(getent group "$asignatura") ]; then error=507; fi
+        if [ ! $(getent group "$grupo_asignatura") ]; then error=508; fi
 
 # Fin control de errores fatales
+        if [ "$error" -lt "500" ]; then /usr/sbin/deluser $usuario $grupo_asignatura 2>/dev/null 1>/dev/null || error=520; fi
+        if [ "$error" -lt "500" ] && [ "$(grep $asignatura /etc/group | grep $usuario | wc -l)" -lt "2" ] ; then
+          /usr/sbin/deluser $usuario $asignatura 2>/dev/null 1>/dev/null || error=521
+        fi
 
-
-		if [ "$error" -lt "500" ]; then /usr/sbin/deluser $usuario $grupo_asignatura 2>/dev/null 1>/dev/null || error=520; fi 
-		if [ "$error" -lt "500" ] && [ "$(grep $asignatura /etc/group | grep $usuario | wc -l)" -lt "2" ] ; then
- 			/usr/sbin/deluser $usuario $asignatura 2>/dev/null 1>/dev/null || error=521
-		 fi
-
-        	if [ "$error" -gt "500" ]; then
-	             txt_salida="$txt_salida$(salida "ERROR" "$error" "$usuario" "$asignatura" "$grupo_asignatura")"
-	          else
-	             txt_salida="$txt_salida$(salida "OK" "200" "$usuario" "$asignatura" "$grupo_asignatura")"
-	        fi
+        if [ "$error" -gt "500" ]; then
+              txt_salida="$txt_salida$(salida "ERROR" "$error" "$usuario" "$asignatura" "$grupo_asignatura")"
+          else
+              txt_salida="$txt_salida$(salida "OK" "200" "$usuario" "$asignatura" "$grupo_asignatura")"
+        fi
 
 	  done
-	
-	 if [ "$vaciar_grupo" = "TRUE" ] && [ "$error" -lt "500" ]; then
-		if [ -d "$HOME_GANESHA/$asignatura/$grupo_asignatura" ]; then
-		   /bin/rm -rf "$HOME_GANESHA/$asignatura/$grupo_asignatura/"* 2>/dev/null 1>/dev/null || error=537;
-		   if [ "$error" -gt "500" ]; then
-			 txt_salida="$txt_salida$(salida "ERROR" "$error" "$usuarios" "$asignatura" "$grupo_asignatura")"
-		   fi
-		fi
- 	 fi
 
-  	else
+    if [ "$vaciar_grupo" = "TRUE" ] && [ "$error" -lt "500" ]; then
+      if [ -d "$HOME_GANESHA/$asignatura/$grupo_asignatura" ]; then
+        /bin/rm -rf "$HOME_GANESHA/$asignatura/$grupo_asignatura/"* 2>/dev/null 1>/dev/null || error=537;
+        if [ "$error" -gt "500" ]; then
+        txt_salida="$txt_salida$(salida "ERROR" "$error" "$usuarios" "$asignatura" "$grupo_asignatura")"
+        fi
+      fi
+    fi
+
+  else
 		error=599
 		txt_salida=$(salida "ERROR" "$error")
 	fi
 
 
-    txt_salida=${txt_salida::-1}
-    echo "$txt_salida"
-    echo "]"
+  txt_salida=${txt_salida::-1}
+  echo "$txt_salida"
+  echo "]"
 

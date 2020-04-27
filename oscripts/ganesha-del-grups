@@ -2,23 +2,23 @@
 #
 
 #  Nombre script: ganesha-del-grups
-# 
-#  Parámetros de entrada: 
-#    $1="Codi d’assignatura" 
-#    $2="Nom dels grups separats per espai" 
+#
+#  Parámetros de entrada:
+#    $1="Codi d’assignatura"
+#    $2="Nom dels grups separats per espai"
 #    $3="Forzar borrado(TRUE/Cualquier otro valor diferente de "TRUE" será falso)"
 #
-#  Salida en STDOUT (no STDERR): 
+#  Salida en STDOUT (no STDERR):
 #    [
 #    {
-#    "codi":<codi>, 
-#    "message":"<mensaje>", 
+#    "codi":<codi>,
+#    "message":"<mensaje>",
 #    "json": { "nomgrup":"<codi_assignatura_grup>" }
 #    },
 #    {
 #    "codi":<codi>,
 #    "message":"<mensaje>,
-#    "json": { "nomgrup":"<codi_assignatura_grup>" }, 
+#    "json": { "nomgrup":"<codi_assignatura_grup>" },
 #    },
 #    ...
 #    {
@@ -49,22 +49,22 @@ grupos_asignatura="$2"
 forzar_borrado="$3"
 
 salida()
-{ 
-    echo "{" 
-    echo "\"codi\":$2," 
-    if [ "$2" -eq "200" ]; then
-       echo "\"message\":\"$1\","
-    else
-       codigo_error="codigo_$2"
-       echo "\"message\":\"${!codigo_error}\","
-    fi
-    echo "\"json\": {\"asignatura:\":\"$asignatura\",\"nomgrup\":\"$3\"}" ; 
-    echo "},"
-} 
+{
+  echo "{"
+  echo "\"codi\":$2,"
+  if [ "$2" -eq "200" ]; then
+      echo "\"message\":\"$1\","
+  else
+      codigo_error="codigo_$2"
+      echo "\"message\":\"${!codigo_error}\","
+  fi
+  echo "\"json\": {\"asignatura:\":\"$asignatura\",\"nomgrup\":\"$3\"}" ;
+  echo "},"
+}
 
-   echo "["
+  echo "["
 
-   if [[ $asignatura && $grupos_asignatura ]]; then
+  if [[ $asignatura && $grupos_asignatura ]]; then
 
     for grupo in $grupos_asignatura
       do
@@ -79,29 +79,29 @@ salida()
        if [ ! $(getent group "$grupo") ]; then error=508; fi
 
 # Fin control de errores fatales
-       
-       if [ "$error" -lt "500" ]; then
-	if [ "$forzar_borrado" = "TRUE" ]; then 
-		/bin/rm -rf $HOME_GANESHA"/$asignatura/$grupo" 2>/dev/null 1>/dev/null || error=536;
-	  else
-		/bin/rmdir $HOME_GANESHA"/$asignatura/$grupo" 2>/dev/null 1>/dev/null || error=536;	
-	fi
-	
-	if [ "$error" -lt "500" ]; then setquota -g "$grupo" 0 0 0 0 $HOME_GANESHA"/" 2>/dev/null 1>/dev/null || error=531; fi
-	if [ "$error" -lt "500" ]; then /usr/sbin/delgroup "$grupo" 2>/dev/null 1>/dev/null || error=532; fi
-       fi
-	
-	if [ "$error" -gt "500" ]; then
-	     txt_salida="$txt_salida$(salida "ERROR" "$error" "$grupo")"
-	  else 
-	     txt_salida="$txt_salida$(salida "OK" "200" "$grupo")"
-	fi
-      done
-     else
-	error=599
-	txt_salida=$(salida "ERROR" "$error")
-    fi
 
-    txt_salida=${txt_salida::-1}
-    echo "$txt_salida"
-    echo "]"
+       if [ "$error" -lt "500" ]; then
+        if [ "$forzar_borrado" = "TRUE" ]; then
+          /bin/rm -rf $HOME_GANESHA"/$asignatura/$grupo" 2>/dev/null 1>/dev/null || error=536;
+        else
+          /bin/rmdir $HOME_GANESHA"/$asignatura/$grupo" 2>/dev/null 1>/dev/null || error=536;
+        fi
+
+        if [ "$error" -lt "500" ]; then setquota -g "$grupo" 0 0 0 0 $HOME_GANESHA"/" 2>/dev/null 1>/dev/null || error=531; fi
+        if [ "$error" -lt "500" ]; then /usr/sbin/delgroup "$grupo" 2>/dev/null 1>/dev/null || error=532; fi
+      fi
+
+      if [ "$error" -gt "500" ]; then
+        txt_salida="$txt_salida$(salida "ERROR" "$error" "$grupo")"
+      else
+        txt_salida="$txt_salida$(salida "OK" "200" "$grupo")"
+      fi
+    done
+  else
+    error=599
+    txt_salida=$(salida "ERROR" "$error")
+  fi
+
+  txt_salida=${txt_salida::-1}
+  echo "$txt_salida"
+  echo "]"

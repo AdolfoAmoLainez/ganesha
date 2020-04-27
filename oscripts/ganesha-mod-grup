@@ -42,16 +42,16 @@ quota_nueva="$4"
 
 salida()
 {
-    echo "{"
-    echo "\"codi\":$2,"
-   if [ "$2" -eq "200" ]; then
-       echo "\"message\":\"$1\","
-    else
-       codigo_error="codigo_$2"
-       echo "\"message\":\"${!codigo_error}\","
-    fi
-    echo "\"json\": { \"assignatura\":\"$asignatura\", \"nomactual\":\"$nombre_grupo_actual\", \"nomnou\":\"$nombre_grupo_nuevo\", \"quota\":\"$quota_nueva\"} " ;
-    echo "}"
+  echo "{"
+  echo "\"codi\":$2,"
+  if [ "$2" -eq "200" ]; then
+      echo "\"message\":\"$1\","
+  else
+      codigo_error="codigo_$2"
+      echo "\"message\":\"${!codigo_error}\","
+  fi
+  echo "\"json\": { \"assignatura\":\"$asignatura\", \"nomactual\":\"$nombre_grupo_actual\", \"nomnou\":\"$nombre_grupo_nuevo\", \"quota\":\"$quota_nueva\"} " ;
+  echo "}"
 }
 
 
@@ -61,12 +61,12 @@ if [[ $asignatura && $nombre_grupo_actual && $nombre_grupo_nuevo && $quota_nueva
 
 # Control de errores fatales: Es para evitar acciones intermedias si las condiciones necesarias conocidas no són validas de antemano
 
-        if [ ! -d "$HOME_GANESHA/$asignatura" ]; then  salida "ERROR" "505"; exit ; fi
-        if [ ! -d "$HOME_GANESHA/$asignatura/$nombre_grupo_actual" ]; then  salida "ERROR" "506"; exit ; fi
-	      if [ "$nombre_grupo_actual" != "$nombre_grupo_nuevo" ] && [ -d "$HOME_GANESHA/$asignatura/$nombre_grupo_nuevo" ]; then  salida "ERROR" "522"; exit ; fi
-        if [ ! $(getent group "$asignatura") ]; then salida "ERROR" "507"; exit; fi
-        if [ ! $(getent group "$nombre_grupo_actual") ]; then salida "ERROR" "508"; exit; fi
-	      if [ "$nombre_grupo_actual" != "$nombre_grupo_nuevo" ] && [ $(getent group "$nombre_grupo_nuevo") ]; then salida "ERROR" "523"; exit; fi
+  if [ ! -d "$HOME_GANESHA/$asignatura" ]; then  salida "ERROR" "505"; exit ; fi
+  if [ ! -d "$HOME_GANESHA/$asignatura/$nombre_grupo_actual" ]; then  salida "ERROR" "506"; exit ; fi
+  if [ "$nombre_grupo_actual" != "$nombre_grupo_nuevo" ] && [ -d "$HOME_GANESHA/$asignatura/$nombre_grupo_nuevo" ]; then  salida "ERROR" "522"; exit ; fi
+  if [ ! $(getent group "$asignatura") ]; then salida "ERROR" "507"; exit; fi
+  if [ ! $(getent group "$nombre_grupo_actual") ]; then salida "ERROR" "508"; exit; fi
+  if [ "$nombre_grupo_actual" != "$nombre_grupo_nuevo" ] && [ $(getent group "$nombre_grupo_nuevo") ]; then salida "ERROR" "523"; exit; fi
 
 # Fin control de errores fatales
 
@@ -83,12 +83,11 @@ if [[ $asignatura && $nombre_grupo_actual && $nombre_grupo_nuevo && $quota_nueva
 	fi
 
 	if [ "$error" -gt "500" ]; then
-	     salida "ERROR" "$error"
+    salida "ERROR" "$error"
 	else
-	     salida "OK" "200"
+    salida "OK" "200"
 	fi
 else
 	error="599"
 	salida "Faltan parámetros" "$error"
 fi
-

@@ -35,16 +35,16 @@ asignatura="$1"
 
 salida()
 {
-    echo "{"
-    echo "\"codi\":$2,"
-    if [ "$2" -eq "200" ]; then
-            echo "\"message\":\"$1\","
-        else
-            codigo_error="codigo_$2"
-            echo "\"message\":\"${!codigo_error}\","
-    fi
-    echo "\"json\": [ {\"codi_assignatura\":\"$asignatura\"} ]" ;
-    echo "}"
+  echo "{"
+  echo "\"codi\":$2,"
+  if [ "$2" -eq "200" ]; then
+          echo "\"message\":\"$1\","
+      else
+          codigo_error="codigo_$2"
+          echo "\"message\":\"${!codigo_error}\","
+  fi
+  echo "\"json\": [ {\"codi_assignatura\":\"$asignatura\"} ]" ;
+  echo "}"
 }
 
 	error="0"
@@ -54,23 +54,23 @@ salida()
 # Control de errores fatales: Es para evitar acciones intermedias si las condiciones necesarias conocidas no són válidas de antemano
 
 		if [ ${#asignatura} -ge 15 ]; then salida "ERROR" "538"; exit; fi
-		case "$asignatura" in
-			(*[![abcdefghijklmnopqrstuvwxyz0123456789-]*) salida "ERROR" "539"; exit ;;
-		esac
-                if [ -d "$HOME_GANESHA/$asignatura" ]; then salida "ERROR" "503"; exit; fi
-                if [ $(getent group "$asignatura") ]; then salida "ERROR" "512"; exit; fi
+    case "$asignatura" in
+      (*[![abcdefghijklmnopqrstuvwxyz0123456789-]*) salida "ERROR" "539"; exit ;;
+    esac
+    if [ -d "$HOME_GANESHA/$asignatura" ]; then salida "ERROR" "503"; exit; fi
+    if [ $(getent group "$asignatura") ]; then salida "ERROR" "512"; exit; fi
 
 # Fin control de errores fatales
 
-		if [ -d "$HOME_GANESHA/$asignatura" ]; then error=503; else /bin/mkdir -m 0750  $HOME_GANESHA"/$asignatura" 2>/dev/null 1>/dev/null || error=511; fi
-		if [ "$error" -lt "500" ]; then if [ $(getent group "$asignatura") ]; then error=512; else /usr/sbin/addgroup "$asignatura" 2>/dev/null 1>/dev/null || error=502; fi; fi
-		if [ "$error" -lt "500" ]; then /bin/chown root:"$asignatura" $HOME_GANESHA"/$asignatura"  2>/dev/null 1>/dev/null || error=504; fi
-	else
-		error="599"
-        fi
+    if [ -d "$HOME_GANESHA/$asignatura" ]; then error=503; else /bin/mkdir -m 0750  $HOME_GANESHA"/$asignatura" 2>/dev/null 1>/dev/null || error=511; fi
+    if [ "$error" -lt "500" ]; then if [ $(getent group "$asignatura") ]; then error=512; else /usr/sbin/addgroup "$asignatura" 2>/dev/null 1>/dev/null || error=502; fi; fi
+    if [ "$error" -lt "500" ]; then /bin/chown root:"$asignatura" $HOME_GANESHA"/$asignatura"  2>/dev/null 1>/dev/null || error=504; fi
+  else
+    error="599"
+  fi
 
-	 if [ "$error" -gt "500" ]; then
-             salida "ERROR" "$error"
-          else
- 	     salida "Assignatura creada correctament." "200"
-	 fi
+  if [ "$error" -gt "500" ]; then
+    salida "ERROR" "$error"
+  else
+    salida "Assignatura creada correctament." "200"
+  fi

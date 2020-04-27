@@ -30,41 +30,42 @@ asignatura="$2"
 
 salida()
 {
-    echo "{"
-    echo "\"codi\":$2,"
-    if [ "$2" -eq "200" ]; then
-	    echo "\"message\":\"$1\","
-	else
-	    codigo_error="codigo_$2"
-            echo "\"message\":\"${!codigo_error}\","
-    fi
-    echo "\"json\": [ {\"usuario\":\"$usuario\"}, {\"asignatura\":\"$asignatura\"} ]" ;
-    echo "}"
+  echo "{"
+  echo "\"codi\":$2,"
+  if [ "$2" -eq "200" ]; then
+    echo "\"message\":\"$1\","
+  else
+    codigo_error="codigo_$2"
+    echo "\"message\":\"${!codigo_error}\","
+  fi
+  echo "\"json\": [ {\"usuario\":\"$usuario\"}, {\"asignatura\":\"$asignatura\"} ]" ;
+  echo "}"
 }
 
 	error=0
 
 	if [[ $usuario && $asignatura ]]; then
-	    if [ $(getent group "$asignatura") ]; then
+	  if [ $(getent group "$asignatura") ]; then
+
 		/usr/sbin/adduser $usuario $asignatura 2>/dev/null 1>/dev/null || error=513
 
-                if [ "$error" -lt "500" ] && [ -d "$HOME_GANESHA/$asignatura" ]; then
-                   cd $HOME_GANESHA"/$asignatura"
-			for directorio_grupo in  $(find ./ -maxdepth 1 -mindepth 1 -type d -printf '%f\n') ; do
-			  /usr/sbin/adduser $usuario $directorio_grupo 2>/dev/null 1>/dev/null || error=516;
-			done
-                fi
+      if [ "$error" -lt "500" ] && [ -d "$HOME_GANESHA/$asignatura" ]; then
+        cd $HOME_GANESHA"/$asignatura"
+        for directorio_grupo in  $(find ./ -maxdepth 1 -mindepth 1 -type d -printf '%f\n') ; do
+          /usr/sbin/adduser $usuario $directorio_grupo 2>/dev/null 1>/dev/null || error=516;
+        done
+      fi
 
-	    else
-	        error=507
-	    fi
+    else
+        error=507
+    fi
   	else
 		error=599
 	fi
 
-        if [ "$error" -gt "500" ]; then
-             salida "ERROR" "$error"
-          else
-	      salida "Añadido el profesor a la asignatura" "200"
-        fi
+  if [ "$error" -gt "500" ]; then
+        salida "ERROR" "$error"
+    else
+  salida "Añadido el profesor a la asignatura" "200"
+  fi
 

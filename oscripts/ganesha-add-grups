@@ -2,22 +2,22 @@
 #
 
 #  Nombre script: ganesha-add-grups
-# 
-#  Parámetros de entrada: 
-#    $1="Codigo asignatura" 
-#    $2="Nom dels grups separats per espai" 
-#    $3="Nius dels professors separats per espai" 
+#
+#  Parámetros de entrada:
+#    $1="Codigo asignatura"
+#    $2="Nom dels grups separats per espai"
+#    $3="Nius dels professors separats per espai"
 #    $4="quota"
 #
-#  Salida en STDOUT (no STDERR): 
+#  Salida en STDOUT (no STDERR):
 #    [
-#    {"codi":<codi>, 
-#    "message":"<mensaje>", 
+#    {"codi":<codi>,
+#    "message":"<mensaje>",
 #    "json": { "nomgrup":"<codi_assignatura_grup>" }
 #     },
 #     {"codi":<codi>,
 #    "message":""<mensaje>",
-#    "json": { "nomgrup":"<codi_assignatura_grup>" }, 
+#    "json": { "nomgrup":"<codi_assignatura_grup>" },
 #     },
 #     ...
 #     {"codi":<codi>,
@@ -30,7 +30,7 @@
 #	1.- Crear directorio de grupo en la asignatura en la ruta definida por "ganesha-config.sh": "$HOME_GANESHA"/"$asignatura"
 #	2.- Crear grupo local de asignatura_grupo
 #	3.- Asignar permisos directorio de asignatura_grupo
-#	4.- Asignar niu_profe a grupo local asignatura	
+#	4.- Asignar niu_profe a grupo local asignatura
 #	5.- Asignar niu_profe a grupo local asignatura_grupo
 #	6.- Mostrar codigo de salida correcta o incorrecta según caso.
 #
@@ -54,67 +54,67 @@ nius_profesores="$3"
 var_quota="$4"
 
 salida()
-{ 
-    echo "{" 
-    echo "\"codi\":$2," 
-    if [ "$2" -eq "200" ]; then
-       echo "\"message\":\"$1\","
-    else
-       codigo_error="codigo_$2"
-       echo "\"message\":\"${!codigo_error}\","
-    fi
-    echo "\"json\": { \"assignatura\":\"$asignatura\", \"nomgrup\":\"$3\" }" ; 
-    echo "},"
-} 
+{
+  echo "{"
+  echo "\"codi\":$2,"
+  if [ "$2" -eq "200" ]; then
+      echo "\"message\":\"$1\","
+  else
+      codigo_error="codigo_$2"
+      echo "\"message\":\"${!codigo_error}\","
+  fi
+  echo "\"json\": { \"assignatura\":\"$asignatura\", \"nomgrup\":\"$3\" }" ;
+  echo "},"
+}
 
-    txt_salida=""
+  txt_salida=""
 
 #    if [[ $asignatura && $grupos_asignatura && $nius_profesores ]]; then
-    if [[ $asignatura && $grupos_asignatura ]]; then
-    
-	echo "["
-    
-        for grupo in $grupos_asignatura
-           do
-                error="0"
+  if [[ $asignatura && $grupos_asignatura ]]; then
+
+	  echo "["
+
+    for grupo in $grupos_asignatura
+      do
+        error="0"
 
 # Control de errores fatales: Es para evitar acciones intermedias si las condiciones necesarias conocidas no són validas de antemano
 
-                if [ ! -d "$HOME_GANESHA/$asignatura" ]; then error=505; fi
-                if [ -d "$HOME_GANESHA/$asignatura/$grupo" ]; then error=514; fi
-                if [ ! $(getent group "$asignatura") ]; then error=507; fi
-                if [ $(getent group "$grupo") ]; then error=515; fi 
+        if [ ! -d "$HOME_GANESHA/$asignatura" ]; then error=505; fi
+        if [ -d "$HOME_GANESHA/$asignatura/$grupo" ]; then error=514; fi
+        if [ ! $(getent group "$asignatura") ]; then error=507; fi
+        if [ $(getent group "$grupo") ]; then error=515; fi
 
 # Fin control de errores fatales
 
-		if [ "$error" -lt "500" ]; then /bin/mkdir -m 2770  $HOME_GANESHA"/$asignatura/$grupo" 2>/dev/null 1>/dev/null || error=517; fi
-		if [ "$error" -lt "500" ]; then /usr/sbin/addgroup "$grupo" 2>/dev/null 1>/dev/null || error=518; fi
-		if [ "$error" -lt "500" ]; then /bin/chown root:"$grupo" $HOME_GANESHA"/$asignatura/$grupo"  2>/dev/null 1>/dev/null || error=519; fi
-		if [ "$error" -lt "500" ]; then setquota -g "$grupo" "$var_quota" "$var_quota" 0 0 $HOME_GANESHA"/" || error=526; fi 
+        if [ "$error" -lt "500" ]; then /bin/mkdir -m 2770  $HOME_GANESHA"/$asignatura/$grupo" 2>/dev/null 1>/dev/null || error=517; fi
+        if [ "$error" -lt "500" ]; then /usr/sbin/addgroup "$grupo" 2>/dev/null 1>/dev/null || error=518; fi
+        if [ "$error" -lt "500" ]; then /bin/chown root:"$grupo" $HOME_GANESHA"/$asignatura/$grupo"  2>/dev/null 1>/dev/null || error=519; fi
+        if [ "$error" -lt "500" ]; then setquota -g "$grupo" "$var_quota" "$var_quota" 0 0 $HOME_GANESHA"/" || error=526; fi
 
-		if  [ "$error" -lt "500" ]; then
+        if  [ "$error" -lt "500" ]; then
 
-			for niu_profe in $nius_profesores
-			 do
-			   error=0
-			   /usr/sbin/adduser $niu_profe $asignatura 2>/dev/null 1>/dev/null || error=513
-			   if [ "$error" -lt "500" ]; then /usr/sbin/adduser $niu_profe $grupo 2>/dev/null 1>/dev/null || error=516; fi
-			 done
-		fi	
+          for niu_profe in $nius_profesores
+          do
+            error=0
+            /usr/sbin/adduser $niu_profe $asignatura 2>/dev/null 1>/dev/null || error=513
+            if [ "$error" -lt "500" ]; then /usr/sbin/adduser $niu_profe $grupo 2>/dev/null 1>/dev/null || error=516; fi
+          done
+		    fi
 
      	  if [ "$error" -gt "500" ]; then
-	     txt_salida="$txt_salida$(salida "ERROR" "$error" "$grupo")" 
-	  else 
-	     txt_salida="$txt_salida$(salida "El grup de l'assignatura s'ha creat correctament." "200" "$grupo")"
-	  fi
-        done
+	        txt_salida="$txt_salida$(salida "ERROR" "$error" "$grupo")"
+	      else
+	        txt_salida="$txt_salida$(salida "El grup de l'assignatura s'ha creat correctament." "200" "$grupo")"
+	      fi
+      done
 
-     else  
-                error="599"
-		txt_salida=$(salida "ERROR" "$error")
-     fi 
+  else
+    error="599"
+    txt_salida=$(salida "ERROR" "$error")
+  fi
 
-        txt_salida=${txt_salida::-1}
-        echo "$txt_salida"
-        echo "]"
+  txt_salida=${txt_salida::-1}
+  echo "$txt_salida"
+  echo "]"
 

@@ -2,15 +2,15 @@
 #
 
 #  Nombre script: ganesha-lvm-info
-# 
-#  Parámetros de entrada: 
-#    Ninguno 
 #
-#  Salida en STDOUT (no STDERR): 
-#    { 
-#    "codi":<codi>, 
-#    "message":"<mensaje>", 
-#    "json": [ { "volname":"<nombre montaje"}, { "espacio_total":"<espacio_total>"  }, { "espacio_usado":"<espacio_usado>"}, { "espacio_libre":"<espacio_libre>" } ] 
+#  Parámetros de entrada:
+#    Ninguno
+#
+#  Salida en STDOUT (no STDERR):
+#    {
+#    "codi":<codi>,
+#    "message":"<mensaje>",
+#    "json": [ { "volname":"<nombre montaje"}, { "espacio_total":"<espacio_total>"  }, { "espacio_usado":"<espacio_usado>"}, { "espacio_libre":"<espacio_libre>" } ]
 #    }
 #
 #  Operaciones:
@@ -19,25 +19,25 @@
 #
 #  Codigos de error:
 #	528 - No se ha podido encontrar los datos de espacio del filesystem, motivo desconocido
-#	529 - No existe el directorio con el filesystem, o no está montado  
+#	529 - No existe el directorio con el filesystem, o no está montado
 
 source /usr/local/sbin/ganesha-config.sh
 
 salida()
 {
-    echo "{"
-    echo "\"codi\":$2,"
-    if [ "$2" -eq "200" ]; then
-       echo "\"message\":\"$1\","
-    else
-       codigo_error="codigo_$2"
-       echo "\"message\":\"${!codigo_error}\","
-    fi
-    echo "\"json\": [ {\"volname\":\"$3\", \"espacio_total\":\"$4\", \"espacio_usado\":\"$5\", \"espacio_libre\":\"$6\"} ]" ;
-    echo "}"
+  echo "{"
+  echo "\"codi\":$2,"
+  if [ "$2" -eq "200" ]; then
+      echo "\"message\":\"$1\","
+  else
+      codigo_error="codigo_$2"
+      echo "\"message\":\"${!codigo_error}\","
+  fi
+  echo "\"json\": [ {\"volname\":\"$3\", \"espacio_total\":\"$4\", \"espacio_usado\":\"$5\", \"espacio_libre\":\"$6\"} ]" ;
+  echo "}"
 }
 
-export -f salida
+  export -f salida
 
 	error="0"
 
@@ -48,8 +48,8 @@ export -f salida
 		error=529
 	fi
 
-        if [ "$error" -gt "500" ]; then
-             salida "ERROR" "$error"
-        fi
+  if [ "$error" -gt "500" ]; then
+        salida "ERROR" "$error"
+  fi
 
- 
+
