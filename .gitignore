@@ -8,6 +8,7 @@
 
 # dependencies
 /node_modules
+/backend/mysql-restapi
 
 # Documentacion
 /doc
