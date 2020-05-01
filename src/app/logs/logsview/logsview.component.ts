@@ -1,19 +1,18 @@
-import { Component, OnInit, OnDestroy, Directive, Input, Output, EventEmitter, ViewChildren, QueryList } from '@angular/core';
-import { NgbDate, NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Log } from 'src/app/shared/log.model';
 import { Subscription } from 'rxjs';
 import { DataBaseService } from 'src/app/shared/database.service';
-import { forEach } from '@angular/router/src/utils/collection';
-
-
-
-
+import { faCalendar } from '@fortawesome/free-solid-svg-icons';
 @Component({
   selector: 'app-logsview',
   templateUrl: './logsview.component.html',
   styleUrls: ['./logsview.component.css']
 })
 export class LogsviewComponent implements OnInit, OnDestroy {
+
+  // Iconos
+  faCalendar = faCalendar;
 
   dataLog;
   usuari = 'Usuari';
@@ -97,6 +96,9 @@ export class LogsviewComponent implements OnInit, OnDestroy {
       count
     };
 
+    console.log(filterObj);
+
+
     return filterObj;
   }
 
@@ -106,7 +108,23 @@ export class LogsviewComponent implements OnInit, OnDestroy {
 
   }
 
+/*   onSort(event) {
+    console.log("Sort");
+
+  } */
+
+  onMouseEnter(log: Log) {
+    // console.log(log);
+
+  }
+
+  onMouseOut() {
+    // console.log('Dismiss!');
+
+  }
+
   onFilterChange() {
+    console.log('Filter Change!');
     this.dbService.getLogs(this.constructFilterObj());
   }
 

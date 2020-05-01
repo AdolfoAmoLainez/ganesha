@@ -7,7 +7,7 @@
   <li class="list-group-item list-group-item-primary">
     <div class="row align-items-center">
       <div class="col-sm-1" *ngIf="perfil == 'professor'">
-          <fa-icon icon="backspace"
+          <fa-icon [icon]="faBackspace"
           class="fa-2x text-primary"
           style="cursor: pointer;"
           (click)="onBackClick()"></fa-icon>
@@ -42,7 +42,7 @@
     *ngFor="let alumne of alumnes; index as i"
   >
     <div class="row">
-      <div class="col-sm-1">
+      <div class="col-1">
         <div class="custom-control custom-checkbox">
           <input
             type="checkbox"
@@ -55,9 +55,9 @@
           <label class="custom-control-label" [attr.for]="alumne.niu"></label>
         </div>
       </div>
-      <div class="col-sm-11">
+      <div class="col-auto">
         {{ alumne.niu + " - " + alumne.nom }}
-        <fa-icon icon="times"
+        <fa-icon [icon]="faTimes"
                  class="text-danger"
                  style="cursor: pointer;"
                  (click)="onDeleteIconClick(alumne)"></fa-icon>
@@ -105,7 +105,7 @@
       type="button"
       class="btn btn-primary"
       (click)="modal.close(niu.value)"
-      [disabled]="!newAlumneForm.valid"
+      [disabled]="!newAlumneForm.get('niu').valid"
     >
       Afegir
     </button>

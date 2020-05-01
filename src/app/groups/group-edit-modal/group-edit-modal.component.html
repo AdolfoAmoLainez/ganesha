@@ -13,32 +13,32 @@
   <form [formGroup]="editForm">
     <div class="form-group">
         <label for="nom">Nom:
-            <fa-icon *ngIf="!canEditName"
-            icon="lock"
-            style="cursor: pointer;"
-            class="text-danger ml-2"
-            (click)="lockName()"></fa-icon>
-            <fa-icon *ngIf="canEditName"
-            icon="lock-open"
-            style="cursor: pointer;"
-            class="text-danger ml-2"
-            (click)="lockName()"></fa-icon>
-          </label>
-          <input type="text" [readonly]="!canEditName?true:null" class="form-control" name="nom" id="nom" #nom formControlName="nom"/>
-          <div *ngIf="editForm.get('nom').errors">
-            <small id="nomHelp" class="text-danger"
-            *ngIf="editForm.get('nom').touched && !editForm.get('nom').valid && editForm.get('nom').errors['pattern']">
-              Ha de començar per lletra. Sense caràcters especials ni majúscules.
-            </small>
-            <small id="nomHelp" class="text-danger"
-            *ngIf="editForm.get('nom').touched && !editForm.get('nom').valid && editForm.get('nom').errors['maxlength']">
-              El nom no pot ser més gran de 25 caràcters.
-            </small>
-            <small id="nomHelp" class="text-danger"
-            *ngIf="editForm.get('nom').touched && !editForm.get('nom').valid && editForm.get('nom').errors['groupNameExists']">
-              Aquest nom ja existeix al sistema.
-            </small>
-          </div>
+          <fa-icon *ngIf="!canEditName"
+          [icon]="faLock"
+          style="cursor: pointer;"
+          class="text-danger ml-2"
+          (click)="lockName()"></fa-icon>
+          <fa-icon *ngIf="canEditName"
+          [icon]="faLockOpen"
+          style="cursor: pointer;"
+          class="text-danger ml-2"
+          (click)="lockName()"></fa-icon>
+        </label>
+        <input type="text" [readonly]="!canEditName?true:null" class="form-control" name="nom" id="nom" #nom formControlName="nom"/>
+        <div *ngIf="editForm.get('nom').errors">
+          <small id="nomHelp" class="text-danger"
+          *ngIf="editForm.get('nom').touched && !editForm.get('nom').valid && editForm.get('nom').errors['pattern']">
+            Ha de començar per lletra. Sense caràcters especials ni majúscules.
+          </small>
+          <small id="nomHelp" class="text-danger"
+          *ngIf="editForm.get('nom').touched && !editForm.get('nom').valid && editForm.get('nom').errors['maxlength']">
+            El nom no pot ser més gran de 25 caràcters.
+          </small>
+          <small id="nomHelp" class="text-danger"
+          *ngIf="editForm.get('nom').touched && !editForm.get('nom').valid && editForm.get('nom').errors['groupNameExists']">
+            Aquest nom ja existeix al sistema.
+          </small>
+        </div>
     </div>
     <div class="form-group">
       <label for="quota">Minuts:</label>
