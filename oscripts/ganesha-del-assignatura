@@ -67,7 +67,7 @@ echo "{"
         error="0"
 
         if [ "$forzar_borrado" = "TRUE" ]; then
-				  echo /bin/rm -rf $HOME_GANESHA"/$asignatura/$directorio_grupo" 2>/dev/null 1>/dev/null || error=530;
+				  /bin/rm -rf $HOME_GANESHA"/$asignatura/$directorio_grupo" 2>/dev/null 1>/dev/null || error=530;
         else
           /bin/rmdir $HOME_GANESHA"/$asignatura/$directorio_grupo" 2>/dev/null 1>/dev/null || error=530;
         fi
