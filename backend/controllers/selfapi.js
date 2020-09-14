@@ -958,7 +958,7 @@ exports.deleteAssignatura = (req, res) => {
   const assignatura = req.body.assignatura;
 
   const { stdout, stderr, code } = shell.exec('sudo /usr/local/sbin/ganesha-del-assignatura ' + assignatura.codi + " " +
-  assignatura.tamanygb + "G " + "TRUE", {silent: true});
+    "TRUE", {silent: true});
 
   if (stdout) {
     console.log("Stdout", stdout);
