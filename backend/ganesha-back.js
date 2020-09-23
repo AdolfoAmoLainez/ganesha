@@ -62,6 +62,13 @@ app.use('/api/crud/*', cas.serviceValidate(),(req, res, next) => {
 
 });
 
+app.use("/api/crud/assignatures/:id", function(req, res, next) {
+  if (req.body.validapgina == false) {
+    req.body.validapgina = 0;
+  }
+  next();
+});
+
 var api = mysqlrestapi(app, dbconfig);
 
 app.use("/loginapi", loginApiRoutes);
