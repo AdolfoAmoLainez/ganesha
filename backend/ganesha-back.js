@@ -21,8 +21,12 @@ app.use((req, res, next) => {
 
 })
 
-// app.use('/api/crud/assignatures', assignaturesRoutes)
-
+app.use("/api/crud/assignatures/:id", function(req, res, next) {
+  if (req.body.validapgina == false) {
+    req.body.validapgina = 0;
+  }
+  next();
+});
 
 var api = mysqlrestapi(app, dbconfig);
 app.use("/selfapi", selfApiRoutes);
