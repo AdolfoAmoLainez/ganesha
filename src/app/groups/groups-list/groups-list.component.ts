@@ -36,6 +36,7 @@ export class GroupsListComponent implements  OnDestroy, OnInit {
   factorUnitats: number;
   minutsConsumits = 0;
   minutsDisponibles = 0;
+  minutsAudio = 20;
 
   addGroupsFrom: FormGroup;
 
@@ -259,7 +260,7 @@ export class GroupsListComponent implements  OnDestroy, OnInit {
     const minutsDisponibles = (this.assignatura.tamany - this.minutsConsumits) -
     (this.addGroupsFrom.get('quantitat').value * this.addGroupsFrom.get('quota').value);
 
-    console.log("totalMinuts: " + totalMinuts);
+    this.minutsAudio = valorInput * 20;
 
     if (totalMinuts < this.minutsDisponibles) {
 

@@ -120,13 +120,21 @@
                   (input)="onAddGroupFormChangeQuantitatValues($event.target.value)"/>
         </div>
         <div class="form-group">
-          <label for="quota">De quants minuts?:</label>
+          <div class="row">
+            <div class="col-12 col-sm-6">
+              <label for="quota">De quants minuts de vídeo?:</label>
           <input type="number" class="form-control" name="quota" id="quota" #quota formControlName="quota" min="0"
                  (input)="onAddGroupFormChangeQuotaValues($event.target.value)"/>
         </div>
+        <div class="col-12 col-sm-6">
+          <label for="minaudio">Minuts d'audio:</label>
+          <input type="number" readonly class="form-control" name="minaudio" id="minaudio" [value]="minutsAudio"/>
+        </div>
+      </div>
+    </div>
         <div class="form-group">
-            <label for="disponibles">Minuts disponibles:</label>
-            <input type="number" readonly class="form-control" name="disponibles" id="disponibles" formControlName="disponibles" #disponiblesInput/>
+          <label for="disponibles">Minuts de vídeo disponibles:</label>
+          <input type="number" readonly class="form-control" name="disponibles" id="disponibles" formControlName="disponibles" #disponiblesInput/>
           </div>
       </form>
     </div>
