@@ -156,12 +156,6 @@ export class DataBaseService {
     return this.http.post<{message: string, consulta: any}>(environment.selfApiUrl + 'get_minuts_consumits', peticio);
   }
 
-
-  /**
-   * TODO: Falta verificar què fem si canvia la quota!
-   * @param assignatura
-   */
-
   updateAssignatura(assignatura: Assignatura) {
     return this.http.put(environment.apiCrudUrl + 'assignatures/' + assignatura.id, assignatura).subscribe(
       (data: any) => {
@@ -387,7 +381,9 @@ export class DataBaseService {
             quota: data[0].quota,
             ordre: data[0].ordre,
             alumnes:  0
-          }
+          };
+
+          // tslint:disable-next-line: object-literal-shorthand
           return {assignatura_codi: data[0].codi, grup: grup};
         },
         (err) => {
@@ -531,7 +527,7 @@ export class DataBaseService {
     );
   }
 
-  getAlumnesNames(alumnes: Alumne[]) {
+  getAlumnesNames(alumnes) {
 
     const obj = {
       alumnes

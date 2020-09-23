@@ -25,6 +25,7 @@ export class UsuarisListComponent implements OnInit, OnDestroy {
   usuarisUpdatedSubs: Subscription;
   usuarisChangedSubs: Subscription;
   perfilsUpdatedSubs: Subscription;
+  usuarisNamesUpdatedSubs: Subscription;
 
   constructor(private modalService: NgbModal,
               private dbService: DataBaseService,
@@ -41,6 +42,8 @@ export class UsuarisListComponent implements OnInit, OnDestroy {
             this.isLoading = false;
           }
         );
+
+        this.dbService.getAlumnesNames(usuaris);
       }
     );
 
@@ -48,6 +51,18 @@ export class UsuarisListComponent implements OnInit, OnDestroy {
       () => {
         this.dbService.getUsuaris();
         this.isLoading = false;
+      }
+    );
+
+    this.usuarisNamesUpdatedSubs = this.dbService.alumnesNamesUpdated.subscribe(
+      (data: any) => {
+        if (data.length > 0) {
+          data.forEach(element => {
+            this.usuaris[this.usuaris.findIndex(alumne => {
+              return element.dn.includes(alumne.niu);
+            })].nom = element.cn[0] + ' ' + element.sn[0];
+          });
+        }
       }
     );
 
@@ -59,6 +74,7 @@ export class UsuarisListComponent implements OnInit, OnDestroy {
     this.usuarisUpdatedSubs.unsubscribe();
     this.usuarisChangedSubs.unsubscribe();
     this.perfilsUpdatedSubs.unsubscribe();
+    this.usuarisNamesUpdatedSubs.unsubscribe();
   }
 
   onGuardar(usuari: Usuari) {
@@ -74,6 +90,7 @@ export class UsuarisListComponent implements OnInit, OnDestroy {
     if (duplicat) {
       this.toastr.error('Aquest niu ja està afegit!!');
     } else {
+      usuari.nom = '';
       this.dbService.modificarUsuari(usuari);
     }
   }

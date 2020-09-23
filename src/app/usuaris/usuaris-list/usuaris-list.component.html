@@ -7,10 +7,10 @@
   <li class="list-group-item list-group-item-action">
     <div class="row justify-content-center">
       <div class="col-sm-1">Id</div>
-      <div class="col-sm-4">Niu</div>
+      <div class="col-sm-2">Niu</div>
+      <div class="col-sm-4">Nom</div>
       <div class="col-sm-2">Perfil</div>
-      <div class="col-sm-2"></div>
-      <div class="col-sm-1"></div>
+      <div class="col-sm-3"></div>
     </div>
   </li>
   <li
@@ -22,7 +22,7 @@
         <div class="col-sm-1">
           {{ usuari.id }}
         </div>
-        <div class="col-sm-4">
+        <div class="col-sm-2">
           <div class="form-group">
             <input
               type="text"
@@ -31,6 +31,18 @@
               [value]="usuari.niu"
               name="niu"
               [(ngModel)]="usuari.niu"
+            />
+          </div>
+        </div>
+        <div class="col-sm-4">
+          <div class="form-group">
+            <input
+              type="text"
+              class="form-control"
+              id="nom"
+              name="nom"
+              [(ngModel)]="usuari.nom"
+              disabled
             />
           </div>
         </div>
@@ -49,11 +61,11 @@
             </select>
           </div>
         </div>
-        <div class="col-sm-2">
+        <div class="col">
           <button type="button" class="btn btn-primary" (click)="onGuardar(usuari)">Guardar</button>
         </div>
-        <div class="col-sm-1 ml-2">
-            <fa-icon [icon]="faTimes"
+        <div class="col">
+          <fa-icon [icon]="faTimes"
             class="fa-2x text-danger "
             style="cursor: pointer;"
             (click)="onEsborrar(usuari)"></fa-icon>
