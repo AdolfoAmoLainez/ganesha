@@ -89,7 +89,7 @@
   <div class="modal-body">
     <form [formGroup]="newAlumneForm">
       <div class="form-group">
-        <label for="niu">Introduiu el NIU del professor:</label>
+        <label for="niu">Introduiu el NIU de l'alumne:</label>
         <input type="text" class="form-control" name="niu" id="niu" #niu formControlName="niu" />
         <div *ngIf="newAlumneForm.get('niu').errors">
           <small id="nomHelp" class="text-danger"
