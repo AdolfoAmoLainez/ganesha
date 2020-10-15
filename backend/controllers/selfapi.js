@@ -1,6 +1,6 @@
 var dbconfig = require('../mysqlconn');
 const shell = require('shelljs');
-var LDAP = require('ldap-client');
+/* var LDAP = require('ldap-client');
 
 var ldap = new LDAP({
     uri:             'ldap://montblanc.uab.es',   // string
@@ -12,7 +12,7 @@ var ldap = new LDAP({
     scope:           LDAP.SUBTREE,      // default scope for all future searches
 }, function(err) {
     // connected and ready
-});
+}); */
 
 /**
  *
@@ -33,7 +33,7 @@ function insertaLog (logEntry) {
 
   dbconfig.connection.query( //Afegir log
     "INSERT INTO `logs` (`usuari`, `accio`, `parametres`, `resultat`, `resposta`) " +
-    'VALUES ("'+logEntry.niu+'", "'+logEntry.accio+'",\''+logEntry.parametres+'\', "'+logEntry.resultat+'", "'+logEntry.resposta+'");',
+    'VALUES ("'+logEntry.niu+'", "'+logEntry.accio+'",\''+logEntry.parametres+'\', "'+logEntry.resultat+'", \''+logEntry.resposta+'\');',
     (errorinsert, result) =>{
 
       if (!errorinsert){
@@ -50,36 +50,22 @@ function insertaLog (logEntry) {
  * @param {*} username: Nom d'usuari
  * @param {*} callback: Funció per tornar true/false
  */
-
 function checkUsernameExists(username, callback) {
-  ldap.bind({
-    binddn: 'cn=proxyCC,ou=CC,ou=users,o=sids',
-    password: 'proxy135'
-},
-(errBind) => {
-  if (!errBind) {
-     ldap.search({
-                      base: 'o=sids',
-                      scope: LDAP.SUBTREE,
-                      filter: '(uid='+username+')',
-                      attrs: 'cn, sn'
-                    },
-                    (err, data) => {
-                      if (err) {
-                        callback(false)
-                      } else {
-                        if (data.length === 0) {
-                          callback(false);
-                        } else {
-                          callback(true);
-                        }
-                      }
+  const { stdout, stderr, code } = shell.exec('ldapsearch -x -b "o=sids" -D "cn=proxycc,ou=cc,ou=users,o=sids" -w proxy135 -H ldaps://carbol.uab.es -L "(uid='+username+')"', {silent: true});
 
-                    });
-  }
-
-});
+      if (stdout) {
+        if (stdout.includes('numEntries:')) {
+          callback(true);
+          return;
+        }
+        else {
+          callback(false);
+          return;
+        }
+      }
+      callback(false);
 }
+
 
 /**
  * Request:
@@ -106,37 +92,58 @@ exports.getAlumnesNames = (req, res) => {
   console.log("\nBusca Noms Alumnes!");
   console.log(req.body);
 
-  filtro = '(|';
+  arrayAlu = [];
 
   req.body.alumnes.forEach(alumne => {
-    filtro += '(uid=' + alumne.niu + ')';
+    const { stdout, stderr, code } = shell.exec('ldapsearch -x -b "o=sids" -D "cn=proxycc,ou=cc,ou=users,o=sids" -w proxy135 -H ldaps://carbol.uab.es -L "(uid='+alumne.niu+')" sn cn | grep "dn:\\|sn:\\|cn:"', {silent: true});
+
+      if (stdout) {
+        lines = stdout.split('\n');
+
+        var userObj = {
+                dn:'',
+                sn:[],
+                cn:[]
+        };
+        for(var line = 0; line<lines.length;line++){
+
+          const partes = lines[line].split(':');
+          if(lines[line].includes("dn:")){
+                  const dn = lines[line].split(':')[1].trim();
+                  userObj.dn=dn;
+          }
+          if(lines[line].includes("sn:")){
+            sn ='';
+            if (partes.length === 3 ){
+              //Assumim que llavors está codificat en Base64 per accents
+              sn = ':' + lines[line].split(':')[2];
+              sn = Buffer.from(sn, 'base64').toString();
+            } else {
+              sn = lines[line].split(':')[1].trim();
+            }
+
+            userObj.sn[0]=sn;
+
+          }
+          if(lines[line].includes("cn:")){
+            cn ='';
+            if (partes.length === 3 ){
+              //Assumim que llavors está codificat en Base64 per accents
+              cn = ':' + lines[line].split(':')[2];
+              cn = Buffer.from(cn, 'base64').toString();
+            } else {
+              cn = lines[line].split(':')[1].trim();
+            }
+
+            userObj.cn[0]=cn
+
+          }
+
+        }
+        arrayAlu.push(userObj);
+      }
   });
-  filtro += ')';
-
-  ldap.bind({
-    binddn: 'cn=proxyCC,ou=CC,ou=users,o=sids',
-    password: 'proxy135'
-},
-(errBind) => {
-  if (!errBind) {
-     ldap.search({
-                      base: 'o=sids',
-                      scope: LDAP.SUBTREE,
-                      filter: filtro,
-                      attrs: 'cn, sn'
-                    },
-                    (err, data) => {
-                      if (err) {
-                        res.status(200).json([]);
-                      } else {
-                        res.status(200).json(data);
-                      }
-
-                    });
-  }
-
-});
-
+  res.status(200).json(arrayAlu);
 }
 
 /**
@@ -227,7 +234,7 @@ exports.addGrups = (req, res) => {
                     const resposta = {problemes: -1, grups:[{message: "Error en la resposta de l'script ganesha-add-grups!"}]};
                     res.status(520).json(resposta);
                     logEntry.resultat = 'error';
-                    logEntry.resposta = resposta.stringify();
+                    logEntry.resposta = JSON.stringify(resposta);
                     insertaLog(logEntry);
                     return;
                   }
@@ -261,22 +268,22 @@ exports.addGrups = (req, res) => {
                           const resposta = {problemes: grupsWithError.length, grups: grupsWithError};
                           res.status(521).json(resposta);
                           logEntry.resultat = 'error';
-                          logEntry.resposta = resposta.stringify();
+                          logEntry.resposta = JSON.stringify(resposta);
                           insertaLog(logEntry);
                         }
                       } else {
-                        const resposta = {problemes: valuesInsert.length, grups: [{message: "No s'ha pogut insertar els grups a la BBDD!"}]};
+                        const resposta = {problemes: valuesInsert.length, grups: [{message: "No ha estat possible insertar els grups a la BBDD!"}]};
                         res.status(520).json(resposta);
                         logEntry.resultat = 'error';
-                        logEntry.resposta = resposta.stringify();
+                        logEntry.resposta = JSON.stringify(resposta);
                         insertaLog(logEntry);
                       }
                     });
                   } else {
                     console.log("Error: No s'ha pogut crear cap grup!");
-                    res.status(520).json({problemes: -1, grups: [{message: "Error: No s'ha pogut crear cap grup!"}]});
+                    res.status(520).json({problemes: -1, grups: [{message: "Error: No ha estat possible crear cap grup!"}]});
                     logEntry.resultat = 'error';
-                    logEntry.resposta = "No s'ha pogut crear cap grup!";
+                    logEntry.resposta = "No ha estat possible crear cap grup!";
                     insertaLog(logEntry);
                     return;
                   }
@@ -330,9 +337,11 @@ exports.deleteGrups = (req, res) => {
 
   req.body.grups.forEach(element => {
 
-    const nom = req.body.assigCodi + '-g' + element.ordre;
-    nomGrups.push(nom);
-    arrayGrups[nom]=element;
+/*      const nom = req.body.assigCodi + '-g' + element.ordre;
+     nomGrups.push(nom);
+     arrayGrups[nom]=element; */
+     nomGrups.push(element.nom);
+     arrayGrups[element.nom]=element;
 
   });
 
@@ -347,7 +356,7 @@ exports.deleteGrups = (req, res) => {
           resultjson = JSON.parse(stdout);
         } catch ( err) {
           console.log("Error en la resposta de l'script ganesha-del-grups!");
-          res.status(520).json({problemes: -1, grups:[{message: "Error en la resposta de l'script ganesha-del-grups!"}] });
+          res.status(520).json({problemes: -1, grups:[{message: "Error en la resposta script ganesha-del-grups!"}] });
           logEntry.resultat = 'error';
           logEntry.resposta = "Error en la resposta de l'script ganesha-del-grups!";
           insertaLog(logEntry);
@@ -378,15 +387,15 @@ exports.deleteGrups = (req, res) => {
                 const resultat = {problemes: grupsWithError.length, grups: grupsWithError};
                 res.status(521).json(resultat);
                 logEntry.resultat = 'error';
-                logEntry.resposta = resultat.stringify();
+                logEntry.resposta = JSON.stringify(resultat);
                 insertaLog(logEntry);
               }
 
             } else {
-              const resultat = {problemes: grupsId.length, grups: [{message: "No s'ha pogut esborrar els grups de la BBDD!"}]};
+              const resultat = {problemes: grupsId.length, grups: [{message: "No ha estat possible esborrar els grups de la BBDD!"}]};
               res.status(520).json(resultat);
               logEntry.resultat = 'error';
-              logEntry.resposta = resultat.stringify();
+              logEntry.resposta = JSON.stringify(resultat);
               insertaLog(logEntry);
             }
           });
@@ -449,10 +458,18 @@ exports.addAlumneGrup = (req, res) => {
   console.log("\nAssignar usuari grup!");
   console.log(req.body);
 
-  checkUsernameExists(req.body.alumne.niu, (resposta) => {
+  responseError = 200;
+  responseMsj = 'Alumne afegit correctament!'
+
+  arrayAlumnes = req.body.alumne.niu.split(',');
+
+  for( var i = 0; i < arrayAlumnes.length; i++) {
+    const niu = arrayAlumnes[i];
+
+  checkUsernameExists(niu.trim(), (resposta) => {
     if (resposta === true) { //Niu existeix
 
-      const { stdout, stderr, code } = shell.exec('sudo /usr/local/sbin/ganesha-add-alumne-grup ' + req.body.alumne.niu + ' ' +
+      const { stdout, stderr, code } = shell.exec('sudo /usr/local/sbin/ganesha-add-alumne-grup ' + niu.trim() + ' ' +
       req.body.assigCodi + ' ' + req.body.grupName, {silent: true});
 
       if (stdout) {
@@ -475,38 +492,54 @@ exports.addAlumneGrup = (req, res) => {
           case 200:
               dbconfig.connection.query( //Afegir profe assignatura
                 "INSERT INTO `alumnes` (`id`, `niu`, `nom`, `grup_id`) " +
-                "VALUES (NULL, '"+req.body.alumne.niu+"', '"+req.body.alumne.nom+"','"+req.body.alumne.grup_id+"');",
+                "VALUES (NULL, '"+niu.trim()+"', '"+req.body.alumne.nom+"','"+req.body.alumne.grup_id+"');",
                 (errorinsert) =>{
                   if (!errorinsert){
-                    res.status(200).json({message: resultjson.message});
+                    // res.status(200).json({message: resultjson.message});
                     logEntry.resultat = 'success';
                     logEntry.resposta = resultjson.message;
                     insertaLog(logEntry);
                   } else {
-                    res.status(520).json({message: "No s'ha pogut insertar l'alumne a la BBDD"});
+                    // res.status(520).json({message: "No s'ha pogut insertar l'alumne a la BBDD"});
                     logEntry.resultat = 'error';
-                    logEntry.resposta = "No s'ha pogut insertar l'alumne a la BBDD";
+                    logEntry.resposta = "No ha estat possible insertar l'alumne a la BBDD";
                     insertaLog(logEntry);
+                    responseError = 520;
+                    responseMsj = "No s'ha pogut insertar l'alumne a la BBDD";
+                    return;
                   }
                 });
             break;
-          case 501: //Problema des de l'script
-          case 502:
-              res.status(501).json({message: resultjson.message});
-              logEntry.resultat = 'error';
-              logEntry.resposta = resultjson.message;
-              insertaLog(logEntry);
-            break;
+          default:
+                //res.status(resultjson.codi).json({message: resultjson.message});
+                logEntry.resultat = 'error';
+                logEntry.resposta = resultjson.message;
+                console.log("ERROR: " + resultjson.message);
+                insertaLog(logEntry);
+                responseError = resultjson.codi;
+                responseMsj = resultjson.message;
+                return;
+              break;
         }
-
+        if (responseError !== 0) return;
       }
     } else { // Niu no existeix
-      res.status(520).json({message: "NIU Alumne no vàlid!"});
+      //res.status(520).json({message: "NIU Alumne no vàlid!"});
       logEntry.resultat = 'error';
       logEntry.resposta = "NIU Alumne no vàlid!";
       insertaLog(logEntry);
+      responseError = 520;
+      responseMsj = "NIU Alumne no vàlid!";
+      return;
     }
   });
+
+  if (responseError !== 200) {break;}
+}
+
+
+res.status(200).json({message: responseMsj});
+
 
 }
 
@@ -609,13 +642,13 @@ exports.deleteAlumnesGrup = (req, res) => {
               } else {
                 res.status(521).json({problemes: alumnesWithError.length, alumnes: alumnesWithError});
                 logEntry.resultat = 'error';
-                logEntry.resposta = {problemes: alumnesWithError.length, alumnes: alumnesWithError}.stringify();
+                logEntry.resposta = JSON.stringify({problemes: alumnesWithError.length, alumnes: alumnesWithError});
                 insertaLog(logEntry);
               }
             } else {
               res.status(520).json({problemes: alumnesIdToDel.length, alumnes: [{message: "No s'ha pogut esborrar els alumnes de la BBDD!"}]});
               logEntry.resultat = 'error';
-              logEntry.resposta = "No s'ha pogut esborrar els alumnes de la BBDD!";
+              logEntry.resposta = "No ha estat possible esborrar els alumnes de la BBDD!";
               insertaLog(logEntry);
             }
           });
@@ -623,7 +656,7 @@ exports.deleteAlumnesGrup = (req, res) => {
         console.log("Error: No s'ha pogut esborrar cap alumne!");
         res.status(520).json({problemes: -1, alumnes: [{message: "Error:  No s'ha pogut esborrar cap alumne!"}]});
         logEntry.resultat = 'error';
-        logEntry.resposta = "No s'ha pogut esborrar cap alumne";
+        logEntry.resposta = "No ha estat possible esborrar cap alumne";
         insertaLog(logEntry);
         return;
       }
@@ -723,14 +756,14 @@ exports.deleteProfesAssignatura = (req, res) => {
                 const resultat = {problemes: profesWithError.length, profes: profesWithError};
                 res.status(521).json(resultat);
                 logEntry.resultat = 'error';
-                logEntry.resposta = resultat.stringify();
+                logEntry.resposta = JSON.stringify(resultat);
                 insertaLog(logEntry);
               }
             } else {
               const resultat = {problemes: profesIdToDel.length, profes: [{message: "No s'ha pogut esborrar els professors de la BBDD!"}]};
               res.status(520).json(resultat);
               logEntry.resultat = 'error';
-              logEntry.resposta = resultat.stringify();
+              logEntry.resposta = JSON.stringify(resultat);
               insertaLog(logEntry);
             }
           });
@@ -738,7 +771,7 @@ exports.deleteProfesAssignatura = (req, res) => {
         console.log("Error: No s'ha pogut esborrar cap professor!");
         res.status(520).json({problemes: -1, profes: [{message: "Error:  No s'ha pogut esborrar cap professor!"}]});
         logEntry.resultat = 'error';
-        logEntry.resposta = "Error:  No s'ha pogut esborrar cap professor!";
+        logEntry.resposta = "Error:  No ha estat possible esborrar cap professor!";
         insertaLog(logEntry);
         return;
       }
@@ -833,15 +866,16 @@ exports.addProfeAssignatura = (req, res) => {
                   } else {
                     res.status(520).json({message: "No s'ha pogut insertar el professor a la BBDD"});
                     logEntry.resultat = 'error';
-                    logEntry.resposta = "No s'ha pogut insertar el professor a la BBDD";
+                    logEntry.resposta = "No ha estat possible insertar el professor a la BBDD";
                     insertaLog(logEntry);
                   }
                 });
             break;
-          case 501: //Problema des de l'script
-              res.status(501).json({message: resultjson.message});
+            default:
+              res.status(stdjson.codi).json({message: stdjson.message});
               logEntry.resultat = 'error';
-              logEntry.resposta = resultjson.message;
+              logEntry.resposta = stdjson.message;
+              console.log("ERROR: " + stdjson.message);
               insertaLog(logEntry);
             break;
         }
@@ -913,7 +947,7 @@ exports.addAssignatura = (req, res) => {
               } else {
                 res.status(520).json({message: "No s'ha pogut insertar l'assignatura en la BBDD"});
                 logEntry.resultat = 'error';
-                logEntry.resposta = "No s'ha pogut insertar l'assignatura " + assignatura.codi + " en la BBDD.";
+                logEntry.resposta = "No ha estat possible insertar l'assignatura " + assignatura.codi + " en la BBDD.";
                 console.log("ERROR: No s'ha pogut insertar l'assignatura " + assignatura.codi + " en la BBDD.");
                 insertaLog(logEntry);
               }
@@ -980,7 +1014,7 @@ exports.deleteAssignatura = (req, res) => {
               } else {
                 res.status(520).json({message: "No s'ha pogut esborrar l'assignatura en la BBDD"});
                 logEntry.resultat = 'error';
-                logEntry.resposta = "No s'ha pogut esborrar l'assignatura " + assignatura.codi + " en la BBDD.";
+                logEntry.resposta = "No ha estat possible esborrar l'assignatura " + assignatura.codi + " en la BBDD.";
                 console.log("ERROR: No s'ha pogut esborrar l'assignatura " + assignatura.codi + " en la BBDD.");
                 insertaLog(logEntry);
               }
@@ -1002,7 +1036,7 @@ exports.deleteAssignatura = (req, res) => {
               } else {
                 res.status(520).json({message: "No s'ha pogut esborrar l'assignatura en la BBDD"});
                 logEntry.resultat = 'error';
-                logEntry.resposta = "No s'ha pogut esborrar l'assignatura " + assignatura.codi + " en la BBDD.";
+                logEntry.resposta = "No ha estat possible esborrar l'assignatura " + assignatura.codi + " en la BBDD.";
                 console.log("ERROR: No s'ha pogut esborrar l'assignatura " + assignatura.codi + " en la BBDD.");
                 insertaLog(logEntry);
               }
@@ -1112,7 +1146,7 @@ exports.addUsuari = (req, res) => {
       } else {
         res.status(520).json({message: "No s'ha pogut insertar l'usuari a la BBDD"});
         logEntry.resultat = 'error';
-        logEntry.resposta = "No s'ha pogut insertar l'usuari a la BBDD";
+        logEntry.resposta = "No ha estat possible insertar l'usuari a la BBDD";
         insertaLog(logEntry);
       }
 
@@ -1313,7 +1347,7 @@ exports.modifyGrup = (req, res) => {
 
                 res.status(520).json({message: "No s'ha pogut modificar el grup en la BBDD"});
                 logEntry.resultat = 'error';
-                logEntry.resposta = "No s'ha pogut modificar el grup " + req.body.nomAnterior + " en la BBDD.";
+                logEntry.resposta = "No ha estat possible modificar el grup " + req.body.nomAnterior + " en la BBDD.";
                 console.log("ERROR: No s'ha pogut modificar el grup " + req.body.nomAnterior + " en la BBDD.");
                 insertaLog(logEntry);
               }
