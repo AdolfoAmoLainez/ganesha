@@ -253,6 +253,10 @@ export class DataBaseService {
       quotaFisica,
       unitatsQuota
     };
+    
+    const modalRef = this.modalService.open(MymodalwaitComponent, {backdrop: 'static', keyboard: false});
+    modalRef.componentInstance.titol = 'Operació en procés';
+    modalRef.componentInstance.missatge = 'Esperi mentre creem els grups. Aquesta acció pot trigar uns minuts....';
 
     return this.http.post<{problemes: number, grups: any}>(environment.selfApiUrl + 'add_grups', obj).subscribe(
       (response) => {
@@ -265,6 +269,7 @@ export class DataBaseService {
           });
         }
         this.grupsChanged.next();
+        modalRef.dismiss();
       },
       (err) => {
 
@@ -277,6 +282,7 @@ export class DataBaseService {
           });
         }
         this.grupsChanged.next();
+        modalRef.dismiss();
       }
     );
   }
@@ -339,7 +345,7 @@ export class DataBaseService {
           this.toastr.error(err.error.grups[0].message);
         } else {
           err.error.grups.forEach(grup => {
-            this.toastr.error(grup.message + ' ' + grup.json.nomgrup);
+            this.toastr.error(grup.message);
           });
         }
         this.grupsChanged.next();
