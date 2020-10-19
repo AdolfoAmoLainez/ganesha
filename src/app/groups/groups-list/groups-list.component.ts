@@ -153,9 +153,6 @@ export class GroupsListComponent implements  OnDestroy, OnInit {
     modalRef.result.then(
       (resposta) => {
 
-        this.groups = this.groups.filter( grup => {
-          return !this.selectedGroups.includes(grup);
-        }); // Esborrem de la vista els grups sel·leccionats
         this.selectAll = false;
 
         this.dbService.deleteGrupsAssignatura(this.selectedGroups, this.assignatura.codi);
