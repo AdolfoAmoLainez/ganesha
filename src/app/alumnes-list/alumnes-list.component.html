@@ -6,12 +6,6 @@
 <ul class="list-group mt-4" *ngIf="!isLoading">
   <li class="list-group-item list-group-item-primary">
     <div class="row align-items-center">
-      <div class="col-sm-1" *ngIf="perfil == 'professor'">
-          <fa-icon [icon]="faBackspace"
-          class="fa-2x text-primary"
-          style="cursor: pointer;"
-          (click)="onBackClick()"></fa-icon>
-      </div>
       <div class="col-sm ml-2">
         <h5>Alumnes del grup {{ grup?.nom }}</h5>
       </div>

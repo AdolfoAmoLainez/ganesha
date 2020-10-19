@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy, AfterViewInit} from '@angular/core';
-import { ActivatedRoute, ParamMap } from '@angular/router';
+import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { Location } from '@angular/common';
 
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
@@ -55,7 +55,8 @@ export class GroupsListComponent implements  OnDestroy, OnInit {
               private activatedRoute: ActivatedRoute,
               private myLocation: Location,
               private dbService: DataBaseService,
-              private authService: AuthService) { }
+              private authService: AuthService,
+              private router: Router) { }
 
   ngOnInit() {
 
@@ -235,7 +236,8 @@ export class GroupsListComponent implements  OnDestroy, OnInit {
   }
 
   onBackClick() {
-    this.myLocation.back();
+    // this.myLocation.back();
+    this.router.navigate(['/','professor','assignatures'])
   }
 
   onAddGroupFormChangeQuantitatValues(valorInput: number) {
@@ -260,6 +262,7 @@ export class GroupsListComponent implements  OnDestroy, OnInit {
     const minutsDisponibles = (this.assignatura.tamany - this.minutsConsumits) -
     (this.addGroupsFrom.get('quantitat').value * this.addGroupsFrom.get('quota').value);
 
+    console.log("totalMinuts: " + totalMinuts);
     this.minutsAudio = valorInput * 20;
 
     if (totalMinuts < this.minutsDisponibles) {

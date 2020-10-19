@@ -19,7 +19,9 @@ const routes: Routes = [
   {path: 'login', component: LoginComponent},
   { path: 'professor', component: ProfeviewComponent, canActivate: [AuthGuard], data: {perfil: 'professor'}, children: [
     {path: 'assignatures', component: AssignaturesListComponent, data: {perfil: 'professor'}},
-    { path: 'grups/:assignaturaid', component: GroupsListComponent, data: {perfil: 'professor'}},
+    { path: 'grups/:assignaturaid', component: GroupsListComponent, data: {perfil: 'professor'}, children:[
+        {path: 'alumnes/:grupid', component: AlumnesListComponent, data: {perfil: 'professor'}}
+      ]},
     { path: 'alumnes/:grupid', component: AlumnesListComponent, data: {perfil: 'professor'}},
   ]},
   { path: 'adm', component: AdminviewComponent, canActivate: [AuthGuard], data: {perfil: 'adm'}, children: [

@@ -60,6 +60,7 @@ export class AlumnesListComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
+
     if (this.activatedRoute.parent.snapshot.data.perfil) {
       this.perfil = this.activatedRoute.parent.snapshot.data.perfil;
     }
@@ -118,6 +119,7 @@ export class AlumnesListComponent implements OnInit, OnDestroy {
         this.dbService.getAlumnesGrup(this.grupId);
         this.selectedAlumnes = [];
 
+        window.scrollTo(0,0);
       }
     );
   }
