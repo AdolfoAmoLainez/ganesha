@@ -5,7 +5,7 @@
 </div>
 
 <div class="row " *ngIf="!isLoading">
-  <div [class.col-sm-6]="perfil==='adm'" [class.col-sm-12]="perfil!=='adm'">
+  <div class="col-sm-6">
     <div class="list-group">
       <div class="list-group-item list-group-item-primary mt-4" *ngIf="perfil == 'professor'">
         <div class="row align-items-center" >
@@ -58,14 +58,14 @@
               <label class="custom-control-label" [attr.for]="group.id"></label>
             </div>
           </div>
-          <h2 class="col-auto">
-            <a *ngIf="perfil == 'professor'" [routerLink]="['/professor','alumnes', group.id]" class="btn btn-link">{{
+          <div class="col-auto">
+            <a *ngIf="perfil == 'professor'" [routerLink]="['alumnes', group.id]" class="btn btn-link">{{
               group.nom + " -> " + group.quota + "min."
             }}</a>
             <a *ngIf="perfil == 'adm'" [routerLink]="['alumnes', group.id]" class="btn btn-link">{{
               group.nom + " -> " + group.quota + "min."
             }}</a>
-         </h2>
+          </div>
          <div class="col-1">
             <fa-icon [icon]="faEdit"
                      style="cursor: pointer;"

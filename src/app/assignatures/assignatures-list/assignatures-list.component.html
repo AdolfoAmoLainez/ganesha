@@ -1,21 +1,22 @@
 <div *ngIf="perfil == 'professor'">
-  <div class="list-group mt-4">
-    <div class="list-group-item list-group-item-primary">
-      <div class="row align-items-center">
-        <div class="col-sm">
+  <div class="row align-items-center">
+    <div class="col-8">
+      <div class="list-group mt-4">
+        <div class="list-group-item list-group-item-primary">
           <h5>
             Assignatures
           </h5>
         </div>
+
+        <div
+          class="list-group-item list-group-item-action"
+          *ngFor="let assignatura of assignatures"
+        >
+          <a [routerLink]="['grups', assignatura.id]" class="btn btn-link"
+          (click)="onAssignaturaProfeClick(assignatura.id)" >{{ assignatura.codi }} - {{ assignatura.nom }}</a
+          >
+        </div>
       </div>
-    </div>
-    <div
-      class="list-group-item list-group-item-action"
-      *ngFor="let assignatura of assignatures"
-    >
-      <a [routerLink]="['grups', assignatura.id]" class="btn btn-link"
-      (click)="onAssignaturaProfeClick(assignatura.id)" >{{ assignatura.codi }} - {{ assignatura.nom }}</a
-      >
     </div>
   </div>
 </div>
@@ -54,3 +55,5 @@
 
 </div>
 </div>
+
+
