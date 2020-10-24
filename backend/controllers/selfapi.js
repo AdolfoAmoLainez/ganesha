@@ -33,7 +33,7 @@ function insertaLog (logEntry) {
 
   dbconfig.connection.query( //Afegir log
     "INSERT INTO `logs` (`usuari`, `accio`, `parametres`, `resultat`, `resposta`) " +
-    'VALUES ("'+logEntry.niu+'", "'+logEntry.accio+'",\''+logEntry.parametres+'\', "'+logEntry.resultat+'", \''+logEntry.resposta+'\');',
+    'VALUES ("'+logEntry.niu+'", "'+logEntry.accio+'",\''+logEntry.parametres+'\', "'+logEntry.resultat+'", "'+logEntry.resposta+'");',
     (errorinsert, result) =>{
 
       if (!errorinsert){
