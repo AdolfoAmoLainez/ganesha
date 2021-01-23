@@ -1,10 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { Subject } from 'rxjs';
-import { isUndefined } from 'util';
 import { HttpClient } from '@angular/common/http';
 
-import { DataBaseService } from '../shared/database.service';
 import {environment} from '../../environments/environment';
 
 
@@ -45,7 +43,7 @@ export class AuthService {
 
   getPerfil() {
     this.username = JSON.parse(localStorage.getItem('currentUser'));
-    if (isUndefined(this.username)) {
+    if (this.username == undefined) {
       this.logout();
       return undefined;
     } else {
@@ -59,8 +57,8 @@ export class AuthService {
 
   getUsername() {
     const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-    if (isUndefined(currentUser)) {
-        this.logout();
+    if (currentUser == undefined) {
+      this.logout();
         return undefined;
     } else {
         return currentUser;
