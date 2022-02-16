@@ -32,46 +32,45 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { LogsviewComponent } from './logs/logsview/logsview.component';
 
 @NgModule({
-  declarations: [
-    AppComponent,
-    AssignaturesListComponent,
-    HeaderComponent,
-    GroupsListComponent,
-    AlumnesListComponent,
-    ProfessorsListComponent,
-    AssignaturaInfoComponent,
-    AssignaturaViewComponent,
-    MymodalyesnoComponent,
-    UsuarisListComponent,
-    LoginComponent,
-    AdminviewComponent,
-    MymodalwaitComponent,
-    GroupEditModalComponent,
-    ProfeviewComponent,
-    LogsviewComponent
-  ],
-  imports: [
-    BrowserModule,
-    FormsModule,
-    NgbModalModule,
-    NgbAccordionModule,
-    AppRoutingModule,
-    HttpClientModule,
-    ReactiveFormsModule,
-    BrowserAnimationsModule,
-    ToastrModule.forRoot({
-      timeOut: 3000,
-      positionClass: 'toast-bottom-left',
-      preventDuplicates: true,
-      tapToDismiss: true,
-      newestOnTop: true
-    }),
-    NgbModule,
-    FontAwesomeModule
-  ],
-  providers: [DataBaseService, AuthService],
-  bootstrap: [AppComponent],
-  entryComponents: [MymodalyesnoComponent, MymodalwaitComponent, GroupEditModalComponent]
+    declarations: [
+        AppComponent,
+        AssignaturesListComponent,
+        HeaderComponent,
+        GroupsListComponent,
+        AlumnesListComponent,
+        ProfessorsListComponent,
+        AssignaturaInfoComponent,
+        AssignaturaViewComponent,
+        MymodalyesnoComponent,
+        UsuarisListComponent,
+        LoginComponent,
+        AdminviewComponent,
+        MymodalwaitComponent,
+        GroupEditModalComponent,
+        ProfeviewComponent,
+        LogsviewComponent
+    ],
+    imports: [
+        BrowserModule,
+        FormsModule,
+        NgbModalModule,
+        NgbAccordionModule,
+        AppRoutingModule,
+        HttpClientModule,
+        ReactiveFormsModule,
+        BrowserAnimationsModule,
+        ToastrModule.forRoot({
+            timeOut: 3000,
+            positionClass: 'toast-bottom-left',
+            preventDuplicates: true,
+            tapToDismiss: true,
+            newestOnTop: true
+        }),
+        NgbModule,
+        FontAwesomeModule
+    ],
+    providers: [DataBaseService, AuthService],
+    bootstrap: [AppComponent]
 })
 export class AppModule {
 
