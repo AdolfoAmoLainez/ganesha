@@ -575,4 +575,12 @@ export class DataBaseService {
 
   }
 
+  resetPwAlumne(username: string) {
+    const obj = {
+      username
+    };
+
+    return this.http.post<{status: string, message: string}>(environment.selfApiUrl + 'set_passwd', obj);
+  }
+
 }
