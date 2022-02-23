@@ -30,6 +30,7 @@ import { ProfeviewComponent } from './profeview/profeview.component';
 
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { LogsviewComponent } from './logs/logsview/logsview.component';
+import { AluviewComponent } from './aluview/aluview.component';
 
 @NgModule({
     declarations: [
@@ -48,7 +49,8 @@ import { LogsviewComponent } from './logs/logsview/logsview.component';
         MymodalwaitComponent,
         GroupEditModalComponent,
         ProfeviewComponent,
-        LogsviewComponent
+        LogsviewComponent,
+        AluviewComponent
     ],
     imports: [
         BrowserModule,
