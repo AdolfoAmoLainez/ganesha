@@ -24,4 +24,5 @@ router.post('/test_user_pgina_validation', SelfApiController.testUserPginaValida
 router.post('/mod_grup', SelfApiController.modifyGrup);
 router.post('/get_logs', SelfApiController.getLogs);
 router.post('/testnamenottaken', SelfApiController.testNomGrum);
+router.post('/set_passwd', SelfApiController.setPasswd);
 module.exports = router;

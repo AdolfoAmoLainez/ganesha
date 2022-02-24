@@ -510,6 +510,7 @@ export class DataBaseService {
       },
       (err) => {
         this.toastr.error('Ha hagut un error al guardar l\'usuari');
+
       }
     );
   }
@@ -562,6 +563,14 @@ export class DataBaseService {
 
     return this.http.post<{nomgrupexisteix: boolean}>(environment.selfApiUrl + 'testnamenottaken', obj);
 
+  }
+
+  resetPwAlumne(username: string) {
+    const obj = {
+      username
+    };
+
+    return this.http.post<{status: string, message: string}>(environment.selfApiUrl + 'set_passwd', obj);
   }
 
 }

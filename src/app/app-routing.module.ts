@@ -13,6 +13,7 @@ import { AdminviewComponent } from './adminview/adminview.component';
 import { ProfeviewComponent } from './profeview/profeview.component';
 import { AuthGuard } from './auth/auth.guard';
 import { LogsviewComponent } from './logs/logsview/logsview.component';
+import { AluviewComponent } from './aluview/aluview.component';
 
 const routes: Routes = [
   {path: '', redirectTo: '/login', pathMatch: 'full'},
@@ -39,7 +40,8 @@ const routes: Routes = [
     {
       path: 'logs', component: LogsviewComponent
     }
-  ]}
+  ]},
+  {path:'alumne', component: AluviewComponent}
   // { path: 'path', component: FeatureComponent },
   // { path: '**', component: PageNotFoundComponent },
 ];

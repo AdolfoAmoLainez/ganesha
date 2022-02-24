@@ -1181,7 +1181,28 @@ exports.validaUsuari = (req, res) => {
           res.status(200).json({status: 'success', message: 'Usuari validat correctament!', perfils});
 
         } else {
-          res.status(200).json({status: 'error', message: 'Aquest usuari no pot accedir a l\'aplicació', perfils});
+
+          dbconfig.connection.query(
+            "SELECT niu FROM `alumnes` WHERE niu='"+req.body.username+"';",
+            (errorSel, alumne) => {
+              if(!errorSel) {
+                if (alumne.length === 1) {
+
+                  const { stdout, stderr, code } = shell.exec('sudo smbldap-usermod ' + 
+                                                              "-N 'perico' " + 
+                                                              "-S 'test test' " + 
+                                                              '-M perico@autonoma.uab.cat ' +
+                                                              req.body.username, {silent: true});
+
+                  res.status(200).json({status: 'success', message: 'Usuari validat correctament!', perfils:[{perfil: 'alumne'}]});
+        
+                } else {
+                  res.status(200).json({status: 'error', message: 'Aquest usuari no pot accedir a l\'aplicació', perfils});
+                }
+              } else {
+                res.status(500).json({message: "No s'ha pogut consultar l'usuari!"});
+              }
+            });
         }
 
       } else {
@@ -1509,3 +1530,43 @@ exports.testNomGrum = (req, res) => {
   }
 
 }
+
+
+function makePw(length) {
+  var result           = '';
+  var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789.?#';
+  var charactersLength = characters.length;
+  for ( var i = 0; i < length; i++ ) {
+    result += characters.charAt(Math.floor(Math.random() * 
+charactersLength));
+ }
+ return result;
+}
+
+/**
+ * Fa canvi de password d'un alumne a ldap
+ *
+ * Request:
+ *  username
+ *
+ * Response:
+ *    status: success, error
+ *    message: missatge d'error
+ */
+
+ exports.setPasswd = (req, res) => {
+   var message ="";
+
+  console.log("\nsetPasswd!!");
+
+  var pw = makePw(9);
+
+  const { stdout, stderr, code } = shell.exec('echo -e "'+pw+'" | sudo smbldap-passwd -s -p ' + req.body.username, {silent: true});
+
+  if (code == 0) {
+    message = "Usuari activat correctament. Revisa el teu correu";
+  } else {
+    message = "Ha hagut algun error al activar l'usuari";
+  }
+  res.status(200).json({status: 'success', message});
+ }

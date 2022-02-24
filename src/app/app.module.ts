@@ -31,6 +31,7 @@ import { ProfeviewComponent } from './profeview/profeview.component';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { LogsviewComponent } from './logs/logsview/logsview.component';
 import { ErrorInterceptor } from './shared/httperror.interceptor';
+import { AluviewComponent } from './aluview/aluview.component';
 
 @NgModule({
   declarations: [
@@ -49,7 +50,8 @@ import { ErrorInterceptor } from './shared/httperror.interceptor';
     MymodalwaitComponent,
     GroupEditModalComponent,
     ProfeviewComponent,
-    LogsviewComponent
+    LogsviewComponent,
+    AluviewComponent
   ],
   imports: [
     BrowserModule,
