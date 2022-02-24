@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { AuthService } from '../auth/auth.service';
 import { DataBaseService } from '../shared/database.service';
 
 @Component({
@@ -11,12 +12,26 @@ export class AluviewComponent implements OnInit {
   veureBtn = true;
   error = false;
   missatge = 'Fent click a "Activa", s\'activarà el teu niu per poder accedir a les carpetes de Ganesha. ' +
-             'Es generarà una contrasenya que rebràs al teu correu electrònic de la uab mail@autonoma.uab.cat';
+             'Es generarà una contrasenya que rebràs al teu correu electrònic de la uab mail@autonoma.uab.cat ' +
+             'i que serà vàlida durant aquest dia.';
   msgBtnActivar = "Activa";
+  perfil = '';
+  msgBtnSortir = 'Sortir';
 
-  constructor(private dbService: DataBaseService) { }
+  constructor(private dbService: DataBaseService,
+              private authService: AuthService) { }
 
   ngOnInit(): void {
+    this.authService.getPerfil().subscribe(
+      (data) => {
+        this.perfil = data.perfils[0].perfil;
+        
+
+        if (this.perfil === 'professor') {
+          this.msgBtnSortir = "Tancar";
+        } 
+      }
+    );
   }
 
   activarClick() {
@@ -39,6 +54,14 @@ export class AluviewComponent implements OnInit {
         
       }
     )
+  }
+
+  sortirClick() {
+    if (this.perfil === 'professor') {
+      window.history.back();
+    } else {
+      this.authService.logout();
+    }
   }
 
 }
