@@ -22,17 +22,19 @@ paths: {
 exports.getUserData = (req, res) => {
 
 
-  if (req.session.cas && req.session.cas.user) {
-    SelfApiController.getUserData(req.session.cas.user, (codi, perfils) => {
+  if (req.session.cas && req.session.cas.attributes.niu) {
+    const usuari = req.session.cas.attributes.niu;
+
+    SelfApiController.getUserData(usuari, (codi, perfils) => {
       switch (codi) {
         case 200:
-          res.status(200).json({username:req.session.cas.user,message: "Usuari validat correctament!", perfils});
+          res.status(200).json({username:usuari,message: "Usuari validat correctament!", perfils});
           break;
         case 401:
-          res.status(401).json({username:req.session.cas.user,message: "L'usuari no té permís per fer servir aquesta aplicació!"});
+          res.status(401).json({username:usuari,message: "L'usuari no té permís per fer servir aquesta aplicació!"});
           break;
         case 500:
-          res.status(401).json({username:req.session.cas.user,message: "No s'ha pogut validar l'usuari!"});
+          res.status(401).json({username:usuari,message: "No s'ha pogut validar l'usuari!"});
           break;
       }
     });
@@ -45,16 +47,24 @@ exports.getUserData = (req, res) => {
 exports.login = (req, res) => {
   console.log("\nloginapi.login!");
 
-  SelfApiController.getUserData(req.session.cas.user, (codi, perfils) => {
+  const usuari = req.session.cas.attributes.niu;
+
+  SelfApiController.getUserData(usuari, (codi, perfils) => {
     switch (codi) {
       case 200:
-        res.redirect(302,'/login');
+        // Guardem dades a l'ldap
+        const { stdout, stderr, code } = shell.exec('sudo /usr/local/sbin/ganesha-set-ldap-info ' + usuari + " " +
+        "\"" + req.session.cas.attributes.givenName + "\" " +
+        "\"" + req.session.cas.attributes.sn + "\" " +
+        req.session.cas.attributes.mail, {silent: true});
+
+        res.redirect(302,'/login').json(stdout);
         break;
       case 401:
-        res.status(401).json({username:req.session.cas.user,message: "L'usuari no té permís per fer servir aquesta aplicació!"});
+        res.status(401).json({username:usuari,message: "L'usuari no té permís per fer servir aquesta aplicació!"});
         break;
       case 500:
-        res.status(401).json({username:req.session.cas.user,message: "No s'ha pogut validar l'usuari!"});
+        res.status(401).json({username:usuari,message: "No s'ha pogut validar l'usuari!"});
         break;
     }
   });

@@ -44,6 +44,7 @@ codigo_537="El directori del grup de l assignatura no es pot buidar, motiu desco
 codigo_538="El nom de l assignatura és massa llarg, màxim 15 caràcters"
 codigo_539="El nom de l assignatura conté caràcters no vàlids, només pot contenir lletres en minúscula, nombres i –"
 codigo_540="L usuari ha estat eliminat del grup d assignatura principal, però no de tots els grups de l assignatura"
+codigo_541="No s han pogut modificar els atributs al LDAP"
 codigo_599="Manquen paràmetres a la comanda"
 
 #codigo_200="Todo correcto"
