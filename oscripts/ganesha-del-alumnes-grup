@@ -1,10 +1,12 @@
 #!/bin/bash
 #
 
-#  Nombre script: ganesha-del-alumnes-grup
+#  Nombre script: ganesha-del-alumnes-grup.en_pruebas
+#  Version: ganesha 02-03-2022
+#  Verificado: NO
 # 
 #  Parámetros de entrada: 
-#    $1="usuario" 
+#    $1="usuarios" 
 #    $2="asignatura"
 #    $3="grupo_asignatura" 
 #    $4="vaciar_grupo" (TRUE/Cualquier otro valor diferente de "TRUE" será falso)
@@ -73,9 +75,29 @@ salida()
 
 
 		if [ "$error" -lt "500" ]; then /usr/sbin/deluser $usuario $grupo_asignatura 2>/dev/null 1>/dev/null || error=520; fi 
-		if [ "$error" -lt "500" ] && [ "$(grep $asignatura /etc/group | grep $usuario | wc -l)" -lt "2" ] ; then
- 			/usr/sbin/deluser $usuario $asignatura 2>/dev/null 1>/dev/null || error=521
-		 fi
+
+                if [ "$error" -lt "500" ] ; then     
+		
+		existe_en_grupo="0"
+ 
+                 cd $HOME_GANESHA"/$asignatura"
+                     for grupo_asignatura_usuario in $(find ./ -maxdepth 1 -mindepth 1 -type d -printf '%f\n') ; do
+
+                       if [ "$(grep "$grupo_asignatura_usuario" /etc/group | grep "$usuario," | wc -l)" -gt "0" ] || [ "$(grep "$grupo_asignatura_usuario" /etc/group | grep ",$usuario" | wc -l)" -gt "0" ] ; then
+                            
+#                           echo  "El usuario está al menos en el grupo $grupo_asignatura_usuario. Abortando";  existe_en_grupo="1" 
+			   existe_en_grupo="1"
+                           break
+                       fi
+
+                     done
+
+                     if [ "$existe_en_grupo" -lt "1" ] ; then
+#                           echo "El usuario $usuario se puede borrar del grupo de asignatura $asignatura."  
+                           /usr/sbin/deluser $usuario $asignatura 2>/dev/null 1>/dev/null || error=521
+                     fi
+
+		fi
 
         	if [ "$error" -gt "500" ]; then
 	             txt_salida="$txt_salida$(salida "ERROR" "$error" "$usuario" "$asignatura" "$grupo_asignatura")"

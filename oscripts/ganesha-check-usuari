@@ -1,0 +1,59 @@
+#!/bin/bash
+#
+
+#  Nombre script: ganesha-check-usuari
+#  Version: ganesha 02-03-2022
+#  Verificado: NO
+#
+#  Parámetros de entrada:
+#    $1="usuario"
+#
+#  Salida en STDOUT (no STDERR):
+#    {
+#    "codi":"<codi>",
+#    "message":"<mensaje>",
+#    "json": { "usuario":"<usuario>", "asignatura":"<asignatura>", "grupo_asignatura":"<grupo_asignatura>" }
+#
+#  Operaciones:
+#	1.- Comprobar si existe "usuario" en el ldap 
+#
+#  Codigos de error:
+#	543 - L usuari no existeix al LDAP ni en local
+#	599 - Faltan parámetros
+
+source /usr/local/sbin/ganesha-config.sh
+usuario="$1"
+
+salida()
+{
+  echo "{"
+  echo "\"codi\":$2,"
+  if [ "$2" -eq "200" ]; then
+      echo "\"message\":\"$1\","
+  else
+      codigo_error="codigo_$2"
+      echo "\"message\":\"${!codigo_error}\","
+  fi
+  echo "\"json\": [ {\"usuario\":\"$usuario\"} ] " ;
+  echo "}"
+}
+
+error="0"
+
+if [[ $usuario ]]; then
+       	
+	if [ $(getent shadow "$usuario") ]; then
+	    error=200
+	else
+	    error=543
+	fi
+else
+  error=599
+fi
+
+if [ "$error" -gt "500" ]; then
+        salida "ERROR" "$error"
+else
+        salida "Usuari existex al LDAP o en local!" "200"
+fi
+

@@ -2,6 +2,8 @@
 #
 
 #  Nombre script: ganesha-add-alumne-grup
+#  Version: ganesha 02-03-2022 
+#  Verificado: NO
 # 
 #  Parámetros de entrada: 
 #    $1="usuario" 
@@ -26,6 +28,7 @@
 #	508 - El grupo local del grupo de la asignatura no existe
 #	509 - No se puede añadir el usuario al grupo local de la asignatura, motivo desconocido
 #	510 - No se puede añadir el usuario al grupo local del grupo de la asignatura, motivo desconocido
+#       542 - L usuari no es pot crear al LDAP amb smbldap-useradd, motiu desconegut
 #	599 - Faltan parametros
 
 source /usr/local/sbin/ganesha-config.sh
@@ -61,18 +64,24 @@ salida()
 # Fin control de errores fatales	
 
 		if [ -d "$HOME_GANESHA/$asignatura/" ]; then
-			if [ $(getent group "$asignatura") ]; then
-				  /usr/sbin/adduser $usuario $asignatura 2>/dev/null 1>/dev/null || error=509; 
+
+			if [ ! $(getent shadow "$usuario") ]; then
+				/usr/sbin/smbldap-useradd -a -c "Usuari SID" -C "" "$usuario"  || error=542;
+			fi
+
+			if [ $(getent group "$asignatura") ] && [ "$error" -lt "500" ]; then
+				/usr/sbin/adduser $usuario $asignatura 2>/dev/null 1>/dev/null || error=509;
 			else error=507;
 			fi
 
-	                if [ -d "$HOME_GANESHA/$asignatura/$grupo_asignatura" ] && [ "$error" -lt "500" ]; then
-                       	 if [ $(getent group "$grupo_asignatura") ]; then
-                                 /usr/sbin/adduser $usuario $grupo_asignatura 2>/dev/null 1>/dev/null || error=510;
-                         else error=508;
-                         fi
-                	else error=506;
-	                fi
+			if [ -d "$HOME_GANESHA/$asignatura/$grupo_asignatura" ] && [ "$error" -lt "500" ]; then
+				if [ $(getent group "$grupo_asignatura") ]; then
+					/usr/sbin/adduser $usuario $grupo_asignatura 2>/dev/null 1>/dev/null || error=510;
+				else error=508;
+				fi
+			else error=506;
+			fi
+
                 else 
 			error=505;
 		fi 
