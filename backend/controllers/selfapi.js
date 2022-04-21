@@ -957,8 +957,9 @@ exports.addAssignatura = (req, res) => {
  *
  */
 exports.deleteAssignatura = (req, res) => {
-  console.log(req.body);
+
   console.log("\ndelete Assignatura.");
+  console.log(req.body);
 
   var logEntry = {
     niu: req.body.username,
@@ -969,73 +970,120 @@ exports.deleteAssignatura = (req, res) => {
   };
   const assignatura = req.body.assignatura;
 
-  const { stdout, stderr, code } = shell.exec('sudo /usr/local/sbin/ganesha-del-assignatura ' + assignatura.codi + " " +
-    "TRUE", {silent: true});
+  console.log("Esborrant alumnes de assignatura " + assignatura.id);
 
-  if (stdout) {
-    console.log("Stdout", stdout);
+  dbconfig.connection.query( //Esborrar alumnes dels grups BBDD
+  "DELETE FROM `alumnes` WHERE grup_id IN ( SELECT id FROM grups WHERE assignatura_id="+assignatura.id+");",
+  (errordeletealu, result) =>{
 
-    const stdjson = JSON.parse(stdout);
+    if (errordeletealu === null){
+      console.log("Esborrant grups de assignatura " + assignatura.id);
+  
+      dbconfig.connection.query( //Esborrar grups BBDD
+      "DELETE FROM `grups` WHERE assignatura_id="+assignatura.id+";",
+      (errordeletegrups, result) =>{
+    
+        if (errordeletegrups === null){
 
-    switch (stdjson.codi) {
-      case 200:
-          dbconfig.connection.query( //Esborrar assignatura BBDD
-            "DELETE FROM `assignatures` WHERE id="+assignatura.id+";",
-            (errorinsert, result) =>{
-
-              if (!errorinsert){
-                res.status(200).json({message: stdjson.message, assignaturaId: result.insertId});
-                logEntry.resultat = 'success';
-                logEntry.resposta = 'Assignatura ' + assignatura.codi + ' esborrada correctament.';
-                console.log("Assignatura " + assignatura.codi + " esborrada correctament.");
-                insertaLog(logEntry);
+          console.log("Esborrant professors de assignatura " + assignatura.id);
+  
+          dbconfig.connection.query( //Esborrar professors BBDD
+          "DELETE FROM `professors` WHERE assignatura_id="+assignatura.id+";",
+          (errordeleteprofe, result) =>{
+            if (errordeleteprofe === null){
+              
+              const { stdout, stderr, code } = shell.exec('sudo /usr/local/sbin/ganesha-del-assignatura ' + assignatura.codi + " " +
+                "TRUE", {silent: true});
+            
+              if (stdout) {
+                console.log("Stdout", stdout);
+            
+                const stdjson = JSON.parse(stdout);
+            
+                switch (stdjson.codi) {
+                  case 200:
+                      dbconfig.connection.query( //Esborrar assignatura BBDD
+                        "DELETE FROM `assignatures` WHERE id="+assignatura.id+";",
+                        (errordeleteAssig, result) =>{
+            
+                          if (!errordeleteAssig){
+                            logEntry.resultat = 'success';
+                            logEntry.resposta = 'Assignatura ' + assignatura.codi + ' esborrada correctament.';
+                            console.log("Assignatura " + assignatura.codi + " esborrada correctament.");
+                            insertaLog(logEntry);
+                            res.status(200).json({message: stdjson.message, assignaturaId: result.insertId});
+                          } else {
+                            logEntry.resultat = 'error';
+                            logEntry.resposta = "No ha estat possible esborrar l'assignatura " + assignatura.codi + " en la BBDD.";
+                            console.log("ERROR: No s'ha pogut esborrar l'assignatura " + assignatura.codi + " en la BBDD.");
+                            insertaLog(logEntry);
+                            res.status(520).json({message: "No s'ha pogut esborrar l'assignatura en la BBDD"});
+                          }
+                        });
+                    break;
+                  case 505:
+                      dbconfig.connection.query( //Esborrar assignatura BBDD
+                        "DELETE FROM `assignatures` WHERE id="+assignatura.id+";",
+                        (errordeleteAssig, result) =>{
+            
+                          if (!errordeleteAssig){
+            
+                            logEntry.resultat = 'success';
+                            logEntry.resposta = 'Assignatura ' + assignatura.codi + ' esborrada correctament '+
+                                                'tot i que la carpeta no existia!';
+                            console.log("Assignatura " + assignatura.codi + " esborrada correctament.");
+                            insertaLog(logEntry);
+                            res.status(200).json({message: logEntry.resposta, assignaturaId: result.insertId});
+                          } else {
+                            logEntry.resultat = 'error';
+                            logEntry.resposta = "No ha estat possible esborrar l'assignatura " + assignatura.codi + " en la BBDD.";
+                            console.log("ERROR: No s'ha pogut esborrar l'assignatura " + assignatura.codi + " en la BBDD.");
+                            insertaLog(logEntry);
+                            res.status(520).json({message: "No s'ha pogut esborrar l'assignatura en la BBDD"});
+                          }
+                        });
+                    break;
+                  default:
+                      res.status(stdjson.codi).json({message: stdjson.message});
+                      logEntry.resultat = 'error';
+                      logEntry.resposta = stdjson.message;
+                      console.log("ERROR: " + stdjson.message);
+                      insertaLog(logEntry);
+                      break;
+                }
+            
               } else {
-                res.status(520).json({message: "No s'ha pogut esborrar l'assignatura en la BBDD"});
+                console.log("Error en la resposta de l'script ganesha-del-assignatura!");
+                res.status(520).json({message: "Error en la resposta de l'script ganesha-del-assignatura!"});
                 logEntry.resultat = 'error';
-                logEntry.resposta = "No ha estat possible esborrar l'assignatura " + assignatura.codi + " en la BBDD.";
-                console.log("ERROR: No s'ha pogut esborrar l'assignatura " + assignatura.codi + " en la BBDD.");
+                logEntry.resposta = "Error en la resposta de l'script ganesha-del-assignatura!";
                 insertaLog(logEntry);
               }
-            });
-        break;
-      case 505:
-          dbconfig.connection.query( //Esborrar assignatura BBDD
-            "DELETE FROM `assignatures` WHERE id="+assignatura.id+";",
-            (errorinsert, result) =>{
-
-              if (!errorinsert){
-
-                logEntry.resultat = 'success';
-                logEntry.resposta = 'Assignatura ' + assignatura.codi + ' esborrada correctament '+
-                                    'tot i que la carpeta no existia!';
-                console.log("Assignatura " + assignatura.codi + " esborrada correctament.");
-                insertaLog(logEntry);
-                res.status(200).json({message: logEntry.resposta, assignaturaId: result.insertId});
-              } else {
-                res.status(520).json({message: "No s'ha pogut esborrar l'assignatura en la BBDD"});
-                logEntry.resultat = 'error';
-                logEntry.resposta = "No ha estat possible esborrar l'assignatura " + assignatura.codi + " en la BBDD.";
-                console.log("ERROR: No s'ha pogut esborrar l'assignatura " + assignatura.codi + " en la BBDD.");
-                insertaLog(logEntry);
-              }
-            });
-        break;
-      default:
-          res.status(stdjson.codi).json({message: stdjson.message});
+            } else {
+              console.log("Error al esborrar professors de l'assignatura!");
+              res.status(520).json({message: "Error al esborrar professors de l'assignatura!"});
+              logEntry.resultat = 'error';
+              logEntry.resposta = "Error al esborrar professors de l'assignatura " + assignatura.id + "!";
+              insertaLog(logEntry);
+            }
+          });
+        } else {
+          console.log("Error al esborrar grups de l'assignatura!");
+          res.status(520).json({message: "Error al esborrar grups de l'assignatura!"});
           logEntry.resultat = 'error';
-          logEntry.resposta = stdjson.message;
-          console.log("ERROR: " + stdjson.message);
+          logEntry.resposta = "Error al esborrar grups de l'assignatura " + assignatura.id + "!";
           insertaLog(logEntry);
-          break;
+        }
+      });
+    } else {
+      console.log("Error al esborrar alumnes de l'assignatura!");
+      res.status(520).json({message: "Error al esborrar grups de l'assignatura!"});
+      logEntry.resultat = 'error';
+      logEntry.resposta = "Error al esborrar alumnes de l'assignatura " + assignatura.id + "!";
+      insertaLog(logEntry);
     }
+  });
 
-  } else {
-    console.log("Error en la resposta de l'script ganesha-del-assignatura!");
-    res.status(520).json({message: "Error en la resposta de l'script ganesha-del-assignatura!"});
-    logEntry.resultat = 'error';
-    logEntry.resposta = "Error en la resposta de l'script ganesha-del-assignatura!";
-    insertaLog(logEntry);
-  }
 }
 
 
