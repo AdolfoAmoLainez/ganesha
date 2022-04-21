@@ -22,7 +22,7 @@
           #selectAllStatus
           (click)="onSelectAll(selectAllStatus.checked);"
         />
-        <label class="custom-control-label" for="selectAll">Selecciona tots</label>
+        <label class="custom-control-label ms-2" for="selectAll">Selecciona tots</label>
       </div>
   </li>
   <li class="list-group-item" *ngFor="let profe of professors; index as i">
@@ -54,7 +54,7 @@
     <button class="btn btn-primary" (click)="onAfegirClick(afegirProfeModal)">
       Afegir Professor
     </button>
-    <button class="btn btn-primary ml-2" (click)="onDeleteProfessors()" [disabled]="selectedProfessors.length === 0">
+    <button class="btn btn-primary ms-2" (click)="onDeleteProfessors()" [disabled]="selectedProfessors.length === 0">
       Esborrar Selecció
     </button>
   </li>
