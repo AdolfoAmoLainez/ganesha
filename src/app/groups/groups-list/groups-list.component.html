@@ -15,7 +15,7 @@
             style="cursor: pointer;"
             (click)="onBackClick()"></fa-icon>
           </div>
-          <div class="col-sm ml-2">
+          <div class="col-sm ms-2">
             <h4>
               Grups de {{assignatura.nom}}
             </h4>
@@ -37,7 +37,7 @@
                 #selectAllStatus
                 (click)="onSelectAll(selectAllStatus.checked);"
               />
-              <label class="custom-control-label" for="selectAll">Selecciona tots</label>
+              <label class="custom-control-label ms-2" for="selectAll">Selecciona tots</label>
             </div>
       </div>
       <div
@@ -75,7 +75,7 @@
             <fa-icon *ngIf="group.alumnes === 0"
                      [icon]="faTimes"
                      style="cursor: pointer;"
-                     class="text-danger ml-2"
+                     class="text-danger ms-2"
                      (click)="onDeleteIconClick(group)"></fa-icon>
          </div>
         </div>
@@ -88,7 +88,7 @@
         >
           Afegir Grups
         </button>
-        <button class="btn btn-primary mt-2 ml-2" (click)="onDeleteGroups()" [disabled]="selectedGroups.length === 0">
+        <button class="btn btn-primary mt-2 ms-2" (click)="onDeleteGroups()" [disabled]="selectedGroups.length === 0">
           Esborrar Selecció
         </button>
       </div>

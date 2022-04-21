@@ -16,12 +16,12 @@
           <fa-icon *ngIf="!canEditName"
           [icon]="faLock"
           style="cursor: pointer;"
-          class="text-danger ml-2"
+          class="text-danger ms-2"
           (click)="lockName()"></fa-icon>
           <fa-icon *ngIf="canEditName"
           [icon]="faLockOpen"
           style="cursor: pointer;"
-          class="text-danger ml-2"
+          class="text-danger ms-2"
           (click)="lockName()"></fa-icon>
         </label>
         <input type="text" [readonly]="!canEditName?true:null" class="form-control" name="nom" id="nom" #nom formControlName="nom"/>
