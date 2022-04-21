@@ -1520,7 +1520,24 @@ exports.getUserData = (username, callback) => {
        callback(200,perfils);
 
       } else {
-        callback(401);
+        dbconfig.connection.query(
+          "SELECT id, 'alumne' as perfil FROM `alumnes` where niu='"+username+"' ORDER BY `alumnes`.`id` ASC;",
+          (errorSelAlu, perfilalu) => {
+            if (!errorSelAlu){
+
+              if (perfilalu.length === 1) {
+                callback(200,perfilalu);
+         
+               } else {
+                 console.log(errorSelAlu);
+                 callback(401);
+               }
+            }else {
+              console.log(errorSelAlu);
+              callback(500);
+            }
+          }
+        );
       }
 
     } else {
@@ -1587,12 +1604,33 @@ charactersLength));
 
   var pw = makePw(9);
 
-  const { stdout, stderr, code } = shell.exec('echo -e "'+pw+'" | sudo smbldap-passwd -s -p ' + req.body.username, {silent: true});
+  var retObj = {
+    status:"",
+    message: ""
+  }
+
+  const { stdout, stderr, code } = shell.exec('echo "'+pw+'" | sudo smbldap-passwd -s -p ' + req.body.username, {silent: true});
 
   if (code == 0) {
     message = "Usuari activat correctament. Revisa el teu correu";
+    const { stdout, stderr, codemail } = shell.exec('sudo smbldap-usershow '+req.body.username+' | grep mail | cut -d" " -f2 ' , {silent: true});
+    const mail = stdout;
+    if (mail.includes("@") && mail.includes("uab.cat")){   
+        //send mail
+        const missatge = "<HTML><BODY>Aquesta &eacute;s la teva contrasenya <br><p style='font-weight: bold; font-size: 24px;'>" + pw + "</p><br>Nom&eacute;s et servir&agrave; durant el dia d'avui.</BODY></HTML>"
+        const capcaleres = '-a "From: sid.comunicacio@uab.cat" \
+        -a "MIME-Version: 1.0" \
+        -a "Content-Type: text/html" ';
+        const { stdout, stderr, codesend } = shell.exec('echo "'+missatge+'" | mail -s "Contrasenya Temporal" ' + capcaleres + mail , {silent: true});
+        retObj = {status: 'success', message: 'Missatge enviat. Revisa la teva bústia de correu!'};
+    } else {
+      retObj = {status: 'failed', message: "Ha hagut algun problema obtenint l'adreça de correu!"};
+    }
+
   } else {
-    message = "Ha hagut algun error al activar l'usuari";
+    retObj = {status: 'failed', message: "Ha hagut algun error activant l'usuari"};
   }
-  res.status(200).json({status: 'success', message});
+
+  console.log(retObj);
+  res.status(200).send(retObj);
  }
