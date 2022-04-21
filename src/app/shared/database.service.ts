@@ -570,7 +570,7 @@ export class DataBaseService {
       username
     };
 
-    return this.http.post<{status: string, message: string}>(environment.selfApiUrl + 'set_passwd', obj);
+    return this.http.post<{status: string, message: string}>(environment.selfApiUrl + 'setPasswd', obj);
   }
 
 }
