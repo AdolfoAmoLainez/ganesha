@@ -51,7 +51,7 @@ function insertaLog (logEntry) {
  * @param {*} callback: Funció per tornar true/false
  */
 function checkUsernameExists(username, callback) {
-  const { stdout, stderr, code } = shell.exec('ldapsearch -x -b "o=sids" -D "cn=proxycc,ou=cc,ou=users,o=sids" -w proxy135 -H ldaps://carbol.uab.es -L "(uid='+username+')"', {silent: true});
+  const { stdout, stderr, code } = shell.exec('ldapsearch -x -b "o=sids" -D "cn=proxycc,ou=cc,ou=users,o=sids" -w proxy135 -H ldaps://montblanc.uab.es -L "(uid='+username+')"', {silent: true});
 
       if (stdout) {
         if (stdout.includes('numEntries:')) {
@@ -95,7 +95,7 @@ exports.getAlumnesNames = (req, res) => {
   arrayAlu = [];
 
   req.body.alumnes.forEach(alumne => {
-    const { stdout, stderr, code } = shell.exec('ldapsearch -x -b "o=sids" -D "cn=proxycc,ou=cc,ou=users,o=sids" -w proxy135 -H ldaps://carbol.uab.es -L "(uid='+alumne.niu+')" sn cn | grep "dn:\\|sn:\\|cn:"', {silent: true});
+    const { stdout, stderr, code } = shell.exec('ldapsearch -x -b "o=sids" -D "cn=proxycc,ou=cc,ou=users,o=sids" -w proxy135 -H ldaps://montblanc.uab.es -L "(uid='+alumne.niu+')" sn cn | grep "dn:\\|sn:\\|cn:"', {silent: true});
 
       if (stdout) {
         lines = stdout.split('\n');
@@ -340,8 +340,8 @@ exports.deleteGrups = (req, res) => {
 /*      const nom = req.body.assigCodi + '-g' + element.ordre;
      nomGrups.push(nom);
      arrayGrups[nom]=element; */
-     nomGrups.push(element.nom);
-     arrayGrups[element.nom]=element;
+    nomGrups.push(element.nom);
+    arrayGrups[element.nom]=element;
 
   });
 
@@ -466,79 +466,64 @@ exports.addAlumneGrup = (req, res) => {
   for( var i = 0; i < arrayAlumnes.length; i++) {
     const niu = arrayAlumnes[i];
 
-  checkUsernameExists(niu.trim(), (resposta) => {
-    if (resposta === true) { //Niu existeix
+    const { stdout, stderr, code } = shell.exec('sudo /usr/local/sbin/ganesha-add-alumne-grup ' + niu.trim() + ' ' +
+    req.body.assigCodi + ' ' + req.body.grupName, {silent: true});
 
-      const { stdout, stderr, code } = shell.exec('sudo /usr/local/sbin/ganesha-add-alumne-grup ' + niu.trim() + ' ' +
-      req.body.assigCodi + ' ' + req.body.grupName, {silent: true});
+    if (stdout) {
+      console.log("Stdout", stdout);
+      var resultjson = '';
 
-      if (stdout) {
-        console.log("Stdout", stdout);
-        var resultjson = '';
-
-        try {
-          resultjson = JSON.parse(stdout);
-        } catch ( err) {
-          console.log("Error en la resposta de l'script ganesha-add-usuari-grup!");
-          res.status(520).json({message: "Error en la resposta de l'script ganesha-add-usuari-grup!"});
-          logEntry.resultat = 'error';
-          logEntry.resposta = "Error en la resposta de l'script ganesha-add-usuari-grup!";
-          insertaLog(logEntry);
-          return;
-        }
-
-
-        switch (resultjson.codi){
-          case 200:
-              dbconfig.connection.query( //Afegir profe assignatura
-                "INSERT INTO `alumnes` (`id`, `niu`, `nom`, `grup_id`) " +
-                "VALUES (NULL, '"+niu.trim()+"', '"+req.body.alumne.nom+"','"+req.body.alumne.grup_id+"');",
-                (errorinsert) =>{
-                  if (!errorinsert){
-                    // res.status(200).json({message: resultjson.message});
-                    logEntry.resultat = 'success';
-                    logEntry.resposta = resultjson.message;
-                    insertaLog(logEntry);
-                  } else {
-                    // res.status(520).json({message: "No s'ha pogut insertar l'alumne a la BBDD"});
-                    logEntry.resultat = 'error';
-                    logEntry.resposta = "No ha estat possible insertar l'alumne a la BBDD";
-                    insertaLog(logEntry);
-                    responseError = 520;
-                    responseMsj = "No s'ha pogut insertar l'alumne a la BBDD";
-                    return;
-                  }
-                });
-            break;
-          default:
-                //res.status(resultjson.codi).json({message: resultjson.message});
-                logEntry.resultat = 'error';
-                logEntry.resposta = resultjson.message;
-                console.log("ERROR: " + resultjson.message);
-                insertaLog(logEntry);
-                responseError = resultjson.codi;
-                responseMsj = resultjson.message;
-                return;
-              break;
-        }
-        if (responseError !== 0) return;
+      try {
+        resultjson = JSON.parse(stdout);
+      } catch ( err) {
+        console.log("Error en la resposta de l'script ganesha-add-usuari-grup!");
+        res.status(520).json({message: "Error en la resposta de l'script ganesha-add-usuari-grup!"});
+        logEntry.resultat = 'error';
+        logEntry.resposta = "Error en la resposta de l'script ganesha-add-usuari-grup!";
+        insertaLog(logEntry);
+        break;
       }
-    } else { // Niu no existeix
-      //res.status(520).json({message: "NIU Alumne no vàlid!"});
-      logEntry.resultat = 'error';
-      logEntry.resposta = "NIU Alumne no vàlid!";
-      insertaLog(logEntry);
-      responseError = 520;
-      responseMsj = "NIU Alumne no vàlid!";
-      return;
+
+
+      switch (resultjson.codi){
+        case 200:
+            dbconfig.connection.query( //Afegir profe assignatura
+              "INSERT INTO `alumnes` (`id`, `niu`, `nom`, `grup_id`) " +
+              "VALUES (NULL, '"+niu.trim()+"', '"+req.body.alumne.nom+"','"+req.body.alumne.grup_id+"');",
+              (errorinsert) =>{
+                if (!errorinsert){
+                  // res.status(200).json({message: resultjson.message});
+                  logEntry.resultat = 'success';
+                  logEntry.resposta = resultjson.message;
+                  insertaLog(logEntry);
+                } else {
+                  // res.status(520).json({message: "No s'ha pogut insertar l'alumne a la BBDD"});
+                  logEntry.resultat = 'error';
+                  logEntry.resposta = "No ha estat possible insertar l'alumne a la BBDD";
+                  insertaLog(logEntry);
+                  responseError = 520;
+                  responseMsj = "No s'ha pogut insertar l'alumne a la BBDD";
+                  return;
+                }
+              });
+          break;
+        default:
+            //res.status(resultjson.codi).json({message: resultjson.message});
+            logEntry.resultat = 'error';
+            logEntry.resposta = resultjson.message;
+            console.log("ERROR: " + resultjson.message);
+            insertaLog(logEntry);
+            responseError = resultjson.codi;
+            responseMsj = resultjson.message;
+          break;
+      }
     }
-  });
 
-  if (responseError !== 200) {break;}
-}
+    if (responseError !== 200) {break;}
+  }
 
 
-res.status(200).json({message: responseMsj});
+  res.status(200).json({message: responseMsj});
 
 
 }
@@ -831,63 +816,56 @@ exports.addProfeAssignatura = (req, res) => {
     resultat: ''
   };
 
-  checkUsernameExists(req.body.professor.niu, (resposta) => {
-    if (resposta === true) { //Niu existeix
-      const { stdout, stderr, code } = shell.exec('sudo /usr/local/sbin/ganesha-add-profe-assignatura ' + req.body.professor.niu + " " +
-      req.body.assignaturaCodi, {silent: true});
 
-      if (stdout) {
-        console.log("Stdout", stdout);
-        var resultjson = '';
+  const { stdout, stderr, code } = shell.exec('sudo /usr/local/sbin/ganesha-add-profe-assignatura ' + req.body.professor.niu + " " +
+  req.body.assignaturaCodi, {silent: true});
 
-        try {
-          resultjson = JSON.parse(stdout);
-        } catch ( err) {
-          console.log("Error en la resposta de l'script ganesha-add-profe-assignatura!");
-          res.status(520).json({problemes: -1, grups:[{message: "Error en la resposta de l'script ganesha-add-profe-assignatura!"}] });
-          logEntry.resultat = 'error';
-          logEntry.resposta = "Error en la resposta de l'script ganesha-add-profe-assignatura!";
-          insertaLog(logEntry);
-          return;
-        }
+  if (stdout) {
+    console.log("Stdout", stdout);
+    var resultjson = '';
 
-
-        switch (resultjson.codi){
-          case 200:
-              dbconfig.connection.query( //Afegir profe assignatura
-                "INSERT INTO `professors` (`id`, `niu`, `nom`, `assignatura_id`) " +
-                "VALUES (NULL, '"+req.body.professor.niu+"', '"+req.body.professor.nom+"','"+req.body.professor.assignatura_id+"');",
-                (errorinsert) =>{
-                  if (!errorinsert){
-                    res.status(200).json({message: resultjson.message});
-                    logEntry.resultat = 'success';
-                    logEntry.resposta = resultjson.message;
-                    insertaLog(logEntry);
-                  } else {
-                    res.status(520).json({message: "No s'ha pogut insertar el professor a la BBDD"});
-                    logEntry.resultat = 'error';
-                    logEntry.resposta = "No ha estat possible insertar el professor a la BBDD";
-                    insertaLog(logEntry);
-                  }
-                });
-            break;
-            default:
-              res.status(stdjson.codi).json({message: stdjson.message});
-              logEntry.resultat = 'error';
-              logEntry.resposta = stdjson.message;
-              console.log("ERROR: " + stdjson.message);
-              insertaLog(logEntry);
-            break;
-        }
-
-      }
-    } else { // No existeix NIU
-      res.status(520).json({message: "NIU del professor no vàlid!"});
+    try {
+      resultjson = JSON.parse(stdout);
+    } catch ( err) {
+      console.log("Error en la resposta de l'script ganesha-add-profe-assignatura!");
+      res.status(520).json({problemes: -1, grups:[{message: "Error en la resposta de l'script ganesha-add-profe-assignatura!"}] });
       logEntry.resultat = 'error';
-      logEntry.resposta = "NIU del professor no vàlid!";
+      logEntry.resposta = "Error en la resposta de l'script ganesha-add-profe-assignatura!";
       insertaLog(logEntry);
+      return;
     }
-  });
+
+
+    switch (resultjson.codi){
+      case 200:
+          dbconfig.connection.query( //Afegir profe assignatura
+            "INSERT INTO `professors` (`id`, `niu`, `nom`, `assignatura_id`) " +
+            "VALUES (NULL, '"+req.body.professor.niu+"', '"+req.body.professor.nom+"','"+req.body.professor.assignatura_id+"');",
+            (errorinsert) =>{
+              if (!errorinsert){
+                res.status(200).json({message: resultjson.message});
+                logEntry.resultat = 'success';
+                logEntry.resposta = resultjson.message;
+                insertaLog(logEntry);
+              } else {
+                res.status(520).json({message: "No s'ha pogut insertar el professor a la BBDD"});
+                logEntry.resultat = 'error';
+                logEntry.resposta = "No ha estat possible insertar el professor a la BBDD";
+                insertaLog(logEntry);
+              }
+            });
+        break;
+      default:
+          res.status(stdjson.codi).json({message: stdjson.message});
+          logEntry.resultat = 'error';
+          logEntry.resposta = stdjson.message;
+          console.log("ERROR: " + stdjson.message);
+          insertaLog(logEntry);
+        break;
+    }
+
+  }
+
 
 
 }
@@ -934,8 +912,7 @@ exports.addAssignatura = (req, res) => {
         if (stdjson.codi == 200) {
           dbconfig.connection.query( //Afegir assignatura
             "INSERT INTO `assignatures` (`id`, `codi`, `nom`, `unitat_id`, `tamany`, `unitatstamany`, `validapgina`) " +
-            "VALUES (NULL, '"+assignatura.codi+"', '"+assignatura.nom+"','"+assignatura.unitat_id+
-             "', '"+assignatura.tamany+"', '"+assignatura.unitatstamany+"', '"+assignatura.validapgina+"');",
+            "VALUES (NULL, '"+assignatura.codi+"', '"+assignatura.nom+"', 0, '"+assignatura.tamany+"', '', '"+assignatura.validapgina+"');",
             (errorinsert, result) =>{
 
               if (!errorinsert){
@@ -949,6 +926,7 @@ exports.addAssignatura = (req, res) => {
                 logEntry.resultat = 'error';
                 logEntry.resposta = "No ha estat possible insertar l'assignatura " + assignatura.codi + " en la BBDD.";
                 console.log("ERROR: No s'ha pogut insertar l'assignatura " + assignatura.codi + " en la BBDD.");
+                console.log(errorinsert);
                 insertaLog(logEntry);
               }
             });
@@ -979,8 +957,9 @@ exports.addAssignatura = (req, res) => {
  *
  */
 exports.deleteAssignatura = (req, res) => {
-  console.log(req.body);
+
   console.log("\ndelete Assignatura.");
+  console.log(req.body);
 
   var logEntry = {
     niu: req.body.username,
@@ -991,73 +970,120 @@ exports.deleteAssignatura = (req, res) => {
   };
   const assignatura = req.body.assignatura;
 
-  const { stdout, stderr, code } = shell.exec('sudo /usr/local/sbin/ganesha-del-assignatura ' + assignatura.codi + " " +
-    "TRUE", {silent: true});
+  console.log("Esborrant alumnes de assignatura " + assignatura.id);
 
-  if (stdout) {
-    console.log("Stdout", stdout);
+  dbconfig.connection.query( //Esborrar alumnes dels grups BBDD
+  "DELETE FROM `alumnes` WHERE grup_id IN ( SELECT id FROM grups WHERE assignatura_id="+assignatura.id+");",
+  (errordeletealu, result) =>{
 
-    const stdjson = JSON.parse(stdout);
+    if (errordeletealu === null){
+      console.log("Esborrant grups de assignatura " + assignatura.id);
+  
+      dbconfig.connection.query( //Esborrar grups BBDD
+      "DELETE FROM `grups` WHERE assignatura_id="+assignatura.id+";",
+      (errordeletegrups, result) =>{
+    
+        if (errordeletegrups === null){
 
-    switch (stdjson.codi) {
-      case 200:
-          dbconfig.connection.query( //Esborrar assignatura BBDD
-            "DELETE FROM `assignatures` WHERE id="+assignatura.id+";",
-            (errorinsert, result) =>{
-
-              if (!errorinsert){
-                res.status(200).json({message: stdjson.message, assignaturaId: result.insertId});
-                logEntry.resultat = 'success';
-                logEntry.resposta = 'Assignatura ' + assignatura.codi + ' esborrada correctament.';
-                console.log("Assignatura " + assignatura.codi + " esborrada correctament.");
-                insertaLog(logEntry);
+          console.log("Esborrant professors de assignatura " + assignatura.id);
+  
+          dbconfig.connection.query( //Esborrar professors BBDD
+          "DELETE FROM `professors` WHERE assignatura_id="+assignatura.id+";",
+          (errordeleteprofe, result) =>{
+            if (errordeleteprofe === null){
+              
+              const { stdout, stderr, code } = shell.exec('sudo /usr/local/sbin/ganesha-del-assignatura ' + assignatura.codi + " " +
+                "TRUE", {silent: true});
+            
+              if (stdout) {
+                console.log("Stdout", stdout);
+            
+                const stdjson = JSON.parse(stdout);
+            
+                switch (stdjson.codi) {
+                  case 200:
+                      dbconfig.connection.query( //Esborrar assignatura BBDD
+                        "DELETE FROM `assignatures` WHERE id="+assignatura.id+";",
+                        (errordeleteAssig, result) =>{
+            
+                          if (!errordeleteAssig){
+                            logEntry.resultat = 'success';
+                            logEntry.resposta = 'Assignatura ' + assignatura.codi + ' esborrada correctament.';
+                            console.log("Assignatura " + assignatura.codi + " esborrada correctament.");
+                            insertaLog(logEntry);
+                            res.status(200).json({message: stdjson.message, assignaturaId: result.insertId});
+                          } else {
+                            logEntry.resultat = 'error';
+                            logEntry.resposta = "No ha estat possible esborrar l'assignatura " + assignatura.codi + " en la BBDD.";
+                            console.log("ERROR: No s'ha pogut esborrar l'assignatura " + assignatura.codi + " en la BBDD.");
+                            insertaLog(logEntry);
+                            res.status(520).json({message: "No s'ha pogut esborrar l'assignatura en la BBDD"});
+                          }
+                        });
+                    break;
+                  case 505:
+                      dbconfig.connection.query( //Esborrar assignatura BBDD
+                        "DELETE FROM `assignatures` WHERE id="+assignatura.id+";",
+                        (errordeleteAssig, result) =>{
+            
+                          if (!errordeleteAssig){
+            
+                            logEntry.resultat = 'success';
+                            logEntry.resposta = 'Assignatura ' + assignatura.codi + ' esborrada correctament '+
+                                                'tot i que la carpeta no existia!';
+                            console.log("Assignatura " + assignatura.codi + " esborrada correctament.");
+                            insertaLog(logEntry);
+                            res.status(200).json({message: logEntry.resposta, assignaturaId: result.insertId});
+                          } else {
+                            logEntry.resultat = 'error';
+                            logEntry.resposta = "No ha estat possible esborrar l'assignatura " + assignatura.codi + " en la BBDD.";
+                            console.log("ERROR: No s'ha pogut esborrar l'assignatura " + assignatura.codi + " en la BBDD.");
+                            insertaLog(logEntry);
+                            res.status(520).json({message: "No s'ha pogut esborrar l'assignatura en la BBDD"});
+                          }
+                        });
+                    break;
+                  default:
+                      res.status(stdjson.codi).json({message: stdjson.message});
+                      logEntry.resultat = 'error';
+                      logEntry.resposta = stdjson.message;
+                      console.log("ERROR: " + stdjson.message);
+                      insertaLog(logEntry);
+                      break;
+                }
+            
               } else {
-                res.status(520).json({message: "No s'ha pogut esborrar l'assignatura en la BBDD"});
+                console.log("Error en la resposta de l'script ganesha-del-assignatura!");
+                res.status(520).json({message: "Error en la resposta de l'script ganesha-del-assignatura!"});
                 logEntry.resultat = 'error';
-                logEntry.resposta = "No ha estat possible esborrar l'assignatura " + assignatura.codi + " en la BBDD.";
-                console.log("ERROR: No s'ha pogut esborrar l'assignatura " + assignatura.codi + " en la BBDD.");
+                logEntry.resposta = "Error en la resposta de l'script ganesha-del-assignatura!";
                 insertaLog(logEntry);
               }
-            });
-        break;
-      case 505:
-          dbconfig.connection.query( //Esborrar assignatura BBDD
-            "DELETE FROM `assignatures` WHERE id="+assignatura.id+";",
-            (errorinsert, result) =>{
-
-              if (!errorinsert){
-
-                logEntry.resultat = 'success';
-                logEntry.resposta = 'Assignatura ' + assignatura.codi + ' esborrada correctament '+
-                                    'tot i que la carpeta no existia!';
-                console.log("Assignatura " + assignatura.codi + " esborrada correctament.");
-                insertaLog(logEntry);
-                res.status(200).json({message: logEntry.resposta, assignaturaId: result.insertId});
-              } else {
-                res.status(520).json({message: "No s'ha pogut esborrar l'assignatura en la BBDD"});
-                logEntry.resultat = 'error';
-                logEntry.resposta = "No ha estat possible esborrar l'assignatura " + assignatura.codi + " en la BBDD.";
-                console.log("ERROR: No s'ha pogut esborrar l'assignatura " + assignatura.codi + " en la BBDD.");
-                insertaLog(logEntry);
-              }
-            });
-        break;
-      default:
-          res.status(stdjson.codi).json({message: stdjson.message});
+            } else {
+              console.log("Error al esborrar professors de l'assignatura!");
+              res.status(520).json({message: "Error al esborrar professors de l'assignatura!"});
+              logEntry.resultat = 'error';
+              logEntry.resposta = "Error al esborrar professors de l'assignatura " + assignatura.id + "!";
+              insertaLog(logEntry);
+            }
+          });
+        } else {
+          console.log("Error al esborrar grups de l'assignatura!");
+          res.status(520).json({message: "Error al esborrar grups de l'assignatura!"});
           logEntry.resultat = 'error';
-          logEntry.resposta = stdjson.message;
-          console.log("ERROR: " + stdjson.message);
+          logEntry.resposta = "Error al esborrar grups de l'assignatura " + assignatura.id + "!";
           insertaLog(logEntry);
-          break;
+        }
+      });
+    } else {
+      console.log("Error al esborrar alumnes de l'assignatura!");
+      res.status(520).json({message: "Error al esborrar grups de l'assignatura!"});
+      logEntry.resultat = 'error';
+      logEntry.resposta = "Error al esborrar alumnes de l'assignatura " + assignatura.id + "!";
+      insertaLog(logEntry);
     }
+  });
 
-  } else {
-    console.log("Error en la resposta de l'script ganesha-del-assignatura!");
-    res.status(520).json({message: "Error en la resposta de l'script ganesha-del-assignatura!"});
-    logEntry.resultat = 'error';
-    logEntry.resposta = "Error en la resposta de l'script ganesha-del-assignatura!";
-    insertaLog(logEntry);
-  }
 }
 
 
