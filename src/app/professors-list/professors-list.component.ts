@@ -80,7 +80,7 @@ export class ProfessorsListComponent implements OnInit, OnDestroy {
           data.forEach(element => {
             this.professors[this.professors.findIndex(alumne => {
               return element.dn.includes(alumne.niu);
-            })].nom = element.cn[0] + ' ' + element.sn[0];
+            })].nom = element.cn[0];
           });
         }
       }
