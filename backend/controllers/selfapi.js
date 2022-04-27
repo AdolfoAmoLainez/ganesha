@@ -51,7 +51,7 @@ function insertaLog (logEntry) {
  * @param {*} callback: Funció per tornar true/false
  */
 function checkUsernameExists(username, callback) {
-  const { stdout, stderr, code } = shell.exec('ldapsearch -x -b "o=sids" -D "cn=proxycc,ou=cc,ou=users,o=sids" -w proxy135 -H ldaps://montblanc.uab.es -L "(uid='+username+')"', {silent: true});
+  const { stdout, stderr, code } = shell.exec('ldapsearch -x -b "ou=apps,o=sids" -D "cn=proxycc,ou=cc,ou=users,o=sids" -w proxy135 -H ldaps://montblanc.uab.es -L "(uid='+username+')"', {silent: true});
 
       if (stdout) {
         if (stdout.includes('numEntries:')) {
@@ -95,7 +95,7 @@ exports.getAlumnesNames = (req, res) => {
   arrayAlu = [];
 
   req.body.alumnes.forEach(alumne => {
-    const { stdout, stderr, code } = shell.exec('ldapsearch -x -b "o=sids" -D "cn=proxycc,ou=cc,ou=users,o=sids" -w proxy135 -H ldaps://montblanc.uab.es -L "(uid='+alumne.niu+')" sn cn | grep "dn:\\|sn:\\|cn:"', {silent: true});
+    const { stdout, stderr, code } = shell.exec('ldapsearch -x -b "ou=apps,o=sids" -D "cn=proxycc,ou=cc,ou=users,o=sids" -w proxy135 -H ldaps://montblanc.uab.es -L "(uid='+alumne.niu+')" sn cn | grep "dn:\\|sn:\\|cn:"', {silent: true});
 
       if (stdout) {
         lines = stdout.split('\n');
