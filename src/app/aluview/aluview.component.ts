@@ -12,8 +12,7 @@ export class AluviewComponent implements OnInit {
   veureBtn = true;
   error = false;
   missatge = 'Fent click a "Activa", s\'activarà el teu niu per poder accedir a les carpetes de Ganesha. ' +
-             'Es generarà una contrasenya que rebràs al teu correu electrònic de la uab mail@autonoma.uab.cat ' +
-             'i que serà vàlida durant aquest dia.';
+             'Es generarà una contrasenya que rebràs al teu correu electrònic de la UAB.';
   msgBtnActivar = "Activa";
   perfil = '';
   msgBtnSortir = 'Sortir';
