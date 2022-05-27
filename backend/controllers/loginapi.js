@@ -58,7 +58,7 @@ exports.login = (req, res) => {
         "\"" + req.session.cas.attributes.sn + "\" " +
         req.session.cas.attributes.mail, {silent: true});
 
-        res.redirect(302,'/login').json(JSON.parse(stdout));
+        res.redirect(302,'/login');
         break;
       case 401:
         res.status(401).json({username:usuari,message: "L'usuari no té permís per fer servir aquesta aplicació!"});
