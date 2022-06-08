@@ -1617,7 +1617,7 @@ charactersLength));
     const mail = stdout;
     if (mail.includes("@") && mail.includes("uab.cat")){   
         //send mail
-        const missatge = "<HTML><BODY>Aquesta &eacute;s la teva contrasenya <br><p style='font-weight: bold; font-size: 24px;'>" + pw + "</p><br>Nom&eacute;s et servir&agrave; durant el dia d'avui.</BODY></HTML>"
+        const missatge = "<HTML><BODY>Aquesta &eacute;s la teva contrasenya <br><p style='font-weight: bold; font-size: 24px;'>" + pw + "</p><br></BODY></HTML>"
         const capcaleres = '-a "From: sid.comunicacio@uab.cat" \
         -a "MIME-Version: 1.0" \
         -a "Content-Type: text/html" ';
