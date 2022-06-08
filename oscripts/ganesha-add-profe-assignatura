@@ -2,69 +2,82 @@
 #
 
 #  Nombre script: ganesha-add-profe-assignatura
-# 
-#  Parámetros de entrada: 
-#    $1="usuario" 
+#  Version: ganesha 02-03-2022
+#  Verificado: NO
+#
+#  Parámetros de entrada:
+#    $1="usuario"
 #    $2="asignatura"
 #
-#  Salida en STDOUT (no STDERR): 
+#  Salida en STDOUT (no STDERR):
 #    {
-#    "codi":<codi>, 
-#    "message":"<mensaje>", 
-#    "json": [ "usuario":"<usuario>", "asignatura":"<asignatura>" ] 
+#    "codi":<codi>,
+#    "message":"<mensaje>",
+#    "json": [ "usuario":"<usuario>", "asignatura":"<asignatura>" ]
 #    }
 #
 #  Operaciones:
-#	1.- Añadir "usuario" al grupo "asignatura" local
-#	2.- Mostrar codigo de salida correcta o incorrecta según caso.
+#       1.- Añadir "usuario" al grupo "asignatura" local
+#       2.- Mostrar codigo de salida correcta o incorrecta según caso.
 #
 #  Codigos de error:
-#	507 - El grupo local de la asignatura no existe 
+#       507 - El grupo local de la asignatura no existe
 #       513 - El profesor no puede añadirse al grupo local de asignatura, motivo desconocido
-#	516 - El profesor no puede añadirse al grupo local del grupo de la asignatura, motivo desconocido
-#	599 - Faltan parámetros
+#       516 - El profesor no puede añadirse al grupo local del grupo de la asignatura, motivo desconocido
+#       542 - L usuari no es pot crear al LDAP amb smbldap-useradd, motiu desconegut
+#       599 - Faltan parámetros
 
 source /usr/local/sbin/ganesha-config.sh
 usuario="$1"
 asignatura="$2"
 
 salida()
-{ 
-    echo "{" 
-    echo "\"codi\":$2,"
-    if [ "$2" -eq "200" ]; then 
-	    echo "\"message\":\"$1\","
-	else
-	    codigo_error="codigo_$2" 
-            echo "\"message\":\"${!codigo_error}\","
-    fi 
-    echo "\"json\": [ {\"usuario\":\"$usuario\"}, {\"asignatura\":\"$asignatura\"} ]" ; 
-    echo "}"
-} 
+{
+  echo "{"
+  echo "\"codi\":$2,"
+  if [ "$2" -eq "200" ]; then
+    echo "\"message\":\"$1\","
+  else
+    codigo_error="codigo_$2"
+    echo "\"message\":\"${!codigo_error}\","
+  fi
+  echo "\"json\": [ {\"usuario\":\"$usuario\"}, {\"asignatura\":\"$asignatura\"} ]" ;
+  echo "}"
+}
 
-	error=0
-	
-	if [[ $usuario && $asignatura ]]; then
-	    if [ $(getent group "$asignatura") ]; then
-		/usr/sbin/adduser $usuario $asignatura 2>/dev/null 1>/dev/null || error=513
+error="0"
 
-                if [ "$error" -lt "500" ] && [ -d "$HOME_GANESHA/$asignatura" ]; then
-                   cd $HOME_GANESHA"/$asignatura"
-			for directorio_grupo in  $(find ./ -maxdepth 1 -mindepth 1 -type d -printf '%f\n') ; do
-			  /usr/sbin/adduser $usuario $directorio_grupo 2>/dev/null 1>/dev/null || error=516; 
-			done
-                fi
+if [[ $usuario && $asignatura ]]; then
 
-	    else
-	        error=507
-	    fi
-  	else
-		error=599
-	fi
+# Control de errores fatales: Es para evitar acciones intermedias si las condiciones necesarias conocidas no son válidas de antemano
 
-        if [ "$error" -gt "500" ]; then
-             salida "ERROR" "$error" 
-          else
-	      salida "Añadido el profesor a la asignatura" "200" 
+        if [ ! -d "$HOME_GANESHA/$asignatura" ]; then  salida "ERROR" "505"; exit ; fi
+        if [ ! $(getent group "$asignatura") ]; then salida "ERROR" "507"; exit; fi
+
+# Fin control de errores fatales
+
+        if [ ! $(getent shadow "$usuario") ]; then
+                /usr/sbin/smbldap-useradd -a -c "Usuari SID" -C "" "$usuario"  || error=542;
         fi
 
+        if [ $(getent group "$asignatura") ] && [ "$error" -lt "500" ]; then
+                /usr/sbin/adduser $usuario $asignatura 2>/dev/null 1>/dev/null || error=513;
+
+                if [ -d "$HOME_GANESHA/$asignatura" ]  && [ "$error" -lt "500" ]; then
+                        cd $HOME_GANESHA"/$asignatura"
+                        for directorio_grupo in  $(find ./ -maxdepth 1 -mindepth 1 -type d -printf '%f\n') ; do
+                                /usr/sbin/adduser $usuario $directorio_grupo 2>/dev/null 1>/dev/null || error=516;
+                        done
+                fi
+        else
+                error=507;
+        fi
+else
+        error=599;
+fi
+
+if [ "$error" -gt "500" ]; then
+        salida "ERROR" "$error"
+else
+        salida "Añadido el profesor a la asignatura" "200"
+fi
