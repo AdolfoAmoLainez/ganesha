@@ -1516,7 +1516,7 @@ exports.getUserData = (username, callback) => {
     (errorSel, perfils) => {
     if (!errorSel){
       console.log(perfils);
-      if (perfils.length === 1) {
+      if (perfils.length >= 1) {
        callback(200,perfils);
 
       } else {
