@@ -1525,7 +1525,7 @@ exports.getUserData = (username, callback) => {
           (errorSelAlu, perfilalu) => {
             if (!errorSelAlu){
 
-              if (perfilalu.length === 1) {
+              if (perfilalu.length >= 1) {
                 callback(200,perfilalu);
          
                } else {
