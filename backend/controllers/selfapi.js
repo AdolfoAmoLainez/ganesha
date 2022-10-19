@@ -1615,7 +1615,7 @@ charactersLength));
     message = "Usuari activat correctament. Revisa el teu correu";
     const { stdout, stderr, codemail } = shell.exec('sudo smbldap-usershow '+req.body.username+' | grep mail | cut -d" " -f2 ' , {silent: true});
     const mail = stdout;
-    if (mail.includes("@") && mail.includes("uab.cat")){   
+    if (mail.includes("@") && (mail.includes("uab.cat") || mail.includes("autonoma.cat"))){   
         //send mail
         const missatge = "<HTML><BODY>Aquesta &eacute;s la teva contrasenya <br><p style='font-weight: bold; font-size: 24px;'>" + pw + "</p><br></BODY></HTML>"
         const capcaleres = '-a "From: sid.comunicacio@uab.cat" \
