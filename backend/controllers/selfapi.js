@@ -1615,13 +1615,28 @@ charactersLength));
     message = "Usuari activat correctament. Revisa el teu correu";
     const { stdout, stderr, codemail } = shell.exec('sudo smbldap-usershow '+req.body.username+' | grep mail | cut -d" " -f2 ' , {silent: true});
     const mail = stdout;
-    if (mail.includes("@") && (mail.includes("uab.cat") || mail.includes("autonoma.cat"))){   
+    if (mail.includes("@")){   
         //send mail
-        const missatge = "<HTML><BODY>Aquesta &eacute;s la teva contrasenya <br><p style='font-weight: bold; font-size: 24px;'>" + pw + "</p><br></BODY></HTML>"
+        var missatge = "";
+        if (mail.includes("uab.cat")){
+          missatge= "<HTML><BODY>" +
+          "Al final d'aquest missatge trobar&agrave;s la teva contrasenya per accedir a les carpetes de Ganesha.<br>" +
+          "<p><span style='font-weight: bold;'>En el cas del professorat</span>, a m&eacute;s dels ordinadors de les aules, l'acc&eacute;s es pot fer des d'ordinadors connectats per cable a la xarxa de la facultat (per exemple, el del vostre despatx). Tamb&eacute; des de casa, utilitzant l'aplicaci&oacute; de t&uacute;nel de la xarxa privada virtual (manual per configurar el t&uacute;nel <a href='https://si-respostes.uab.cat/inici/teletreball/xarxa-privada-virtual/servei-de-tunel'>aqu&iacute;</a> ). A m&eacute;s, podeu consultar el v&iacute;deo-tutorial d'&uacute;s de Ganesha <a href='https://uab-my.sharepoint.com/:v:/r/personal/1318095_uab_cat/Documents/Acces%20a%20Ganesha/Ganesha%20acces%20professorat.mp4?csf=1&web=1&e=2qcvfd'>aqu&iacute;</a>.</p>"+
+          "La teva contrasenya &eacute;s:"+
+          "<p style='font-weight: bold; font-size: 24px;'> " + pw + "</p><br></BODY></HTML>";
+        } 
+        if(mail.includes("autonoma.cat")){
+           missatge= "<HTML><BODY>" +
+          "Al final d'aquest missatge trobar&agrave;s la teva contrasenya per accedir a les carpetes de Ganesha.<br>" +
+          "<p><span style='font-weight: bold;'>En el cas de l'alumnat</span>, l'acc&eacute;s a les carpetes es pot fer des dels ordinadors de la facultat (aules informatitzades, sales d'edici&oacute; o estudis de continu&iuml;tat), utilitzant la icona d'acc&eacute;s a Ganesha que hi ha a l'escriptori. Tamb&eacute; teniu un v&iacute;deo-tutorial de l'&uacute;s de Ganesha <a href='https://uab-my.sharepoint.com/:v:/r/personal/1318095_uab_cat/Documents/Acces%20a%20Ganesha/Ganesha%20acces%20alumnes.mp4?csf=1&web=1&e=SOvpbO'>aqu&iacute;</a>.</p>"+
+          "La teva contrasenya &eacute;s:"+
+          "<p style='font-weight: bold; font-size: 24px;'> " + pw + "</p><br></BODY></HTML>";
+        }
+
         const capcaleres = '-a "From: sid.comunicacio@uab.cat" \
         -a "MIME-Version: 1.0" \
         -a "Content-Type: text/html" ';
-        const { stdout, stderr, codesend } = shell.exec('echo "'+missatge+'" | mail -s "Contrasenya Temporal" ' + capcaleres + mail , {silent: true});
+        const { stdout, stderr, codesend } = shell.exec('echo "'+missatge+'" | mail -s "Contrasenya de Ganesha" ' + capcaleres + mail , {silent: true});
         retObj = {status: 'success', message: 'Missatge enviat. Revisa la teva bústia de correu!'};
     } else {
       retObj = {status: 'failed', message: "Ha hagut algun problema obtenint l'adreça de correu!"};
