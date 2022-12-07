@@ -1609,7 +1609,7 @@ charactersLength));
     message: ""
   }
 
-  const { stdout, stderr, code } = shell.exec('echo "'+pw+'" | sudo smbldap-passwd -s -p ' + req.body.username, {silent: true});
+  const { stdout, stderr, code } = shell.exec('echo "'+pw+'" | sudo smbldap-passwd -p ' + req.body.username, {silent: true});
 
   if (code == 0) {
     message = "Usuari activat correctament. Revisa el teu correu";
