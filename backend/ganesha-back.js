@@ -34,7 +34,8 @@ app.use(cookieParser());
 app.use(session({
 	secret: 'FljhP)/&|a"N>0JDxzpDo0;Vx-u9vd3^#qDHCw6!(w73<hBmH;A+S`C^XJU8H',
         resave: false,
-        saveUninitialized: true
+        saveUninitialized: truee,
+        cookie: { secure: true }
 	}
 ));
 
